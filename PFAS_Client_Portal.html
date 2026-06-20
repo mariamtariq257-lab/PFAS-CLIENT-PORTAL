@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PFAS Client Portal</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #1F3A5F;
+    --navy-dark: #16294A;
+    --gold: #C9A864;
+    --gold-light: #E8D4A0;
+    --green: #276749;
+    --amber: #B7791F;
+    --red: #9B2C2C;
+    --slate: #475569;
+    --slate-light: #94A3B8;
+    --bg: #F4F6F9;
+    --card: #FFFFFF;
+    --border: #E5E7EB;
+  }
+  html, body {
+    background: var(--bg); color: #1E293B;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 14px; line-height: 1.5; min-height: 100vh;
+  }
+  body { padding: 0; }
+
+  /* ============ LOGIN SCREEN ============ */
+  .login-overlay {
+    position: fixed; inset: 0; z-index: 999;
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 60%, #2C4F7C 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .login-overlay.hidden { display: none; }
+  .login-card {
+    background: #fff; border-radius: 20px; padding: 44px 40px;
+    width: 100%; max-width: 420px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    position: relative; overflow: hidden;
+  }
+  .login-card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+  }
+  .login-logo {
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, var(--navy), #2C4F7C);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 26px; color: #fff;
+    margin: 0 auto 18px;
+    box-shadow: 0 8px 20px rgba(31,58,95,0.25);
+  }
+  .login-title {
+    text-align: center; font-size: 22px; font-weight: 700; color: var(--navy);
+    letter-spacing: -0.3px;
+  }
+  .login-sub {
+    text-align: center; font-size: 13px; color: var(--slate);
+    margin-top: 6px; margin-bottom: 28px;
+  }
+  .login-field { margin-bottom: 14px; }
+  .login-label {
+    display: block; font-size: 11px; font-weight: 600; color: var(--slate);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .login-input {
+    width: 100%; padding: 11px 14px;
+    border: 1px solid var(--border); border-radius: 10px;
+    font-size: 14px; font-family: inherit; outline: none;
+    transition: border 0.15s;
+  }
+  .login-input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(31,58,95,0.08); }
+  .login-btn {
+    width: 100%; padding: 12px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-dark));
+    color: #fff; border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    margin-top: 12px; transition: all 0.15s;
+  }
+  .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(31,58,95,0.3); }
+  .login-error { font-size: 12px; color: var(--red); text-align: center; margin-top: 10px; display: none; }
+  .login-error.show { display: block; }
+  .login-footer { text-align: center; font-size: 11px; color: var(--slate-light); margin-top: 24px; letter-spacing: 0.5px; }
+  .login-hint {
+    background: #F8FAFC; border-radius: 8px; padding: 10px 14px;
+    font-size: 11px; color: var(--slate); margin-top: 16px;
+    border-left: 3px solid var(--gold);
+  }
+  .login-hint strong { color: var(--navy); }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+    color: #fff; padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-logo {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px; color: var(--navy-dark);
+  }
+  .brand-name { font-weight: 700; font-size: 16px; letter-spacing: 0.3px; }
+  .brand-sub { font-size: 10px; letter-spacing: 2px; color: var(--gold-light); text-transform: uppercase; margin-top: 2px; }
+  .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 12px; }
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(46, 204, 113, 0.15); color: #4ADE80;
+    padding: 4px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+  }
+  .live-dot { width: 6px; height: 6px; background: #4ADE80; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .user-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 12px 4px 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px; font-size: 12px;
+  }
+  .user-chip .av { width: 26px; height: 26px; border-radius: 50%; background: var(--gold); color: var(--navy-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; }
+  .logout-btn {
+    background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15);
+    padding: 6px 12px; border-radius: 16px; font-size: 11px; cursor: pointer;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.18); }
+
+  .container { max-width: 1480px; margin: 0 auto; padding: 24px 28px; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #2C4F7C 100%);
+    color: #fff; border-radius: 16px; padding: 28px 32px;
+    margin-bottom: 24px; position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ""; position: absolute; right: -80px; top: -80px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(201, 168, 100, 0.18) 0%, transparent 70%);
+  }
+  .hero-eyebrow { font-size: 10px; letter-spacing: 2.5px; color: var(--gold-light); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+  .hero-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .hero-sub { font-size: 15px; opacity: 0.85; max-width: 700px; line-height: 1.5; }
+  .live-corner {
+    position: absolute; top: 14px; right: 18px;
+    background: rgba(255,255,255,0.12); color: #fff;
+    padding: 4px 9px; border-radius: 10px;
+    font-size: 10px; font-weight: 600;
+    display: flex; align-items: center; gap: 5px; letter-spacing: 0.5px;
+  }
+  .live-corner::before {
+    content: ""; width: 6px; height: 6px; background: #4ADE80; border-radius: 50%; animation: pulse 2s infinite;
+  }
+
+  /* SELECTOR */
+  .selector-wrap {
+    background: var(--card); border-radius: 14px;
+    padding: 18px 24px; border: 1px solid var(--border);
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .selector-label { font-size: 11px; letter-spacing: 1.5px; font-weight: 700; color: var(--slate); text-transform: uppercase; }
+  .selector-pills { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+  .pill {
+    padding: 7px 14px; border-radius: 18px; border: 1px solid var(--border);
+    font-size: 12.5px; font-weight: 500; cursor: pointer;
+    transition: all 0.15s; color: var(--slate);
+    background: var(--card); white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--navy); color: var(--navy); }
+  .pill.active {
+    background: var(--navy); color: #fff; border-color: var(--navy);
+    box-shadow: 0 4px 12px rgba(31, 58, 95, 0.25);
+  }
+
+  .main-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+  @media (max-width: 1100px) { .main-grid { grid-template-columns: 1fr; } }
+
+  .project-header {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 26px 28px; margin-bottom: 20px;
+  }
+  .ph-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
+  .ph-title-block { flex: 1; }
+  .ph-eyebrow { font-size: 11px; letter-spacing: 2px; font-weight: 600; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
+  .ph-title { font-size: 24px; font-weight: 700; color: #1E293B; line-height: 1.25; }
+  .ph-meta { display: flex; gap: 18px; margin-top: 12px; font-size: 13px; color: var(--slate); flex-wrap: wrap; }
+  .ph-meta strong { color: #1E293B; font-weight: 600; }
+  .health-chip {
+    padding: 7px 14px; border-radius: 12px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .health-green { background: #DCFCE7; color: var(--green); }
+  .health-amber { background: #FEF3C7; color: var(--amber); }
+  .health-red   { background: #FECACA; color: var(--red); }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .kpi {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px;
+    position: relative; overflow: hidden;
+  }
+  .kpi::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .kpi.k-progress::before { background: var(--green); }
+  .kpi.k-tasks::before    { background: var(--navy); }
+  .kpi.k-phase::before    { background: var(--gold); }
+  .kpi.k-fee::before      { background: #8B5CF6; }
+  .kpi-label { font-size: 10px; letter-spacing: 1.4px; font-weight: 700; color: var(--slate); text-transform: uppercase; margin-bottom: 6px; }
+  .kpi-value { font-size: 24px; font-weight: 700; line-height: 1; }
+  .kpi.k-progress .kpi-value { color: var(--green); }
+  .kpi.k-tasks .kpi-value    { color: var(--navy); }
+  .kpi.k-phase .kpi-value    { color: var(--gold); font-size: 17px; line-height: 1.2; padding-top: 2px; }
+  .kpi.k-fee .kpi-value      { color: #6D28D9; }
+  .kpi-sub { font-size: 11px; color: var(--slate-light); margin-top: 4px; }
+
+  .section-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px 24px; margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 11px; letter-spacing: 2px; font-weight: 700;
+    color: var(--slate); text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before { content: ""; width: 4px; height: 14px; background: var(--gold); border-radius: 2px; }
+
+  .phase-row { padding: 10px 0; border-bottom: 1px dashed #F1F5F9; }
+  .phase-row:last-of-type { border-bottom: none; }
+  .phase-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .phase-name { font-size: 13px; font-weight: 600; color: #1E293B; flex: 1; }
+  .phase-pct { font-size: 12.5px; font-weight: 700; }
+  .phase-bar { height: 6px; background: #F1F5F9; border-radius: 3px; overflow: hidden; }
+  .phase-bar > span { display: block; height: 100%; border-radius: 3px; transition: width 0.5s; }
+  .b-green > span { background: linear-gradient(90deg, var(--green), #34A06F); }
+  .b-amber > span { background: linear-gradient(90deg, var(--amber), #D69334); }
+  .b-red   > span { background: linear-gradient(90deg, var(--red), #C84545); }
+  .b-grey  > span { background: #CBD5E1; }
+  .pct-green { color: var(--green); } .pct-amber { color: var(--amber); } .pct-red { color: var(--red); } .pct-grey { color: var(--slate-light); }
+
+  .status-report {
+    background: linear-gradient(135deg, #F8FAFC 0%, #fff 100%);
+    border-left: 4px solid var(--navy);
+    padding: 16px 20px; border-radius: 0 12px 12px 0;
+    font-size: 13px; line-height: 1.65; color: #334155;
+  }
+  .status-report strong { color: #1E293B; font-weight: 600; }
+  .status-report .sr-meta { font-size: 10.5px; letter-spacing: 1px; color: var(--slate-light); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .member-card {
+    background: linear-gradient(135deg, #FAFBFC 0%, #F4F6F9 100%);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px;
+    display: flex; gap: 12px; align-items: center;
+    transition: all 0.15s; cursor: pointer;
+  }
+  .member-card:hover { border-color: var(--navy); box-shadow: 0 4px 14px rgba(31, 58, 95, 0.1); }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .av-navy   { background: linear-gradient(135deg, var(--navy), #2C4F7C); }
+  .av-gold   { background: linear-gradient(135deg, var(--gold), #B89653); }
+  .av-green  { background: linear-gradient(135deg, var(--green), #34A06F); }
+  .av-purple { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
+  .member-info { flex: 1; min-width: 0; }
+  .member-name { font-size: 13px; font-weight: 600; color: #1E293B; }
+  .member-role { font-size: 11px; color: var(--slate-light); margin-top: 2px; }
+  .member-email { font-size: 11px; color: var(--navy); margin-top: 4px; word-break: break-all; }
+
+  .actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .action-btn {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 18px;
+    text-decoration: none;
+    display: flex; align-items: center; gap: 14px;
+    transition: all 0.15s; cursor: pointer; text-align: left;
+    color: inherit;
+  }
+  .action-btn:hover { border-color: var(--navy); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(31, 58, 95, 0.1); }
+  .action-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .ai-blue   { background: #DBEAFE; color: #1E40AF; }
+  .ai-green  { background: #DCFCE7; color: var(--green); }
+  .ai-purple { background: #EDE9FE; color: #6D28D9; }
+  .ai-orange { background: #FED7AA; color: #9A3412; }
+  .ai-pink   { background: #FCE7F3; color: #BE185D; }
+  .ai-cyan   { background: #CFFAFE; color: #155E75; }
+  .action-text { flex: 1; }
+  .action-title { font-size: 13px; font-weight: 600; color: #1E293B; }
+  .action-desc { font-size: 11px; color: var(--slate-light); margin-top: 2px; }
+
+  .sidebar { display: flex; flex-direction: column; gap: 20px; }
+
+  .chat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+    display: flex; flex-direction: column; min-height: 560px;
+  }
+  .chat-header {
+    background: linear-gradient(135deg, #6264A7, #5159B6);
+    color: #fff; padding: 16px 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chat-avatar {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px;
+  }
+  .chat-title { font-size: 14px; font-weight: 600; }
+  .chat-status { font-size: 11px; opacity: 0.85; display: flex; align-items: center; gap: 5px; }
+  .chat-status::before { content: ""; width: 7px; height: 7px; background: #4ADE80; border-radius: 50%; }
+  .chat-body {
+    flex: 1; overflow-y: auto; padding: 18px;
+    background: #FAFBFC;
+    display: flex; flex-direction: column; gap: 12px;
+    min-height: 320px; max-height: 380px;
+  }
+  .msg { max-width: 88%; padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.45; }
+  .msg-them { background: #fff; border: 1px solid var(--border); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg-me { background: #6264A7; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg-sender { font-size: 10px; color: var(--slate-light); margin-bottom: 3px; font-weight: 600; letter-spacing: 0.3px; padding: 0 4px; }
+  .msg-time { font-size: 10px; opacity: 0.6; margin-top: 4px; }
+  .chat-cta-banner {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+    border-top: 1px solid var(--border); text-align: center;
+  }
+  .chat-cta-banner .lbl {
+    font-size: 10.5px; letter-spacing: 0.8px; color: var(--slate);
+    margin-bottom: 8px; text-transform: uppercase; font-weight: 600;
+  }
+  .chat-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #6264A7, #5159B6);
+    color: #fff; padding: 10px 18px; border-radius: 22px;
+    text-decoration: none; font-size: 13px; font-weight: 600;
+    transition: all 0.15s;
+  }
+  .chat-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(98, 100, 167, 0.35); }
+
+  .feed-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px 22px;
+  }
+  .feed-item {
+    display: flex; gap: 12px; padding: 10px 0;
+    border-bottom: 1px dashed #F1F5F9;
+  }
+  .feed-item:last-of-type { border-bottom: none; }
+  .feed-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; flex-shrink: 0; margin-top: 2px;
+  }
+  .fi-done    { background: #DCFCE7; color: var(--green); }
+  .fi-update  { background: #DBEAFE; color: #1E40AF; }
+  .fi-comment { background: #EDE9FE; color: #6D28D9; }
+  .fi-meeting { background: #FEF3C7; color: var(--amber); }
+  .feed-text { flex: 1; font-size: 12.5px; color: var(--slate); line-height: 1.5; }
+  .feed-text strong { color: #1E293B; font-weight: 600; }
+  .feed-time { font-size: 10.5px; color: var(--slate-light); margin-top: 2px; }
+
+  .chat-body::-webkit-scrollbar { width: 6px; }
+  .chat-body::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">P</div>
+    <div class="login-title">PFAS Client Portal</div>
+    <div class="login-sub">Sign in to your engagement workspace</div>
+
+    <div class="login-field">
+      <label class="login-label">Client Code</label>
+      <input type="text" class="login-input" id="loginUser" placeholder="e.g. pcmmdc" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label class="login-label">Access Key</label>
+      <input type="password" class="login-input" id="loginPass" placeholder="Enter your access key">
+    </div>
+    <button class="login-btn" onclick="attemptLogin()">Sign In</button>
+    <div class="login-error" id="loginError">Invalid client code or access key</div>
+
+    <div class="login-hint">
+      <strong>Demo access:</strong> code <strong>demo</strong> / key <strong>pfas2026</strong><br>
+      <span style="font-size: 10.5px; color: var(--slate-light);">Live clients use codes like pcmmdc, p4a, fiedmc, energy, fisheries</span>
+    </div>
+
+    <div class="login-footer">© 2026 Punjab Financial Advisory Services</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell" style="display: none;">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-logo">P</div>
+      <div>
+        <div class="brand-sub">Punjab Financial Advisory Services</div>
+        <div class="brand-name">Client Portal</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="live-badge"><span class="live-dot"></span> LIVE · Synced with ClickUp</span>
+      <span class="user-chip"><span class="av" id="userInitial">D</span><span id="userName">Demo Client</span></span>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="hero">
+      <div class="live-corner">LIVE FEED</div>
+      <div class="hero-eyebrow">Project Portfolio Overview</div>
+      <div class="hero-title">Welcome to your PFAS engagement portal</div>
+      <div class="hero-sub">Track project progress, communicate with your advisory team in Microsoft Teams, access shared documents and meeting minutes, and schedule meetings — all in one place.</div>
+    </div>
+
+    <div class="main-grid">
+
+      <div>
+        <div class="project-header" id="projectHeader"></div>
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <div class="section-card">
+          <div class="section-title">Your PFAS Advisory Team</div>
+          <div class="team-grid" id="teamGrid"></div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">Latest Status Update — Live from ClickUp</div>
+          <div class="status-report" id="statusReport"></div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">Phase Progress</div>
+          <div id="phaseList"></div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">Quick Actions</div>
+          <div class="actions-grid" id="actionsGrid"></div>
+        </div>
+
+      </div>
+
+      <div class="sidebar">
+
+        <div class="chat-card">
+          <div class="chat-header">
+            <div class="chat-avatar">💬</div>
+            <div>
+              <div class="chat-title" id="chatTitle">Microsoft Teams Conversation</div>
+              <div class="chat-status">Team typically responds within 2 hours</div>
+            </div>
+          </div>
+          <div class="chat-body" id="chatBody"></div>
+          <div class="chat-cta-banner">
+            <div class="lbl">Continue the conversation in Teams</div>
+            <a class="chat-cta" id="chatCta" href="#" target="_blank">
+              ↗ Open in Microsoft Teams
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// One login per client. Each code unlocks ONLY that client's project.
+const ACCESS = {
+  "pcmmdc":    { key: "PCMMDC@2026",    name: "PCMMDC",                project: "pcmmdc" },
+  "p4a":       { key: "P4A@2026",       name: "P4A",                   project: "p4a" },
+  "fiedmc":    { key: "FIEDMC@2026",    name: "FIEDMC",                project: "fiedmc-m3ic" },
+  "energy":    { key: "Energy@2026",    name: "Energy Dept",           project: "energy" },
+  "fisheries": { key: "Fisheries@2026", name: "Fisheries Dept",        project: "shrimps" },
+  "demo":      { key: "pfas2026",       name: "Demo Client",           project: "pcmmdc" }
+};
+
+function attemptLogin() {
+  const user = document.getElementById("loginUser").value.trim().toLowerCase();
+  const pass = document.getElementById("loginPass").value.trim();
+  const acc = ACCESS[user];
+  if (acc && acc.key === pass) {
+    document.getElementById("loginOverlay").classList.add("hidden");
+    document.getElementById("appShell").style.display = "block";
+    document.getElementById("userName").textContent = acc.name;
+    document.getElementById("userInitial").textContent = acc.name[0];
+    currentProjectId = acc.project;
+    renderAll();
+  } else {
+    document.getElementById("loginError").classList.add("show");
+  }
+}
+function logout() {
+  document.getElementById("loginOverlay").classList.remove("hidden");
+  document.getElementById("appShell").style.display = "none";
+  document.getElementById("loginUser").value = "";
+  document.getElementById("loginPass").value = "";
+  document.getElementById("loginError").classList.remove("show");
+}
+document.addEventListener("keypress", e => {
+  if (e.key === "Enter" && !document.getElementById("loginOverlay").classList.contains("hidden")) attemptLogin();
+});
+
+const PROJECTS = [
+  {
+    id: "shrimps",
+    name: "Shrimps Estate Project",
+    client: "Fisheries Department",
+    type: "Leasing Model & Financial Feasibility",
+    health: "amber",
+    fee: "PKR 25 M",
+    phase: "Client Review",
+    progress: 62,
+    activeTasks: 4,
+    overdueTasks: 3,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgCqTpi_G5uURooyJBe2Wcx7AeHoAcmCRAJ-CBsxk5-Hsas?e=bM3UOd",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Shrimps%20Estate%20Project/Fisheries",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Shrimps%20Estate%20Project%20%7C%20Review&attendees=ammar.yasir@pfas.com.pk,khalid.safdar@pfas.pk",
+    statusReport: "Team is finalising the <strong>second client presentation</strong> covering the project's financial impact across the value chain, including final assessment of project earnings and a summary of our analysis. Site visit to Sargodha completed; <strong>Recommendations V1</strong> presented to client (14 May), feedback received 20 May. Three deep-dive analyses underway: imported feed pricing, workforce-energy-processing, PL capacity & grow-out pond options. Status: <strong>Phase 1 + 2 invoices outstanding</strong> (50% of fee), client follow-up recommended.",
+    statusDate: "18 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Data Gathering", pct: 100, status: "green" },
+      { name: "Analysis", pct: 90, status: "amber" },
+      { name: "Client Review", pct: 50, status: "amber" },
+      { name: "Finalization", pct: 0, status: "grey" },
+      { name: "Payment", pct: 50, status: "amber" }
+    ],
+    team: [
+      { name: "Ammar Yasir", role: "Team Lead", email: "ammar.yasir@pfas.com.pk", color: "navy" },
+      { name: "Khalid Safdar", role: "Senior Analyst", email: "khalid.safdar@pfas.pk", color: "gold" },
+      { name: "Meiraj N. Khan", role: "Analyst", email: "meiraj.khan@pfas.pk", color: "green" }
+    ],
+    chat: [
+      { from: "them", sender: "Ammar Yasir", text: "Good morning! We're finalising the second presentation covering the financial impact of the value chain. Will share by end of week.", time: "Today, 10:42 AM" },
+      { from: "me", text: "Thanks Ammar. Will review with our team and revert with comments.", time: "Today, 11:15 AM" },
+      { from: "them", sender: "Khalid Safdar", text: "Site visit notes & photos are in the OneDrive folder. Quick walkthrough on Wednesday's call?", time: "Today, 2:30 PM" }
+    ],
+    activity: [
+      { sender: "Khalid Safdar", text: "Site visit notes & photos are in the OneDrive folder. Quick walkthrough on Wednesday's call?", time: "Today, 2:30 PM" },
+      { sender: "Ammar Yasir", text: "Good morning! We're finalising the second presentation covering the financial impact of the value chain. Will share by end of week.", time: "Today, 10:42 AM" },
+      { sender: "Meiraj N. Khan", text: "Inland Hatchery analysis moved to internal review. Will share findings shortly.", time: "5 Jun" }
+    ]
+  },
+
+  {
+    id: "pcmmdc",
+    name: "HR Manual & Policy Compendium",
+    client: "PCMMDC",
+    type: "HR Restructuring Advisory",
+    health: "amber",
+    fee: "PKR 5.5 M",
+    phase: "Policy Drafting",
+    progress: 67,
+    activeTasks: 4,
+    overdueTasks: 4,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgAIioMgxuNmSIiqijomYjrCAUCzUlrnmB-1_i78v2L2a-M?e=QWFKTg",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/HR%20Manual%20%26%20Policy%20Compendium/PCMMDC",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20PCMMDC%20HR%20Manual%20%7C%20Review&attendees=hashim.riaz@pfas.com.pk,fahad.tanveer@pfas.pk",
+    statusReport: "On <strong>17 Jun</strong>, HR Expert (Qamar Sb) met GM HR PCMMDC to discuss finalisation of the HR Manual with PCMMDC's comments incorporated. A follow-up session held <strong>today (18 Jun)</strong> continues that discussion — key points to be shared by HR Expert subsequently. Recent context: CEO PCMMDC working session held 3 Jun, all policy changes locked with GM HR (Mr. Jazib) on 5 Jun. The draft HR Manual was delivered with covering letter and Invoice 3. Annexures finalisation in progress; follow-up Friday session planned with HR Expert.",
+    statusDate: "18 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Diagnostic Review", pct: 100, status: "green" },
+      { name: "Structure & Pay Reform", pct: 100, status: "green" },
+      { name: "Policy Drafting", pct: 75, status: "amber" },
+      { name: "Finalization", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Hashim Riaz", role: "Project Manager", email: "hashim.riaz@pfas.com.pk", color: "navy" },
+      { name: "Muhammad Fahad Tanveer", role: "PM Team Lead", email: "fahad.tanveer@pfas.pk", color: "gold" },
+      { name: "Qamar Sb", role: "HR Expert (Consultant)", email: "—", color: "purple" }
+    ],
+    chat: [
+      { from: "them", sender: "Hashim Riaz", text: "Today's update: HR Expert met GM HR PCMMDC on 17 Jun to discuss finalising the HR Manual with PCMMDC's comments. Follow-up session today to continue.", time: "Today, 11:21 AM" },
+      { from: "me", text: "Great. When will the final manual be ready for our CEO's sign-off?", time: "Today, 12:00 PM" },
+      { from: "them", sender: "Hashim Riaz", text: "Friday session with HR Expert is planned. Final draft expected to follow within a week of that.", time: "Today, 12:15 PM" }
+    ],
+    activity: [
+      { sender: "Hashim Riaz", text: "HR Expert held a meeting with GM HR PCMMDC on finalising the HR Manual by incorporating PCMMDC's comments on Jun 17, 2026 with a follow-up session planned for today to continue the discussion. Key points from the meeting will be shared subsequently by the HR Expert.", time: "Today, 11:21 AM" },
+      { sender: "Hashim Riaz", text: "HR Expert is meeting GM HR PCMMDC today to discuss and finalise the HR Manual. Comments on the HR Manual and Annexures shared with the HR Expert. The same to be discussed with the expert during a session planned for Friday (Jun 19, 2026).", time: "Yesterday, 8:24 AM" },
+      { sender: "Hamza Naeem", text: "Internal Recruitment Policy finalised internally by External Consultants.", time: "9 days ago" }
+    ]
+  },
+
+  {
+    id: "p4a",
+    name: "Tertiary Care General Hospital",
+    client: "Punjab Aid for Affected Areas (P4A)",
+    type: "Economic & Financial Feasibility",
+    health: "amber",
+    fee: "PKR 29.825 M",
+    phase: "Contract Signing",
+    progress: 20,
+    activeTasks: 4,
+    overdueTasks: 3,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgAYhriqzbPgS6GsZaO8JcsOAdNku4tGqSB5C6wZ6Tr5tE4?e=mpwXk0",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Tertiary%20Care%20Hospital/P4A",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20P4A%20Tertiary%20Care%20Hospital%20%7C%20Discussion&attendees=hashim.riaz@pfas.com.pk,fahad.tanveer@pfas.pk",
+    statusReport: "There is currently a <strong>hold-up</strong> following P4A team's email of 9 Jun requesting PFAS to revise the proposal downward, on the basis that the prior consultant (who worked on the 2017 assignment) did not expect substantial rework. PFAS's review of documents indicates <strong>considerable rework is warranted</strong> due to major changes in macroeconomic conditions, healthcare sector evolution in Punjab (introduction of SHI insurance packages), PSER changes, land costs etc. A detailed response has been prepared by the Team Lead. Healthcare consultant Shehzad Leghari engaged 5 Jun; proposal expected this week.",
+    statusDate: "15 Jun 2026",
+    phases: [
+      { name: "Contract Signing", pct: 67, status: "amber" },
+      { name: "Team Mobilization", pct: 0, status: "red" },
+      { name: "PPP Structuring", pct: 0, status: "grey" },
+      { name: "Financial Feasibility", pct: 0, status: "grey" },
+      { name: "Concept Note & TA", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Hashim Riaz", role: "Team Lead", email: "hashim.riaz@pfas.com.pk", color: "navy" },
+      { name: "Muhammad Fahad Tanveer", role: "PM Team", email: "fahad.tanveer@pfas.pk", color: "gold" },
+      { name: "Shehzad Leghari", role: "Healthcare Consultant", email: "—", color: "purple" }
+    ],
+    chat: [
+      { from: "them", sender: "Hashim Riaz", text: "Good day. We've engaged Shehzad Leghari as the healthcare consultant. He'll share a short proposal this week based on the TORs.", time: "Mon, 11:00 AM" },
+      { from: "me", text: "On the proposal revision — we'd like to discuss this further. Can we set up a call?", time: "Mon, 2:15 PM" },
+      { from: "them", sender: "Hashim Riaz", text: "Yes. We've prepared a detailed response highlighting why substantial rework is warranted — happy to walk through it.", time: "Mon, 2:45 PM" }
+    ],
+    activity: [
+      { sender: "Muhammad Fahad Tanveer", text: "There is a hold-up post email from P4A team on June 9, 2026, where PFAS was asked to revise the proposal downwards. Based on the review of documents it appears a considerable amount of rework is required due to massive changes in the macroeconomic situation, healthcare sector in Punjab (SHI insurance packages), PSER, land costs etc. A detailed response was developed by Team Lead and shared with COO PFAS.", time: "9 Jun" },
+      { sender: "Hashim Riaz", text: "Shehzad Leghari engaged as healthcare consultant. He'll share a short proposal this week based on the TORs.", time: "5 Jun" },
+      { sender: "Hashim Riaz", text: "PHIMC data request letter sent (revised version, after Mr. Afridi's direction).", time: "30 May" }
+    ]
+  },
+
+  {
+    id: "fiedmc-m3ic",
+    name: "M3IC Commercial Plot Sale",
+    client: "FIEDMC",
+    type: "Optimal Fund Utilisation Advisory",
+    health: "green",
+    fee: "PKR 5.6 M",
+    phase: "Stakeholder Engagement",
+    progress: 45,
+    activeTasks: 3,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgBsumuXRajrR68p1lVoyk9fAXSzT8AjpCaraSizNyGvS-A?e=gFo5iI",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/M3IC%20Commercial%20Plot%20Sale/FIEDMC",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20FIEDMC%20M3IC%20%7C%20Review&attendees=fahad.tanveer@pfas.pk,hashim.riaz@pfas.com.pk",
+    statusReport: "Stakeholder engagement phase progressing well. <strong>5 of 7 planned interviews</strong> have been completed. Strategy framework v1 drafted and under internal review. No overdue items. Project is on track for the next deliverable.",
+    statusDate: "16 Jun 2026",
+    phases: [
+      { name: "Contract Signing", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Stakeholder Engagement", pct: 70, status: "green" },
+      { name: "Strategy Formulation", pct: 10, status: "amber" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Muhammad Fahad Tanveer", role: "Project Lead", email: "fahad.tanveer@pfas.pk", color: "navy" },
+      { name: "Hashim Riaz", role: "Senior Advisor", email: "hashim.riaz@pfas.com.pk", color: "gold" }
+    ],
+    chat: [
+      { from: "them", sender: "Fahad Tanveer", text: "Stakeholder engagement progressing well. 5 of 7 interviews complete. Strategy framework v1 drafted.", time: "Today, 12:30 PM" },
+      { from: "me", text: "Excellent. When can we expect preliminary findings?", time: "Today, 1:00 PM" }
+    ],
+    activity: [
+      { sender: "Fahad Tanveer", text: "Stakeholder engagement progressing well. 5 of 7 interviews complete. Strategy framework v1 drafted.", time: "Today, 12:30 PM" },
+      { sender: "Hashim Riaz", text: "Strategy framework v1 will be circulated for internal review by EOD.", time: "3 days ago" }
+    ]
+  },
+
+  {
+    id: "energy",
+    name: "PMW Strategic Design",
+    client: "Energy Department, Punjab",
+    type: "Project Management Wing Restructuring",
+    health: "amber",
+    fee: "PKR 7.074 M",
+    phase: "Contract Signing",
+    progress: 15,
+    activeTasks: 2,
+    overdueTasks: 1,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgAP0fwlxoZcSaBjo-3Nhe-8ASdBglItdkiDqd329IHzhC0?e=5ekc3e",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/PMW%20Strategic%20Design/Energy",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Energy%20PMW%20%7C%20Discussion&attendees=fahad.tanveer@pfas.pk,hashim.riaz@pfas.com.pk,awais.khan@pfas.com.pk",
+    statusReport: "Contract documents have been shared with the client's legal team for review. Awaiting confirmation on contract sign-off. Once signed, Phase 1 (Diagnostic & Receipt Classification) commences immediately. Team mobilization is ready pending contract close.",
+    statusDate: "17 Jun 2026",
+    phases: [
+      { name: "Contract Signing", pct: 50, status: "amber" },
+      { name: "Diagnostic (D-I)", pct: 0, status: "grey" },
+      { name: "Institutional Framework (D-II)", pct: 0, status: "grey" },
+      { name: "Final Study (D-III)", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Muhammad Fahad Tanveer", role: "Project Lead", email: "fahad.tanveer@pfas.pk", color: "navy" },
+      { name: "Hashim Riaz", role: "Senior Advisor", email: "hashim.riaz@pfas.com.pk", color: "gold" },
+      { name: "Awais Khan", role: "Analyst", email: "awais.khan@pfas.com.pk", color: "green" }
+    ],
+    chat: [
+      { from: "them", sender: "Fahad Tanveer", text: "Contract documents shared with your legal team. Awaiting confirmation.", time: "Yesterday, 4:30 PM" }
+    ],
+    activity: [
+      { sender: "Fahad Tanveer", text: "Contract documents shared with your legal team for review. Awaiting confirmation.", time: "Yesterday, 4:30 PM" }
+    ]
+  }
+];
+
+let currentProjectId = "pcmmdc";
+
+function renderAll() {
+  const p = PROJECTS.find(x => x.id === currentProjectId);
+  renderHeader(p);
+  renderKPIs(p);
+  renderStatusReport(p);
+  renderPhases(p);
+  renderTeam(p);
+  renderActions(p);
+  renderChat(p);
+}
+
+function renderHeader(p) {
+  const healthLabel = p.health === "green" ? "GREEN" : p.health === "amber" ? "AMBER" : "RED";
+  document.getElementById("projectHeader").innerHTML = `
+    <div class="ph-top">
+      <div class="ph-title-block">
+        <div class="ph-eyebrow">${p.type}</div>
+        <div class="ph-title">${p.name}</div>
+      </div>
+      <div class="health-chip health-${p.health}">● ${healthLabel}</div>
+    </div>
+    <div class="ph-meta">
+      <span><strong>Client:</strong> ${p.client}</span>
+      <span><strong>Current Phase:</strong> ${p.phase}</span>
+      <span><strong>Team Size:</strong> ${p.team.length}</span>
+    </div>
+  `;
+}
+
+function renderKPIs(p) {
+  document.getElementById("kpiRow").innerHTML = `
+    <div class="kpi k-progress">
+      <div class="kpi-label">Project Progress</div>
+      <div class="kpi-value">${p.progress}%</div>
+      <div class="kpi-sub">Overall completion</div>
+    </div>
+    <div class="kpi k-tasks">
+      <div class="kpi-label">Active Tasks</div>
+      <div class="kpi-value">${p.activeTasks}</div>
+      <div class="kpi-sub">${p.overdueTasks} need attention</div>
+    </div>
+    <div class="kpi k-phase">
+      <div class="kpi-label">Current Phase</div>
+      <div class="kpi-value">${p.phase}</div>
+      <div class="kpi-sub">In progress</div>
+    </div>
+    <div class="kpi k-fee">
+      <div class="kpi-label">Engagement Value</div>
+      <div class="kpi-value">${p.fee}</div>
+      <div class="kpi-sub">Total advisory fee</div>
+    </div>
+  `;
+}
+
+function renderStatusReport(p) {
+  document.getElementById("statusReport").innerHTML = `
+    <div class="sr-meta">Last 10 days · Updated ${p.statusDate}</div>
+    ${p.statusReport}
+  `;
+}
+
+function renderPhases(p) {
+  document.getElementById("phaseList").innerHTML = p.phases.map(ph => `
+    <div class="phase-row">
+      <div class="phase-head">
+        <div class="phase-name">${ph.name}</div>
+        <div class="phase-pct pct-${ph.status}">${ph.pct}%</div>
+      </div>
+      <div class="phase-bar b-${ph.status}"><span style="width:${ph.pct}%"></span></div>
+    </div>
+  `).join("");
+}
+
+function renderTeam(p) {
+  document.getElementById("teamGrid").innerHTML = p.team.map(m => {
+    const initials = m.name.split(" ").map(n => n[0]).join("").substring(0, 2);
+    return `
+      <div class="member-card">
+        <div class="avatar av-${m.color}">${initials}</div>
+        <div class="member-info">
+          <div class="member-name">${m.name}</div>
+          <div class="member-role">${m.role}</div>
+          <div class="member-email">${m.email}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderActions(p) {
+  document.getElementById("actionsGrid").innerHTML = `
+    <a class="action-btn" href="${p.onedriveProject}" target="_blank">
+      <div class="action-icon ai-blue">📁</div>
+      <div class="action-text">
+        <div class="action-title">Shared Documents</div>
+        <div class="action-desc">Client Communication folder</div>
+      </div>
+    </a>
+    <a class="action-btn" href="${p.teamsScheduleMeeting}" target="_blank">
+      <div class="action-icon ai-green">📅</div>
+      <div class="action-text">
+        <div class="action-title">Schedule Meeting</div>
+        <div class="action-desc">New Teams meeting · pre-invited</div>
+      </div>
+    </a>
+    <a class="action-btn" href="${p.onedriveProject}" target="_blank">
+      <div class="action-icon ai-purple">📝</div>
+      <div class="action-text">
+        <div class="action-title">Meeting Minutes</div>
+        <div class="action-desc">MoMs folder · OneDrive</div>
+      </div>
+    </a>
+    <a class="action-btn" href="${p.onedriveProject}" target="_blank">
+      <div class="action-icon ai-orange">📤</div>
+      <div class="action-text">
+        <div class="action-title">Submit Data / Document</div>
+        <div class="action-desc">Upload to data-from-client folder</div>
+      </div>
+    </a>
+    <a class="action-btn" href="#" onclick="alert('Latest status update is shown live above.'); return false;">
+      <div class="action-icon ai-pink">📊</div>
+      <div class="action-text">
+        <div class="action-title">Status Report</div>
+        <div class="action-desc">Live · see above</div>
+      </div>
+    </a>
+    <a class="action-btn" href="${p.onedriveProject}" target="_blank">
+      <div class="action-icon ai-cyan">💰</div>
+      <div class="action-text">
+        <div class="action-title">Invoices & Payments</div>
+        <div class="action-desc">Payments folder · OneDrive</div>
+      </div>
+    </a>
+  `;
+}
+
+function renderChat(p) {
+  document.getElementById("chatTitle").textContent = `${p.client} ↔ PFAS Team`;
+  document.getElementById("chatCta").href = p.teamsChannelDeepLink;
+  document.getElementById("chatBody").innerHTML = p.chat.map(m => {
+    if (m.from === "me") {
+      return `<div class="msg msg-me">${m.text}<div class="msg-time">${m.time}</div></div>`;
+    } else {
+      return `<div style="display: flex; flex-direction: column; align-items: flex-start;"><div class="msg-sender">${m.sender}</div><div class="msg msg-them">${m.text}<div class="msg-time" style="color: var(--slate-light);">${m.time}</div></div></div>`;
+    }
+  }).join("");
+  const body = document.getElementById("chatBody");
+  body.scrollTop = body.scrollHeight;
+}
+
+setInterval(() => {
+  const dot = document.querySelector(".live-dot");
+  if (dot) dot.style.opacity = (Math.random() > 0.5) ? "1" : "0.4";
+}, 1500);
+</script>
+
+</body>
+</html>
