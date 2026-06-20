@@ -379,6 +379,7 @@
   .chat-body::-webkit-scrollbar { width: 6px; }
   .chat-body::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
 </style>
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
 </head>
 <body>
 
@@ -387,22 +388,16 @@
   <div class="login-card">
     <div class="login-logo">P</div>
     <div class="login-title">PFAS Client Portal</div>
-    <div class="login-sub">Sign in to your engagement workspace</div>
+    <div class="login-sub">Sign in to access your engagement workspace</div>
 
-    <div class="login-field">
-      <label class="login-label">Client Code</label>
-      <input type="text" class="login-input" id="loginUser" placeholder="e.g. pcmmdc" autocomplete="off">
+    <div style="text-align: center; padding: 24px 0 8px;">
+      <button class="login-btn" onclick="attemptLogin()" style="margin-top: 0;">Sign In Securely</button>
     </div>
-    <div class="login-field">
-      <label class="login-label">Access Key</label>
-      <input type="password" class="login-input" id="loginPass" placeholder="Enter your access key">
-    </div>
-    <button class="login-btn" onclick="attemptLogin()">Sign In</button>
-    <div class="login-error" id="loginError">Invalid client code or access key</div>
+
+    <div class="login-error" id="loginError">Invalid login</div>
 
     <div class="login-hint">
-      <strong>Demo access:</strong> code <strong>demo</strong> / key <strong>pfas2026</strong><br>
-      <span style="font-size: 10.5px; color: var(--slate-light);">Live clients use codes like pcmmdc, p4a, fiedmc, energy, fisheries</span>
+      <strong>Secure login powered by Auth0.</strong> You will be redirected to a secure sign-in page. Contact your PFAS engagement lead if you need access.
     </div>
 
     <div class="login-footer">© 2026 Punjab Financial Advisory Services</div>
@@ -491,40 +486,69 @@
 
 <script>
 // One login per client. Each code unlocks ONLY that client's project.
-const ACCESS = {
-  "pcmmdc":    { key: "PCMMDC@2026",    name: "PCMMDC",                project: "pcmmdc" },
-  "p4a":       { key: "P4A@2026",       name: "P4A",                   project: "p4a" },
-  "fiedmc":    { key: "FIEDMC@2026",    name: "FIEDMC",                project: "fiedmc-m3ic" },
-  "energy":    { key: "Energy@2026",    name: "Energy Dept",           project: "energy" },
-  "fisheries": { key: "Fisheries@2026", name: "Fisheries Dept",        project: "shrimps" },
-  "demo":      { key: "pfas2026",       name: "Demo Client",           project: "pcmmdc" }
+// ============ AUTH0 CONFIG ============
+const AUTH0_DOMAIN = "dev-zrdwden5qdovxa40.us.auth0.com";
+const AUTH0_CLIENT_ID = "Rhh7Of9haJruOvHsEYswD5YtmohXV81N";
+
+// Map Auth0 email → project
+const EMAIL_PROJECT_MAP = {
+  "pcmmdc@pfas.pk":    { name: "PCMMDC",         project: "pcmmdc" },
+  "p4a@pfas.pk":       { name: "P4A",            project: "p4a" },
+  "fiedmc@pfas.pk":    { name: "FIEDMC",         project: "fiedmc-m3ic" },
+  "energy@pfas.pk":    { name: "Energy Dept",    project: "energy" },
+  "fisheries@pfas.pk": { name: "Fisheries Dept", project: "shrimps" },
+  "demo@pfas.pk":      { name: "Demo Client",    project: "pcmmdc" }
 };
 
-function attemptLogin() {
-  const user = document.getElementById("loginUser").value.trim().toLowerCase();
-  const pass = document.getElementById("loginPass").value.trim();
-  const acc = ACCESS[user];
-  if (acc && acc.key === pass) {
+let auth0Client = null;
+
+async function initAuth0() {
+  auth0Client = await auth0.createAuth0Client({
+    domain: AUTH0_DOMAIN,
+    clientId: AUTH0_CLIENT_ID,
+    authorizationParams: {
+      redirect_uri: window.location.origin
+    },
+    cacheLocation: "localstorage"
+  });
+
+  // Check if returning from Auth0
+  if (window.location.search.includes("code=")) {
+    await auth0Client.handleRedirectCallback();
+    window.history.replaceState({}, document.title, "/");
+  }
+
+  const isAuthenticated = await auth0Client.isAuthenticated();
+  if (isAuthenticated) {
+    const user = await auth0Client.getUser();
+    const email = (user.email || "").toLowerCase();
+    const acc = EMAIL_PROJECT_MAP[email];
+    if (!acc) {
+      document.getElementById("loginError").textContent = "Your account is not linked to any PFAS project. Contact admin.";
+      document.getElementById("loginError").classList.add("show");
+      return;
+    }
     document.getElementById("loginOverlay").classList.add("hidden");
     document.getElementById("appShell").style.display = "block";
     document.getElementById("userName").textContent = acc.name;
     document.getElementById("userInitial").textContent = acc.name[0];
     currentProjectId = acc.project;
     renderAll();
-  } else {
-    document.getElementById("loginError").classList.add("show");
   }
 }
-function logout() {
-  document.getElementById("loginOverlay").classList.remove("hidden");
-  document.getElementById("appShell").style.display = "none";
-  document.getElementById("loginUser").value = "";
-  document.getElementById("loginPass").value = "";
-  document.getElementById("loginError").classList.remove("show");
+
+function attemptLogin() {
+  // For Auth0 Universal Login - redirects to Auth0 hosted page
+  auth0Client.loginWithRedirect();
 }
-document.addEventListener("keypress", e => {
-  if (e.key === "Enter" && !document.getElementById("loginOverlay").classList.contains("hidden")) attemptLogin();
-});
+
+function logout() {
+  auth0Client.logout({
+    logoutParams: { returnTo: window.location.origin }
+  });
+}
+
+initAuth0();
 
 const PROJECTS = [
   {
