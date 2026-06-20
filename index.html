@@ -492,12 +492,28 @@ const AUTH0_CLIENT_ID = "Rhh7Of9haJruOvHsEYswD5YtmohXV81N";
 
 // Map Auth0 email → project
 const EMAIL_PROJECT_MAP = {
-  "pcmmdc@pfas.pk":    { name: "PCMMDC",         project: "pcmmdc" },
-  "p4a@pfas.pk":       { name: "P4A",            project: "p4a" },
-  "fiedmc@pfas.pk":    { name: "FIEDMC",         project: "fiedmc-m3ic" },
-  "energy@pfas.pk":    { name: "Energy Dept",    project: "energy" },
-  "fisheries@pfas.pk": { name: "Fisheries Dept", project: "shrimps" },
-  "demo@pfas.pk":      { name: "Demo Client",    project: "pcmmdc" }
+  "demo@pfas.pk":       { name: "Demo Client",            project: "pcmmdc" },
+  "pcmmdc@pfas.pk":     { name: "PCMMDC",                 project: "pcmmdc" },
+  "p4a@pfas.pk":        { name: "P4A",                    project: "p4a" },
+  "fiedmc@pfas.pk":     { name: "FIEDMC",                 project: "fiedmc-m3ic" },
+  "fiedmc-sbp@pfas.pk": { name: "FIEDMC (SBP)",           project: "fiedmc-sbp" },
+  "energy@pfas.pk":     { name: "Energy Dept",            project: "energy" },
+  "fisheries@pfas.pk":  { name: "Fisheries Dept",         project: "shrimps" },
+  "cw-bot1@pfas.pk":    { name: "C&W (BOT-1)",            project: "bot1" },
+  "cw-bot2@pfas.pk":    { name: "C&W (BOT-2)",            project: "bot2" },
+  "cw-bot3@pfas.pk":    { name: "C&W (BOT-3)",            project: "bot3" },
+  "cw-bot4@pfas.pk":    { name: "C&W (BOT-4)",            project: "bot4" },
+  "cw-bot5@pfas.pk":    { name: "C&W (BOT-5)",            project: "bot5" },
+  "cw-om@pfas.pk":      { name: "C&W (18 O&M)",           project: "om-roads" },
+  "wildlife-b@pfas.pk": { name: "Wildlife (Bansra Gali)", project: "wildlife-bansra" },
+  "wildlife-c@pfas.pk": { name: "Wildlife (Changa)",      project: "wildlife-changa" },
+  "tam@pfas.pk":        { name: "TAM",                    project: "tam" },
+  "pha@pfas.pk":        { name: "PHA",                    project: "pha" },
+  "pbf@pfas.pk":        { name: "Punjab Benevolent",      project: "pbf" },
+  "finance@pfas.pk":    { name: "Finance Dept",           project: "punjab-onebill" },
+  "vss@pfas.pk":        { name: "Finance (VSS)",          project: "vss" },
+  "hed@pfas.pk":        { name: "HED",                    project: "hed" },
+  "phimc@pfas.pk":      { name: "PHIMC",                  project: "phimc" }
 };
 
 let auth0Client = null;
@@ -551,6 +567,7 @@ function logout() {
 initAuth0();
 
 const PROJECTS = [
+  // ============ FISHERIES ============
   {
     id: "shrimps",
     name: "Shrimps Estate Project",
@@ -564,8 +581,8 @@ const PROJECTS = [
     overdueTasks: 3,
     onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgCqTpi_G5uURooyJBe2Wcx7AeHoAcmCRAJ-CBsxk5-Hsas?e=bM3UOd",
     teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Shrimps%20Estate%20Project/Fisheries",
-    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Shrimps%20Estate%20Project%20%7C%20Review&attendees=ammar.yasir@pfas.com.pk,khalid.safdar@pfas.pk",
-    statusReport: "Team is finalising the <strong>second client presentation</strong> covering the project's financial impact across the value chain, including final assessment of project earnings and a summary of our analysis. Site visit to Sargodha completed; <strong>Recommendations V1</strong> presented to client (14 May), feedback received 20 May. Three deep-dive analyses underway: imported feed pricing, workforce-energy-processing, PL capacity & grow-out pond options. Status: <strong>Phase 1 + 2 invoices outstanding</strong> (50% of fee), client follow-up recommended.",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Shrimps%20Estate%20Project%20%7C%20Review",
+    statusReport: "Team is finalising the <strong>second client presentation</strong> covering project's financial impact across the value chain. Site visit to Sargodha completed; <strong>Recommendations V1</strong> presented to client (14 May). Three deep-dive analyses underway: imported feed pricing, workforce-energy-processing, PL capacity & grow-out pond options.",
     statusDate: "18 Jun 2026",
     phases: [
       { name: "Onboarding", pct: 100, status: "green" },
@@ -582,17 +599,199 @@ const PROJECTS = [
       { name: "Meiraj N. Khan", role: "Analyst", email: "meiraj.khan@pfas.pk", color: "green" }
     ],
     chat: [
-      { from: "them", sender: "Ammar Yasir", text: "Good morning! We're finalising the second presentation covering the financial impact of the value chain. Will share by end of week.", time: "Today, 10:42 AM" },
-      { from: "me", text: "Thanks Ammar. Will review with our team and revert with comments.", time: "Today, 11:15 AM" },
-      { from: "them", sender: "Khalid Safdar", text: "Site visit notes & photos are in the OneDrive folder. Quick walkthrough on Wednesday's call?", time: "Today, 2:30 PM" }
-    ],
-    activity: [
-      { sender: "Khalid Safdar", text: "Site visit notes & photos are in the OneDrive folder. Quick walkthrough on Wednesday's call?", time: "Today, 2:30 PM" },
-      { sender: "Ammar Yasir", text: "Good morning! We're finalising the second presentation covering the financial impact of the value chain. Will share by end of week.", time: "Today, 10:42 AM" },
-      { sender: "Meiraj N. Khan", text: "Inland Hatchery analysis moved to internal review. Will share findings shortly.", time: "5 Jun" }
+      { from: "them", sender: "Ammar Yasir", text: "Good morning! We're finalising the second presentation covering the financial impact of the value chain.", time: "Today, 10:42 AM" }
     ]
   },
 
+  // ============ C&W ROADS ============
+  {
+    id: "bot1",
+    name: "BOT-1 Depalpur-Pakpattan-Vehari Road",
+    client: "C&W Department",
+    type: "Dualization BOT-PPP",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Engagement & Mobilization",
+    progress: 12,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/CWRoadsBOT",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/BOT-1%20Depalpur-Pakpattan/C%26W%20Roads",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20BOT-1%20Discussion",
+    statusReport: "Engagement phase underway. Initial stakeholder mapping in progress with C&W Department.",
+    statusDate: "16 Jun 2026",
+    phases: [
+      { name: "Engagement & Mobilization", pct: 60, status: "green" },
+      { name: "Research & Diagnostic", pct: 0, status: "grey" },
+      { name: "Feasibility & Analysis", pct: 0, status: "grey" },
+      { name: "Approvals & Clearances", pct: 0, status: "grey" },
+      { name: "Procurement & Bidding", pct: 0, status: "grey" },
+      { name: "Contract Signing & Close", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Abdul Wahab", role: "Project Lead", email: "abdul.wahab@pfas.com.pk", color: "navy" },
+      { name: "Umar Paracha", role: "Analyst", email: "umar.paracha@pfas.com.pk", color: "gold" }
+    ],
+    chat: [
+      { from: "them", sender: "Abdul Wahab", text: "Initial mobilization meetings scheduled with C&W team for next week.", time: "16 Jun" }
+    ]
+  },
+
+  {
+    id: "bot2",
+    name: "BOT-2 Chiragabad-Jhang-Shorkot Road",
+    client: "C&W Department",
+    type: "Dualization BOT-PPP",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Engagement & Mobilization",
+    progress: 10,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/CWRoadsBOT",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/BOT-2%20Chiragabad-Jhang/C%26W%20Roads",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20BOT-2%20Discussion",
+    statusReport: "Engagement phase underway. Coordination with C&W on baseline traffic study scope.",
+    statusDate: "16 Jun 2026",
+    phases: [
+      { name: "Engagement & Mobilization", pct: 50, status: "green" },
+      { name: "Research & Diagnostic", pct: 0, status: "grey" },
+      { name: "Feasibility & Analysis", pct: 0, status: "grey" },
+      { name: "Approvals & Clearances", pct: 0, status: "grey" },
+      { name: "Procurement & Bidding", pct: 0, status: "grey" },
+      { name: "Contract Signing & Close", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Abdul Wahab", role: "Project Lead", email: "abdul.wahab@pfas.com.pk", color: "navy" },
+      { name: "Umar Paracha", role: "Analyst", email: "umar.paracha@pfas.com.pk", color: "gold" }
+    ],
+    chat: []
+  },
+
+  {
+    id: "bot3",
+    name: "BOT-3 Muzaffargarh-Alipur-TM Panah Road",
+    client: "C&W Department",
+    type: "Dualization BOT-PPP",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Engagement & Mobilization",
+    progress: 15,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/CWRoadsBOT",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/BOT-3%20Muzaffargarh-Alipur/C%26W%20Roads",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20BOT-3%20Discussion",
+    statusReport: "Engagement phase underway. Traffic data collection points being mapped.",
+    statusDate: "16 Jun 2026",
+    phases: [
+      { name: "Engagement & Mobilization", pct: 75, status: "green" },
+      { name: "Research & Diagnostic", pct: 0, status: "grey" },
+      { name: "Feasibility & Analysis", pct: 0, status: "grey" },
+      { name: "Approvals & Clearances", pct: 0, status: "grey" },
+      { name: "Procurement & Bidding", pct: 0, status: "grey" },
+      { name: "Contract Signing & Close", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Abdul Wahab", role: "Project Lead", email: "abdul.wahab@pfas.com.pk", color: "navy" },
+      { name: "Umar Paracha", role: "Analyst", email: "umar.paracha@pfas.com.pk", color: "gold" }
+    ],
+    chat: []
+  },
+
+  {
+    id: "bot4",
+    name: "BOT-4 Sahiwal-Samundari Road",
+    client: "C&W Department",
+    type: "Add Carriageway BOT-PPP",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Engagement & Mobilization",
+    progress: 10,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/CWRoadsBOT",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/BOT-4%20Sahiwal-Samundari/C%26W%20Roads",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20BOT-4%20Discussion",
+    statusReport: "Mobilization underway. Land-use and right-of-way studies being scoped.",
+    statusDate: "16 Jun 2026",
+    phases: [
+      { name: "Engagement & Mobilization", pct: 50, status: "green" },
+      { name: "Research & Diagnostic", pct: 0, status: "grey" },
+      { name: "Feasibility & Analysis", pct: 0, status: "grey" },
+      { name: "Approvals & Clearances", pct: 0, status: "grey" },
+      { name: "Procurement & Bidding", pct: 0, status: "grey" },
+      { name: "Contract Signing & Close", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Abdul Wahab", role: "Project Lead", email: "abdul.wahab@pfas.com.pk", color: "navy" },
+      { name: "Umar Paracha", role: "Analyst", email: "umar.paracha@pfas.com.pk", color: "gold" }
+    ],
+    chat: []
+  },
+
+  {
+    id: "bot5",
+    name: "BOT-5 Bahawalpur-Jhangra Sharqi Road",
+    client: "C&W Department",
+    type: "Add Carriageway BOT-PPP",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Engagement & Mobilization",
+    progress: 8,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/CWRoadsBOT",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/BOT-5%20Bahawalpur-Jhangra/C%26W%20Roads",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20BOT-5%20Discussion",
+    statusReport: "Mobilization underway. Baseline assessment scope being finalised with C&W team.",
+    statusDate: "16 Jun 2026",
+    phases: [
+      { name: "Engagement & Mobilization", pct: 40, status: "green" },
+      { name: "Research & Diagnostic", pct: 0, status: "grey" },
+      { name: "Feasibility & Analysis", pct: 0, status: "grey" },
+      { name: "Approvals & Clearances", pct: 0, status: "grey" },
+      { name: "Procurement & Bidding", pct: 0, status: "grey" },
+      { name: "Contract Signing & Close", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Abdul Wahab", role: "Project Lead", email: "abdul.wahab@pfas.com.pk", color: "navy" },
+      { name: "Umar Paracha", role: "Analyst", email: "umar.paracha@pfas.com.pk", color: "gold" }
+    ],
+    chat: []
+  },
+
+  {
+    id: "om-roads",
+    name: "18 O&M Roads PPP",
+    client: "C&W Department",
+    type: "Operations & Maintenance PPP",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Engagement & Mobilization",
+    progress: 18,
+    activeTasks: 1,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/CWRoadsBOT",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/18%20O%26M%20Roads/C%26W%20Roads",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%2018%20O%26M%20Roads%20Discussion",
+    statusReport: "18 roads O&M PPP scoping in progress. Asset condition baseline being compiled across all 18 candidate roads.",
+    statusDate: "16 Jun 2026",
+    phases: [
+      { name: "Engagement & Mobilization", pct: 90, status: "green" },
+      { name: "Research & Diagnostic", pct: 10, status: "amber" },
+      { name: "Feasibility & Analysis", pct: 0, status: "grey" },
+      { name: "Approvals & Clearances", pct: 0, status: "grey" },
+      { name: "Procurement & Bidding", pct: 0, status: "grey" },
+      { name: "Contract Signing & Close", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Abdul Wahab", role: "Project Lead", email: "abdul.wahab@pfas.com.pk", color: "navy" }
+    ],
+    chat: []
+  },
+
+  // ============ PCMMDC ============
   {
     id: "pcmmdc",
     name: "HR Manual & Policy Compendium",
@@ -606,8 +805,8 @@ const PROJECTS = [
     overdueTasks: 4,
     onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgAIioMgxuNmSIiqijomYjrCAUCzUlrnmB-1_i78v2L2a-M?e=QWFKTg",
     teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/HR%20Manual%20%26%20Policy%20Compendium/PCMMDC",
-    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20PCMMDC%20HR%20Manual%20%7C%20Review&attendees=hashim.riaz@pfas.com.pk,fahad.tanveer@pfas.pk",
-    statusReport: "On <strong>17 Jun</strong>, HR Expert (Qamar Sb) met GM HR PCMMDC to discuss finalisation of the HR Manual with PCMMDC's comments incorporated. A follow-up session held <strong>today (18 Jun)</strong> continues that discussion — key points to be shared by HR Expert subsequently. Recent context: CEO PCMMDC working session held 3 Jun, all policy changes locked with GM HR (Mr. Jazib) on 5 Jun. The draft HR Manual was delivered with covering letter and Invoice 3. Annexures finalisation in progress; follow-up Friday session planned with HR Expert.",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20PCMMDC%20HR%20Manual%20%7C%20Review",
+    statusReport: "On <strong>17 Jun</strong>, HR Expert (Qamar Sb) met GM HR PCMMDC to discuss finalisation of the HR Manual with PCMMDC's comments incorporated. A follow-up session held <strong>today (18 Jun)</strong> continues that discussion. Recent context: CEO PCMMDC working session held 3 Jun, all policy changes locked with GM HR (Mr. Jazib) on 5 Jun. The draft HR Manual was delivered with covering letter and Invoice 3.",
     statusDate: "18 Jun 2026",
     phases: [
       { name: "Onboarding", pct: 100, status: "green" },
@@ -624,17 +823,309 @@ const PROJECTS = [
       { name: "Qamar Sb", role: "HR Expert (Consultant)", email: "—", color: "purple" }
     ],
     chat: [
-      { from: "them", sender: "Hashim Riaz", text: "Today's update: HR Expert met GM HR PCMMDC on 17 Jun to discuss finalising the HR Manual with PCMMDC's comments. Follow-up session today to continue.", time: "Today, 11:21 AM" },
-      { from: "me", text: "Great. When will the final manual be ready for our CEO's sign-off?", time: "Today, 12:00 PM" },
-      { from: "them", sender: "Hashim Riaz", text: "Friday session with HR Expert is planned. Final draft expected to follow within a week of that.", time: "Today, 12:15 PM" }
-    ],
-    activity: [
-      { sender: "Hashim Riaz", text: "HR Expert held a meeting with GM HR PCMMDC on finalising the HR Manual by incorporating PCMMDC's comments on Jun 17, 2026 with a follow-up session planned for today to continue the discussion. Key points from the meeting will be shared subsequently by the HR Expert.", time: "Today, 11:21 AM" },
-      { sender: "Hashim Riaz", text: "HR Expert is meeting GM HR PCMMDC today to discuss and finalise the HR Manual. Comments on the HR Manual and Annexures shared with the HR Expert. The same to be discussed with the expert during a session planned for Friday (Jun 19, 2026).", time: "Yesterday, 8:24 AM" },
-      { sender: "Hamza Naeem", text: "Internal Recruitment Policy finalised internally by External Consultants.", time: "9 days ago" }
+      { from: "them", sender: "Hashim Riaz", text: "Today's update: HR Expert met GM HR PCMMDC on 17 Jun. Follow-up session today to continue.", time: "Today, 11:21 AM" }
     ]
   },
 
+  // ============ FIEDMC ============
+  {
+    id: "fiedmc-m3ic",
+    name: "M3IC Commercial Plot Sale",
+    client: "FIEDMC",
+    type: "Optimal Fund Utilisation Advisory",
+    health: "green",
+    fee: "PKR 5.6 M",
+    phase: "Stakeholder Engagement",
+    progress: 45,
+    activeTasks: 3,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgBsumuXRajrR68p1lVoyk9fAXSzT8AjpCaraSizNyGvS-A?e=gFo5iI",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/M3IC%20Commercial%20Plot%20Sale/FIEDMC",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20FIEDMC%20M3IC%20%7C%20Review",
+    statusReport: "Stakeholder engagement phase progressing well. <strong>5 of 7 planned interviews</strong> completed. Strategy framework v1 drafted and under internal review.",
+    statusDate: "16 Jun 2026",
+    phases: [
+      { name: "Contract Signing", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Stakeholder Engagement", pct: 70, status: "green" },
+      { name: "Strategy Formulation", pct: 10, status: "amber" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Muhammad Fahad Tanveer", role: "Project Lead", email: "fahad.tanveer@pfas.pk", color: "navy" },
+      { name: "Hashim Riaz", role: "Senior Advisor", email: "hashim.riaz@pfas.com.pk", color: "gold" }
+    ],
+    chat: [
+      { from: "them", sender: "Fahad Tanveer", text: "Stakeholder engagement progressing well. 5 of 7 interviews complete.", time: "Today, 12:30 PM" }
+    ]
+  },
+
+  {
+    id: "fiedmc-sbp",
+    name: "Strategic Business Plan",
+    client: "FIEDMC",
+    type: "Strategic Advisory",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Stakeholder Engagement",
+    progress: 30,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgBsumuXRajrR68p1lVoyk9fAXSzT8AjpCaraSizNyGvS-A?e=gFo5iI",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Strategic%20Business%20Plan/FIEDMC",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20FIEDMC%20SBP",
+    statusReport: "Strategic Business Plan engagement underway alongside M3IC project. Initial environmental scan completed.",
+    statusDate: "14 Jun 2026",
+    phases: [
+      { name: "Contract Signing", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Stakeholder Engagement", pct: 40, status: "amber" },
+      { name: "Strategy Formulation", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Muhammad Fahad Tanveer", role: "Project Lead", email: "fahad.tanveer@pfas.pk", color: "navy" },
+      { name: "Hashim Riaz", role: "Senior Advisor", email: "hashim.riaz@pfas.com.pk", color: "gold" }
+    ],
+    chat: []
+  },
+
+  // ============ WILDLIFE ============
+  {
+    id: "wildlife-bansra",
+    name: "Bansra Gali Wildlife",
+    client: "Wildlife Department",
+    type: "Site Advisory",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Onboarding",
+    progress: 15,
+    activeTasks: 1,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/Wildlife",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Bansra%20Gali%20Wildlife/Wildlife",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Bansra%20Gali",
+    statusReport: "Onboarding phase. Initial scoping discussions with Wildlife Department in progress.",
+    statusDate: "12 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 75, status: "green" },
+      { name: "Team Mobilization", pct: 0, status: "grey" },
+      { name: "Data Gathering", pct: 0, status: "grey" },
+      { name: "Analysis", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [],
+    chat: []
+  },
+
+  {
+    id: "wildlife-changa",
+    name: "Changa Manga Wildlife",
+    client: "Wildlife Department",
+    type: "Site Advisory",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Onboarding",
+    progress: 12,
+    activeTasks: 1,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/Wildlife",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Changa%20Manga%20Wildlife/Wildlife",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Changa%20Manga",
+    statusReport: "Onboarding phase. Initial scoping discussions with Wildlife Department in progress.",
+    statusDate: "12 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 60, status: "green" },
+      { name: "Team Mobilization", pct: 0, status: "grey" },
+      { name: "Data Gathering", pct: 0, status: "grey" },
+      { name: "Analysis", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [],
+    chat: []
+  },
+
+  // ============ TAM ============
+  {
+    id: "tam",
+    name: "Time Travel Theme Park",
+    client: "Tourism, Archaeology & Museums",
+    type: "Project Advisory",
+    health: "amber",
+    fee: "PKR TBD",
+    phase: "Data Gathering",
+    progress: 35,
+    activeTasks: 2,
+    overdueTasks: 1,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/TAM",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Time%20Travel%20Theme%20Park/TAM",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20TAM%20Theme%20Park",
+    statusReport: "Project mobilized. Data gathering on visitor patterns, archaeological constraints, and revenue benchmarks underway.",
+    statusDate: "15 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Data Gathering", pct: 50, status: "amber" },
+      { name: "Analysis", pct: 0, status: "grey" },
+      { name: "Client Review", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Ammar Yasir", role: "Team Lead", email: "ammar.yasir@pfas.com.pk", color: "navy" },
+      { name: "Khalid Safdar", role: "Senior Analyst", email: "khalid.safdar@pfas.pk", color: "gold" },
+      { name: "Meiraj N. Khan", role: "Analyst", email: "meiraj.khan@pfas.pk", color: "green" }
+    ],
+    chat: []
+  },
+
+  // ============ PHA ============
+  {
+    id: "pha",
+    name: "PHA Lahore Financial Sustainability",
+    client: "Parks & Horticulture Authority",
+    type: "Financial Sustainability Advisory",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Data Gathering",
+    progress: 28,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/PHA",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/PHA%20Lahore/PHA",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20PHA%20Lahore",
+    statusReport: "Data gathering underway. Revenue stream analysis and CapEx benchmarking in progress.",
+    statusDate: "14 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Data Gathering", pct: 45, status: "amber" },
+      { name: "Analysis", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Hashim Riaz", role: "Project Lead", email: "hashim.riaz@pfas.com.pk", color: "navy" }
+    ],
+    chat: []
+  },
+
+  // ============ PUNJAB BENEVOLENT FUND ============
+  {
+    id: "pbf",
+    name: "Employees Welfare Fund",
+    client: "Punjab Benevolent Fund",
+    type: "Welfare Fund Advisory",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Data Gathering",
+    progress: 32,
+    activeTasks: 3,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/PBF",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Employees%20Welfare%20Fund/Punjab%20Benevolent%20Fund",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20PBF%20Welfare",
+    statusReport: "Data gathering underway. Beneficiary database and historical disbursement analysis in progress.",
+    statusDate: "13 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Data Gathering", pct: 50, status: "amber" },
+      { name: "Analysis", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [],
+    chat: []
+  },
+
+  // ============ FINANCE DEPARTMENT ============
+  {
+    id: "punjab-onebill",
+    name: "Punjab One Bill Study",
+    client: "Finance Department",
+    type: "Revenue Consolidation Study",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Phase 1 - DIAGNOSTICS & RECEIPT CLASSIFICATION",
+    progress: 25,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/Finance",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Punjab%20One%20Bill%20Study/Finance%20Department",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Punjab%20One%20Bill",
+    statusReport: "Phase 1 diagnostics & receipt classification underway. Mapping of existing receipt heads and process flows in progress.",
+    statusDate: "15 Jun 2026",
+    phases: [
+      { name: "Pre-Contract Signing", pct: 100, status: "green" },
+      { name: "Phase 1 — Diagnostics", pct: 40, status: "amber" },
+      { name: "Phase 2 — Institutional & Legal", pct: 0, status: "grey" },
+      { name: "Phase 3 — Final Study", pct: 0, status: "grey" },
+      { name: "Payments", pct: 0, status: "grey" }
+    ],
+    team: [],
+    chat: []
+  },
+
+  {
+    id: "vss",
+    name: "VSS Engagement",
+    client: "Finance Department",
+    type: "Voluntary Separation Scheme Advisory",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Diagnostic Review",
+    progress: 20,
+    activeTasks: 1,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/Finance",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/VSS%20Engagement/Finance%20Department",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20VSS%20Engagement",
+    statusReport: "Diagnostic review of existing workforce structures underway across pilot departments.",
+    statusDate: "13 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Diagnostic Review", pct: 50, status: "amber" },
+      { name: "Analysis", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [],
+    chat: []
+  },
+
+  // ============ ENERGY ============
+  {
+    id: "energy",
+    name: "PMW Strategic Design",
+    client: "Energy Department",
+    type: "Project Management Wing Restructuring",
+    health: "amber",
+    fee: "PKR 7.074 M",
+    phase: "Contract Signing",
+    progress: 15,
+    activeTasks: 2,
+    overdueTasks: 1,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgAP0fwlxoZcSaBjo-3Nhe-8ASdBglItdkiDqd329IHzhC0?e=5ekc3e",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/PMW%20Strategic%20Design/Energy",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Energy%20PMW",
+    statusReport: "Contract documents shared with the client's legal team for review. Awaiting confirmation on contract sign-off.",
+    statusDate: "17 Jun 2026",
+    phases: [
+      { name: "Contract Signing", pct: 50, status: "amber" },
+      { name: "Diagnostic (D-I)", pct: 0, status: "grey" },
+      { name: "Institutional Framework (D-II)", pct: 0, status: "grey" },
+      { name: "Final Study (D-III)", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [
+      { name: "Muhammad Fahad Tanveer", role: "Project Lead", email: "fahad.tanveer@pfas.pk", color: "navy" },
+      { name: "Hashim Riaz", role: "Senior Advisor", email: "hashim.riaz@pfas.com.pk", color: "gold" },
+      { name: "Awais Khan", role: "Analyst", email: "awais.khan@pfas.com.pk", color: "green" }
+    ],
+    chat: [
+      { from: "them", sender: "Fahad Tanveer", text: "Contract documents shared with your legal team. Awaiting confirmation.", time: "Yesterday" }
+    ]
+  },
+
+  // ============ P4A ============
   {
     id: "p4a",
     name: "Tertiary Care General Hospital",
@@ -648,8 +1139,8 @@ const PROJECTS = [
     overdueTasks: 3,
     onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgAYhriqzbPgS6GsZaO8JcsOAdNku4tGqSB5C6wZ6Tr5tE4?e=mpwXk0",
     teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/Tertiary%20Care%20Hospital/P4A",
-    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20P4A%20Tertiary%20Care%20Hospital%20%7C%20Discussion&attendees=hashim.riaz@pfas.com.pk,fahad.tanveer@pfas.pk",
-    statusReport: "There is currently a <strong>hold-up</strong> following P4A team's email of 9 Jun requesting PFAS to revise the proposal downward, on the basis that the prior consultant (who worked on the 2017 assignment) did not expect substantial rework. PFAS's review of documents indicates <strong>considerable rework is warranted</strong> due to major changes in macroeconomic conditions, healthcare sector evolution in Punjab (introduction of SHI insurance packages), PSER changes, land costs etc. A detailed response has been prepared by the Team Lead. Healthcare consultant Shehzad Leghari engaged 5 Jun; proposal expected this week.",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20P4A%20Tertiary%20Care",
+    statusReport: "Currently a <strong>hold-up</strong> following P4A team's email of 9 Jun requesting PFAS revise the proposal downward. PFAS's review of documents indicates <strong>considerable rework is warranted</strong> due to major changes in macroeconomic conditions, healthcare sector evolution in Punjab (SHI insurance packages), PSER changes, land costs. Detailed response prepared by Team Lead. Healthcare consultant Shehzad Leghari engaged 5 Jun.",
     statusDate: "15 Jun 2026",
     phases: [
       { name: "Contract Signing", pct: 67, status: "amber" },
@@ -665,88 +1156,67 @@ const PROJECTS = [
       { name: "Shehzad Leghari", role: "Healthcare Consultant", email: "—", color: "purple" }
     ],
     chat: [
-      { from: "them", sender: "Hashim Riaz", text: "Good day. We've engaged Shehzad Leghari as the healthcare consultant. He'll share a short proposal this week based on the TORs.", time: "Mon, 11:00 AM" },
-      { from: "me", text: "On the proposal revision — we'd like to discuss this further. Can we set up a call?", time: "Mon, 2:15 PM" },
-      { from: "them", sender: "Hashim Riaz", text: "Yes. We've prepared a detailed response highlighting why substantial rework is warranted — happy to walk through it.", time: "Mon, 2:45 PM" }
-    ],
-    activity: [
-      { sender: "Muhammad Fahad Tanveer", text: "There is a hold-up post email from P4A team on June 9, 2026, where PFAS was asked to revise the proposal downwards. Based on the review of documents it appears a considerable amount of rework is required due to massive changes in the macroeconomic situation, healthcare sector in Punjab (SHI insurance packages), PSER, land costs etc. A detailed response was developed by Team Lead and shared with COO PFAS.", time: "9 Jun" },
-      { sender: "Hashim Riaz", text: "Shehzad Leghari engaged as healthcare consultant. He'll share a short proposal this week based on the TORs.", time: "5 Jun" },
-      { sender: "Hashim Riaz", text: "PHIMC data request letter sent (revised version, after Mr. Afridi's direction).", time: "30 May" }
+      { from: "them", sender: "Hashim Riaz", text: "We've engaged Shehzad Leghari as the healthcare consultant. He'll share a proposal this week.", time: "Mon, 11:00 AM" }
     ]
   },
 
+  // ============ HIGHER EDUCATION ============
   {
-    id: "fiedmc-m3ic",
-    name: "M3IC Commercial Plot Sale",
-    client: "FIEDMC",
-    type: "Optimal Fund Utilisation Advisory",
+    id: "hed",
+    name: "Higher Education Department Advisory",
+    client: "Higher Education Department",
+    type: "Strategic Advisory",
     health: "green",
-    fee: "PKR 5.6 M",
-    phase: "Stakeholder Engagement",
-    progress: 45,
+    fee: "PKR TBD",
+    phase: "Data Gathering",
+    progress: 22,
+    activeTasks: 2,
+    overdueTasks: 0,
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/HED",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/HED%20Engagement/Higher%20Education%20Dept",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20HED",
+    statusReport: "Data gathering phase underway. University-level financial benchmarking in progress.",
+    statusDate: "13 Jun 2026",
+    phases: [
+      { name: "Onboarding", pct: 100, status: "green" },
+      { name: "Team Mobilization", pct: 100, status: "green" },
+      { name: "Data Gathering", pct: 40, status: "amber" },
+      { name: "Analysis", pct: 0, status: "grey" },
+      { name: "Closure", pct: 0, status: "grey" }
+    ],
+    team: [],
+    chat: []
+  },
+
+  // ============ PHIMC ============
+  {
+    id: "phimc",
+    name: "Economic & Financial Feasibility - 6 Hospitals",
+    client: "PHIMC",
+    type: "Healthcare Feasibility Advisory",
+    health: "green",
+    fee: "PKR TBD",
+    phase: "Data Gathering",
+    progress: 30,
     activeTasks: 3,
     overdueTasks: 0,
-    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgBsumuXRajrR68p1lVoyk9fAXSzT8AjpCaraSizNyGvS-A?e=gFo5iI",
-    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/M3IC%20Commercial%20Plot%20Sale/FIEDMC",
-    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20FIEDMC%20M3IC%20%7C%20Review&attendees=fahad.tanveer@pfas.pk,hashim.riaz@pfas.com.pk",
-    statusReport: "Stakeholder engagement phase progressing well. <strong>5 of 7 planned interviews</strong> have been completed. Strategy framework v1 drafted and under internal review. No overdue items. Project is on track for the next deliverable.",
-    statusDate: "16 Jun 2026",
+    onedriveProject: "https://pfaspk-my.sharepoint.com/sites/PHIMC",
+    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/6%20Hospitals%20Feasibility/PHIMC",
+    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20PHIMC%206%20Hospitals",
+    statusReport: "Data gathering underway across the 6 hospital sites. Catchment analysis and demand forecasting in progress. PHIMC data request letter sent (revised version, after Mr. Afridi's direction).",
+    statusDate: "13 Jun 2026",
     phases: [
-      { name: "Contract Signing", pct: 100, status: "green" },
+      { name: "Onboarding", pct: 100, status: "green" },
       { name: "Team Mobilization", pct: 100, status: "green" },
-      { name: "Stakeholder Engagement", pct: 70, status: "green" },
-      { name: "Strategy Formulation", pct: 10, status: "amber" },
+      { name: "Data Gathering", pct: 60, status: "amber" },
+      { name: "Analysis", pct: 0, status: "grey" },
+      { name: "PPP Structuring", pct: 0, status: "grey" },
       { name: "Closure", pct: 0, status: "grey" }
     ],
     team: [
-      { name: "Muhammad Fahad Tanveer", role: "Project Lead", email: "fahad.tanveer@pfas.pk", color: "navy" },
-      { name: "Hashim Riaz", role: "Senior Advisor", email: "hashim.riaz@pfas.com.pk", color: "gold" }
+      { name: "Hashim Riaz", role: "Team Lead", email: "hashim.riaz@pfas.com.pk", color: "navy" }
     ],
-    chat: [
-      { from: "them", sender: "Fahad Tanveer", text: "Stakeholder engagement progressing well. 5 of 7 interviews complete. Strategy framework v1 drafted.", time: "Today, 12:30 PM" },
-      { from: "me", text: "Excellent. When can we expect preliminary findings?", time: "Today, 1:00 PM" }
-    ],
-    activity: [
-      { sender: "Fahad Tanveer", text: "Stakeholder engagement progressing well. 5 of 7 interviews complete. Strategy framework v1 drafted.", time: "Today, 12:30 PM" },
-      { sender: "Hashim Riaz", text: "Strategy framework v1 will be circulated for internal review by EOD.", time: "3 days ago" }
-    ]
-  },
-
-  {
-    id: "energy",
-    name: "PMW Strategic Design",
-    client: "Energy Department, Punjab",
-    type: "Project Management Wing Restructuring",
-    health: "amber",
-    fee: "PKR 7.074 M",
-    phase: "Contract Signing",
-    progress: 15,
-    activeTasks: 2,
-    overdueTasks: 1,
-    onedriveProject: "https://pfaspk-my.sharepoint.com/:f:/g/personal/hamza_naeem_pfas_pk/IgAP0fwlxoZcSaBjo-3Nhe-8ASdBglItdkiDqd329IHzhC0?e=5ekc3e",
-    teamsChannelDeepLink: "https://teams.microsoft.com/l/channel/PMW%20Strategic%20Design/Energy",
-    teamsScheduleMeeting: "https://teams.microsoft.com/l/meeting/new?subject=PFAS%20%E2%80%94%20Energy%20PMW%20%7C%20Discussion&attendees=fahad.tanveer@pfas.pk,hashim.riaz@pfas.com.pk,awais.khan@pfas.com.pk",
-    statusReport: "Contract documents have been shared with the client's legal team for review. Awaiting confirmation on contract sign-off. Once signed, Phase 1 (Diagnostic & Receipt Classification) commences immediately. Team mobilization is ready pending contract close.",
-    statusDate: "17 Jun 2026",
-    phases: [
-      { name: "Contract Signing", pct: 50, status: "amber" },
-      { name: "Diagnostic (D-I)", pct: 0, status: "grey" },
-      { name: "Institutional Framework (D-II)", pct: 0, status: "grey" },
-      { name: "Final Study (D-III)", pct: 0, status: "grey" },
-      { name: "Closure", pct: 0, status: "grey" }
-    ],
-    team: [
-      { name: "Muhammad Fahad Tanveer", role: "Project Lead", email: "fahad.tanveer@pfas.pk", color: "navy" },
-      { name: "Hashim Riaz", role: "Senior Advisor", email: "hashim.riaz@pfas.com.pk", color: "gold" },
-      { name: "Awais Khan", role: "Analyst", email: "awais.khan@pfas.com.pk", color: "green" }
-    ],
-    chat: [
-      { from: "them", sender: "Fahad Tanveer", text: "Contract documents shared with your legal team. Awaiting confirmation.", time: "Yesterday, 4:30 PM" }
-    ],
-    activity: [
-      { sender: "Fahad Tanveer", text: "Contract documents shared with your legal team for review. Awaiting confirmation.", time: "Yesterday, 4:30 PM" }
-    ]
+    chat: []
   }
 ];
 
