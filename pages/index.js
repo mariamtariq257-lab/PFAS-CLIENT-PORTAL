@@ -235,7 +235,7 @@ const STAFF_DIRECTORY = {
   "ammar.yasir@pfas.com.pk":    { designation: "Senior Manager / Senior Associate Project Management & TPV",       contact: "0345-4547945" },
   "hamza.naeem@pfas.pk":        { designation: "Manager / Associate Project Management & TPV",                     contact: "0346-6991919" },
   "maryam.tariq@pfas.pk":       { designation: "Assistant Manager / Senior Analyst Project Management & TPV",      contact: "0334-7073889" },
-  "meiraj.khan@pfas.pk":        { designation: "Analyst Project Management & TPV",                                 contact: "+92 322 0227875" },
+  "meiraj.khan@pfas.pk":        { designation: "Analyst Project Management & TPV",                                 contact: "0322-0227875" },
   "amjad.murtaza@pfas.pk":      { designation: "Senior Manager / Senior Associate Transaction Advisory",           contact: "0334-3610333" },
   "syed.rehan@pfas.pk":         { designation: "Manager / Associate Financial Management",                         contact: "0333-4445651" },
   "umar.paracha@pfas.com.pk":   { designation: "Assistant Manager / Senior Analyst Transaction Advisory",          contact: "0331-0040695" },
@@ -529,23 +529,31 @@ function DocumentsSection({ project }) {
 
 // ── Quick actions ─────────────────────────────────────────────────────────────
 function ActionsGrid({ project }) {
+  // Scheduling: two paths.
+  //  • teamsBookingUrl  → open self-service Bookings / Virtual Appointments page (client, no login)
+  //  • teamsScheduleUrl → Teams "New meeting" deep link composer (PFAS team, set time + invite)
   return (
     <div className="actions-grid">
       <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-blue">📁</div>
         <div className="action-text"><div className="action-title">Shared Documents</div><div className="action-desc">Client Communication folder</div></div>
       </a>
-      <a className="action-btn" href={project.teamsMeeting || "#"} target="_blank" rel="noreferrer">
+
+      {/* Client self-service booking — no Teams account required */}
+      <a className="action-btn" href={project.teamsBookingUrl || project.teamsMeeting || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-green">📅</div>
-        <div className="action-text"><div className="action-title">Schedule Meeting</div><div className="action-desc">New Teams meeting · pre-invited</div></div>
+        <div className="action-text"><div className="action-title">Book a Meeting</div><div className="action-desc">Pick an open slot with your PFAS team</div></div>
       </a>
+
+      {/* PFAS-side scheduler — Teams deep link (opens New meeting composer) */}
+      <a className="action-btn" href={project.teamsScheduleUrl || "https://teams.microsoft.com/l/meeting/new"} target="_blank" rel="noreferrer">
+        <div className="action-icon ai-purple">🗓</div>
+        <div className="action-text"><div className="action-title">Schedule in Teams</div><div className="action-desc">Open Teams to set up & invite</div></div>
+      </a>
+
       <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-purple">📝</div>
         <div className="action-text"><div className="action-title">Meeting Minutes</div><div className="action-desc">MoMs folder · OneDrive</div></div>
-      </a>
-      <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
-        <div className="action-icon ai-orange">📤</div>
-        <div className="action-text"><div className="action-title">Submit Data / Document</div><div className="action-desc">Upload to data-from-client folder</div></div>
       </a>
       <a className="action-btn" href={project.teamsChannel || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-pink">💬</div>
