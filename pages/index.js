@@ -206,7 +206,7 @@ function PhaseList({ phases }) {
       {sorted.map((ph, i) => (
         <div className="phase-row" key={i}>
           <div className="phase-head">
-            <div className="phase-name">{ph.name}</div>
+            <div className="phase-name">{(ph.name || "").replace(/^\s*phase\s*[-:.]?\s*/i, "")}</div>
             <div className={`phase-pct pct-${ph.status}`}>{ph.pct}%</div>
           </div>
           <div className={`phase-bar b-${ph.status}`}>
@@ -264,12 +264,21 @@ function TeamGrid({ team }) {
         const designation = staff.designation || m.role || "—";
         const contact     = staff.contact     || null;
         const emailDisplay = m.email && m.email !== "—" ? m.email : null;
+        // Per-member Teams scheduling deep link — pre-fills this member as attendee
+        const scheduleHref = emailDisplay
+          ? `https://teams.microsoft.com/l/meeting/new?attendees=${encodeURIComponent(emailDisplay)}&subject=${encodeURIComponent("PFAS Meeting — " + m.name)}`
+          : "https://teams.microsoft.com/l/meeting/new";
         return (
           <div className="member-card" key={i}>
             <div className={`avatar av-${m.color}`}>{initials}</div>
             <div className="member-info">
               <div className="member-name">{m.name}</div>
               <div className="member-role">{designation}</div>
+              <a className="member-schedule-btn" href={scheduleHref} target="_blank" rel="noreferrer">
+                📅 Schedule Meeting
+              </a>
+            </div>
+            <div className="member-contact-side">
               {emailDisplay && (
                 <div className="member-email">
                   <span className="member-contact-icon">✉</span>
@@ -545,24 +554,82 @@ function ActionsGrid({ project }) {
         <div className="action-text"><div className="action-title">Book a Meeting</div><div className="action-desc">Pick an open slot with your PFAS team</div></div>
       </a>
 
-      {/* PFAS-side scheduler — Teams deep link (opens New meeting composer) */}
-      <a className="action-btn" href={project.teamsScheduleUrl || "https://teams.microsoft.com/l/meeting/new"} target="_blank" rel="noreferrer">
-        <div className="action-icon ai-purple">🗓</div>
-        <div className="action-text"><div className="action-title">Schedule in Teams</div><div className="action-desc">Open Teams to set up & invite</div></div>
-      </a>
-
       <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-purple">📝</div>
         <div className="action-text"><div className="action-title">Meeting Minutes</div><div className="action-desc">MoMs folder · OneDrive</div></div>
-      </a>
-      <a className="action-btn" href={project.teamsChannel || "#"} target="_blank" rel="noreferrer">
-        <div className="action-icon ai-pink">💬</div>
-        <div className="action-text"><div className="action-title">Message PFAS Team</div><div className="action-desc">Open Teams channel</div></div>
       </a>
       <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-cyan">💰</div>
         <div className="action-text"><div className="action-title">Invoices & Payments</div><div className="action-desc">Payments folder · OneDrive</div></div>
       </a>
+    </div>
+  );
+}
+
+// ── Scheduling log ────────────────────────────────────────────────────────────
+// Reads project.meetings: [{ title, datetime (ISO), attendees?, joinUrl?, notesUrl? }]
+// Auto-splits into Upcoming (datetime >= now) and Completed (datetime < now).
+// Works today with a static array in PROJECT_META; flip `meetings` to a live
+// Graph /events or ClickUp feed later with no change to this component.
+function MeetingLog({ project }) {
+  const all = Array.isArray(project.meetings) ? project.meetings : [];
+  const now = new Date();
+
+  const parse = (m) => ({ ...m, _d: m.datetime ? new Date(m.datetime) : null });
+  const parsed = all.map(parse).filter(m => m._d && !isNaN(m._d));
+
+  const upcoming = parsed
+    .filter(m => m._d >= now)
+    .sort((a, b) => a._d - b._d);
+  const completed = parsed
+    .filter(m => m._d < now)
+    .sort((a, b) => b._d - a._d);
+
+  const fmt = (d) =>
+    d.toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" }) +
+    " · " +
+    d.toLocaleTimeString("en-PK", { hour: "numeric", minute: "2-digit" });
+
+  const row = (m, i, kind) => (
+    <div className={`mtg-row mtg-${kind}`} key={`${kind}-${i}`}>
+      <div className="mtg-dot" />
+      <div className="mtg-body">
+        <div className="mtg-title">{m.title || "Meeting"}</div>
+        <div className="mtg-meta">
+          {fmt(m._d)}
+          {m.attendees ? <span className="mtg-attendees"> · {m.attendees}</span> : null}
+        </div>
+      </div>
+      <div className="mtg-actions">
+        {kind === "up" && m.joinUrl && (
+          <a className="mtg-link mtg-join" href={m.joinUrl} target="_blank" rel="noreferrer">Join ↗</a>
+        )}
+        {kind === "done" && m.notesUrl && (
+          <a className="mtg-link mtg-notes" href={m.notesUrl} target="_blank" rel="noreferrer">Minutes ↗</a>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="section-card mtg-card">
+      <div className="section-title">Scheduling Log</div>
+
+      <div className="mtg-group-label mtg-up-label">
+        <span className="mtg-label-dot dot-amber" /> Upcoming Meetings
+        <span className="mtg-count">{upcoming.length}</span>
+      </div>
+      {upcoming.length
+        ? upcoming.map((m, i) => row(m, i, "up"))
+        : <div className="mtg-empty">No upcoming meetings scheduled.</div>}
+
+      <div className="mtg-group-label mtg-done-label" style={{ marginTop: 18 }}>
+        <span className="mtg-label-dot dot-green" /> Completed Meetings
+        <span className="mtg-count">{completed.length}</span>
+      </div>
+      {completed.length
+        ? completed.map((m, i) => row(m, i, "done"))
+        : <div className="mtg-empty">No meetings recorded yet.</div>}
     </div>
   );
 }
@@ -720,6 +787,9 @@ export default function ClientPortal() {
 
               {/* Teams Discussion Panel — center */}
               <TeamsPanel project={project} />
+
+              {/* Scheduling Log — upcoming + completed meetings */}
+              <MeetingLog project={project} />
 
               {/* Documents */}
               <DocumentsSection project={project} />
