@@ -255,7 +255,14 @@ const STAFF_DIRECTORY = {
 function TeamGrid({ team }) {
   if (!team?.length) return <p style={{ color: "#94A3B8", fontSize: 13 }}>Team details coming soon.</p>;
   return (
-    <div className="team-grid">
+    <div
+      className="team-grid"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+        gap: 14,
+      }}
+    >
       {team.map((m, i) => {
         const initials = m.name.split(" ").map(n => n[0]).join("").substring(0, 2);
         // Enrich from staff directory using email as key
@@ -269,29 +276,100 @@ function TeamGrid({ team }) {
           ? `https://teams.microsoft.com/l/meeting/new?attendees=${encodeURIComponent(emailDisplay)}&subject=${encodeURIComponent("PFAS Meeting — " + m.name)}`
           : "https://teams.microsoft.com/l/meeting/new";
         return (
-          <div className="member-card" key={i}>
-            <div className={`avatar av-${m.color}`}>{initials}</div>
-            <div className="member-info">
-              <div className="member-name">{m.name}</div>
-              <div className="member-role">{designation}</div>
-              <a className="member-schedule-btn" href={scheduleHref} target="_blank" rel="noreferrer">
-                📅 Schedule Meeting
-              </a>
+          <div
+            className="member-card"
+            key={i}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+              padding: 16,
+              background: "#fff",
+              border: "1px solid #E2E8F0",
+              borderRadius: 14,
+              minWidth: 0,
+            }}
+          >
+            {/* Header: avatar + name/role side by side */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+              <div
+                className={`avatar av-${m.color}`}
+                style={{
+                  flexShrink: 0,
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: 15,
+                }}
+              >
+                {initials}
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div
+                  className="member-name"
+                  style={{ fontWeight: 700, fontSize: 15, color: "#1E293B", lineHeight: 1.25 }}
+                >
+                  {m.name}
+                </div>
+                <div
+                  className="member-role"
+                  style={{ fontSize: 12.5, color: "#64748B", lineHeight: 1.35, marginTop: 2 }}
+                >
+                  {designation}
+                </div>
+              </div>
             </div>
-            <div className="member-contact-side">
+
+            {/* Contact block */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
               {emailDisplay && (
-                <div className="member-email">
-                  <span className="member-contact-icon">✉</span>
-                  <a href={`mailto:${emailDisplay}`} style={{ color: "var(--navy)", textDecoration: "none" }}>{emailDisplay}</a>
+                <div className="member-email" style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12.5, minWidth: 0 }}>
+                  <span style={{ flexShrink: 0 }}>✉</span>
+                  <a
+                    href={`mailto:${emailDisplay}`}
+                    style={{ color: "#1F3A5F", textDecoration: "none", overflowWrap: "anywhere", wordBreak: "break-word" }}
+                  >
+                    {emailDisplay}
+                  </a>
                 </div>
               )}
               {contact && (
-                <div className="member-contact">
-                  <span className="member-contact-icon">📞</span>
-                  <a href={`tel:${contact}`} style={{ color: "var(--slate)", textDecoration: "none" }}>{contact}</a>
+                <div className="member-contact" style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12.5 }}>
+                  <span style={{ flexShrink: 0 }}>📞</span>
+                  <a href={`tel:${contact}`} style={{ color: "#475569", textDecoration: "none" }}>{contact}</a>
                 </div>
               )}
             </div>
+
+            {/* Schedule button */}
+            <a
+              className="member-schedule-btn"
+              href={scheduleHref}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                marginTop: 2,
+                padding: "7px 12px",
+                background: "#EEF2FF",
+                color: "#4338CA",
+                fontSize: 12.5,
+                fontWeight: 600,
+                borderRadius: 8,
+                textDecoration: "none",
+                border: "1px solid #E0E7FF",
+              }}
+            >
+              📅 Schedule Meeting
+            </a>
           </div>
         );
       })}
