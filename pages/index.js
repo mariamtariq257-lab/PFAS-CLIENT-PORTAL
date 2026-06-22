@@ -45,7 +45,7 @@ function DevPicker({ onSelect }) {
   return (
     <div className="login-overlay">
       <div className="login-card">
-        <div className="login-logo">P</div>
+        <div className="login-logo">PFAS</div>
         <div className="login-title">PFAS Client Portal</div>
         <div className="login-sub">Local development mode</div>
         <div className="dev-banner">
@@ -78,7 +78,7 @@ function LoginScreen({ onLogin, error }) {
   return (
     <div className="login-overlay">
       <div className="login-card">
-        <div className="login-logo">P</div>
+        <div className="login-logo">PFAS</div>
         <div className="login-title">PFAS Client Portal</div>
         <div className="login-sub">Sign in to access your engagement workspace</div>
         <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
@@ -116,7 +116,7 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev }) {
   return (
     <div className="topbar">
       <div className="brand">
-        <div className="brand-logo">P</div>
+        <div className="brand-logo">PFAS</div>
         <div>
           <div className="brand-sub">Punjab Financial Advisory Services</div>
           <div className="brand-name">Client Portal</div>
@@ -140,9 +140,8 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev }) {
   );
 }
 
-// ── Project header ────────────────────────────────────────────────────────────
+// ── Project header (health chip removed) ──────────────────────────────────────
 function ProjectHeader({ project }) {
-  const healthLabel = { green: "GREEN", amber: "AMBER", red: "RED" }[project.health] || "AMBER";
   return (
     <div className="project-header">
       <div className="ph-top">
@@ -150,7 +149,6 @@ function ProjectHeader({ project }) {
           <div className="ph-eyebrow">{project.type}</div>
           <div className="ph-title">{project.displayName || project.name}</div>
         </div>
-        <div className={`health-chip health-${project.health}`}>● {healthLabel}</div>
       </div>
       <div className="ph-meta">
         <span><strong>Client:</strong> {project.clientName}</span>
@@ -237,6 +235,7 @@ const STAFF_DIRECTORY = {
   "ammar.yasir@pfas.com.pk":    { designation: "Senior Manager / Senior Associate Project Management & TPV",       contact: "0345-4547945" },
   "hamza.naeem@pfas.pk":        { designation: "Manager / Associate Project Management & TPV",                     contact: "0346-6991919" },
   "maryam.tariq@pfas.pk":       { designation: "Assistant Manager / Senior Analyst Project Management & TPV",      contact: "0334-7073889" },
+  "meiraj.khan@pfas.pk":        { designation: "Analyst Project Management & TPV",                                 contact: "+92 322 0227875" },
   "amjad.murtaza@pfas.pk":      { designation: "Senior Manager / Senior Associate Transaction Advisory",           contact: "0334-3610333" },
   "syed.rehan@pfas.pk":         { designation: "Manager / Associate Financial Management",                         contact: "0333-4445651" },
   "umar.paracha@pfas.com.pk":   { designation: "Assistant Manager / Senior Analyst Transaction Advisory",          contact: "0331-0040695" },
@@ -659,7 +658,7 @@ export default function ClientPortal() {
         {headAndCss}
         <div style={{ minHeight: "100vh", background: "#F4F6F9", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ textAlign: "center", color: "#475569" }}>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", color: "#fff", fontWeight: 800, fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>P</div>
+            <div style={{ width: 72, height: 48, borderRadius: 12, background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", color: "#fff", fontWeight: 800, fontSize: 18, letterSpacing: 1, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>PFAS</div>
             <p style={{ fontSize: 14 }}>Loading portal…</p>
           </div>
         </div>
