@@ -8,35 +8,87 @@ const AUTH0_CLIENT_ID = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID || "Rhh7Of9haJru
 
 // IS_DEV is determined client-side only to avoid SSR/hydration mismatch
 
+// ── EMAIL → PROJECT(S) MAP ────────────────────────────────────────────────────
+// Each entry has a `projects` array. Single-project clients have 1 entry,
+// multi-project clients have multiple. The dropdown only shows if length > 1.
+//
+// Old single-project logins (cw-bot1@pfas.pk etc.) still work — they map to
+// a single-element projects array. New combined logins (cw@pfas.pk) map to
+// the full project list and trigger the dropdown UI.
 const EMAIL_PROJECT_MAP = {
-  "demo@pfas.pk":       { name: "Demo Client",            slug: "pcmmdc"         },
-  "pcmmdc@pfas.pk":     { name: "PCMMDC",                 slug: "pcmmdc"         },
-  "p4a@pfas.pk":        { name: "P4A",                    slug: "p4a"            },
-  "fiedmc@pfas.pk":     { name: "FIEDMC",                 slug: "fiedmc-m3ic"    },
-  "fiedmc-sbp@pfas.pk": { name: "FIEDMC (SBP)",           slug: "fiedmc-sbp"     },
-  "energy@pfas.pk":     { name: "Energy Dept",            slug: "energy"         },
-  "fisheries@pfas.pk":  { name: "Fisheries Dept",         slug: "shrimps"        },
-  "cw-bot1@pfas.pk":    { name: "C&W (BOT-1)",            slug: "bot1"           },
-  "cw-bot2@pfas.pk":    { name: "C&W (BOT-2)",            slug: "bot2"           },
-  "cw-bot3@pfas.pk":    { name: "C&W (BOT-3)",            slug: "bot3"           },
-  "cw-bot4@pfas.pk":    { name: "C&W (BOT-4)",            slug: "bot4"           },
-  "cw-bot5@pfas.pk":    { name: "C&W (BOT-5)",            slug: "bot5"           },
-  "cw-om@pfas.pk":      { name: "C&W (18 O&M)",           slug: "om-roads"       },
-  "wildlife-b@pfas.pk": { name: "Wildlife (Bansra Gali)", slug: "wildlife-bansra"},
-  "wildlife-c@pfas.pk": { name: "Wildlife (Changa)",      slug: "wildlife-changa"},
-  "tam@pfas.pk":        { name: "TAM",                    slug: "tam"            },
-  "pha@pfas.pk":        { name: "PHA",                    slug: "pha"            },
-  "pbf@pfas.pk":        { name: "Punjab Benevolent",      slug: "pbf"            },
-  "finance@pfas.pk":    { name: "Finance Dept",           slug: "punjab-onebill" },
-  "vss@pfas.pk":        { name: "Finance (VSS)",          slug: "vss"            },
-  "hed@pfas.pk":        { name: "HED",                    slug: "hed"            },
-  "phimc@pfas.pk":      { name: "PHIMC",                  slug: "phimc"          },
+  // ── Single-project logins (one client, one project) ────────────────────────
+  "demo@pfas.pk":       { name: "Demo Client",            projects: [{ slug: "pcmmdc",         label: "PCMMDC HR Manual" }] },
+  "pcmmdc@pfas.pk":     { name: "PCMMDC",                 projects: [{ slug: "pcmmdc",         label: "PCMMDC HR Manual" }] },
+  "p4a@pfas.pk":        { name: "P4A",                    projects: [{ slug: "p4a",            label: "Tertiary Care Hospital" }] },
+  "energy@pfas.pk":     { name: "Energy Dept",            projects: [{ slug: "energy",         label: "PMW Strategic Design" }] },
+  "fisheries@pfas.pk":  { name: "Fisheries Dept",         projects: [{ slug: "shrimps",        label: "Shrimps Estate Project" }] },
+  "tam@pfas.pk":        { name: "TAM",                    projects: [{ slug: "tam",            label: "Time Travel Theme Park" }] },
+  "pha@pfas.pk":        { name: "PHA",                    projects: [{ slug: "pha",            label: "PHA Lahore Sustainability" }] },
+  "pbf@pfas.pk":        { name: "Punjab Benevolent",      projects: [{ slug: "pbf",            label: "Employees Welfare Fund" }] },
+  "hed@pfas.pk":        { name: "HED",                    projects: [{ slug: "hed",            label: "HED Engagement" }] },
+  "phimc@pfas.pk":      { name: "PHIMC",                  projects: [{ slug: "phimc",          label: "6 Hospitals Feasibility" }] },
+
+  // ── Combined logins (one client, multiple projects → dropdown appears) ─────
+  "cw@pfas.pk": {
+    name: "C&W Department",
+    projects: [
+      { slug: "bot1",     label: "BOT-1 Depalpur-Pakpattan-Vehari" },
+      { slug: "bot2",     label: "BOT-2 Chiragabad-Jhang-Shorkot" },
+      { slug: "bot3",     label: "BOT-3 Muzaffargarh-Alipur-TM Panah" },
+      { slug: "bot4",     label: "BOT-4 Sahiwal-Samundari" },
+      { slug: "bot5",     label: "BOT-5 Bahawalpur-Jhangra Sharqi" },
+      { slug: "om-roads", label: "18 O&M Roads PPP" },
+    ],
+  },
+  "fiedmc@pfas.pk": {
+    name: "FIEDMC",
+    projects: [
+      { slug: "fiedmc-m3ic", label: "M3IC Commercial Plot Sale" },
+      { slug: "fiedmc-sbp",  label: "Strategic Business Plan" },
+    ],
+  },
+  "finance@pfas.pk": {
+    name: "Finance Department",
+    projects: [
+      { slug: "punjab-onebill", label: "Punjab One Bill Study" },
+      { slug: "vss",            label: "VSS Engagement" },
+    ],
+  },
+  "wildlife@pfas.pk": {
+    name: "Wildlife Department",
+    projects: [
+      { slug: "wildlife-bansra", label: "Bansra Gali Wildlife" },
+      { slug: "wildlife-changa", label: "Changa Manga Wildlife" },
+    ],
+  },
+
+  // ── Legacy single-project logins (kept active so nothing breaks) ───────────
+  "fiedmc-sbp@pfas.pk": { name: "FIEDMC (SBP)",           projects: [{ slug: "fiedmc-sbp",     label: "FIEDMC Strategic Business Plan" }] },
+  "cw-bot1@pfas.pk":    { name: "C&W (BOT-1)",            projects: [{ slug: "bot1",           label: "BOT-1 Depalpur-Pakpattan-Vehari" }] },
+  "cw-bot2@pfas.pk":    { name: "C&W (BOT-2)",            projects: [{ slug: "bot2",           label: "BOT-2 Chiragabad-Jhang-Shorkot" }] },
+  "cw-bot3@pfas.pk":    { name: "C&W (BOT-3)",            projects: [{ slug: "bot3",           label: "BOT-3 Muzaffargarh-Alipur-TM Panah" }] },
+  "cw-bot4@pfas.pk":    { name: "C&W (BOT-4)",            projects: [{ slug: "bot4",           label: "BOT-4 Sahiwal-Samundari" }] },
+  "cw-bot5@pfas.pk":    { name: "C&W (BOT-5)",            projects: [{ slug: "bot5",           label: "BOT-5 Bahawalpur-Jhangra Sharqi" }] },
+  "cw-om@pfas.pk":      { name: "C&W (18 O&M)",           projects: [{ slug: "om-roads",       label: "18 O&M Roads PPP" }] },
+  "wildlife-b@pfas.pk": { name: "Wildlife (Bansra Gali)", projects: [{ slug: "wildlife-bansra",label: "Bansra Gali Wildlife" }] },
+  "wildlife-c@pfas.pk": { name: "Wildlife (Changa)",      projects: [{ slug: "wildlife-changa",label: "Changa Manga Wildlife" }] },
+  "vss@pfas.pk":        { name: "Finance (VSS)",          projects: [{ slug: "vss",            label: "VSS Engagement" }] },
 };
 
-// All slugs for dev picker
-const ALL_PROJECTS = Object.values(EMAIL_PROJECT_MAP).filter(
-  (v, i, a) => a.findIndex(x => x.slug === v.slug) === i
-);
+// All distinct project slugs (for dev picker)
+const ALL_PROJECTS = (() => {
+  const seen = new Set();
+  const list = [];
+  Object.values(EMAIL_PROJECT_MAP).forEach(acc => {
+    acc.projects.forEach(p => {
+      if (!seen.has(p.slug)) {
+        seen.add(p.slug);
+        list.push({ slug: p.slug, name: p.label });
+      }
+    });
+  });
+  return list;
+})();
 
 
 // ── Dev mode project picker ───────────────────────────────────────────────────
@@ -110,9 +162,121 @@ function LoadingSkeleton() {
   );
 }
 
+// ── Project switcher dropdown ─────────────────────────────────────────────────
+// Renders only when the logged-in client has 2+ projects. Compact dropdown
+// styled to match the top bar. Closes on outside click.
+function ProjectSwitcher({ projects, currentSlug, onChange }) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [open]);
+
+  const current = projects.find(p => p.slug === currentSlug) || projects[0];
+
+  return (
+    <div
+      ref={wrapRef}
+      style={{ position: "relative", display: "inline-block" }}
+    >
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "6px 12px",
+          background: "rgba(255,255,255,0.12)",
+          color: "#fff",
+          border: "1px solid rgba(255,255,255,0.2)",
+          borderRadius: 16,
+          fontSize: 12,
+          fontWeight: 600,
+          cursor: "pointer",
+          maxWidth: 280,
+        }}
+      >
+        <span style={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}>
+          {current.label}
+        </span>
+        <span style={{ fontSize: 10, opacity: 0.8 }}>▾</span>
+      </button>
+
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 6px)",
+            right: 0,
+            background: "#fff",
+            border: "1px solid #E2E8F0",
+            borderRadius: 12,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+            padding: 6,
+            zIndex: 100,
+            minWidth: 280,
+            maxHeight: 360,
+            overflowY: "auto",
+          }}
+        >
+          <div style={{
+            fontSize: 10,
+            letterSpacing: 1.2,
+            fontWeight: 700,
+            color: "#94A3B8",
+            padding: "8px 12px 4px",
+            textTransform: "uppercase",
+          }}>
+            Switch Project
+          </div>
+          {projects.map(p => {
+            const isActive = p.slug === currentSlug;
+            return (
+              <button
+                key={p.slug}
+                onClick={() => { onChange(p.slug); setOpen(false); }}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "10px 12px",
+                  background: isActive ? "#F1F5F9" : "transparent",
+                  border: "none",
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: isActive ? 600 : 500,
+                  color: isActive ? "#1F3A5F" : "#334155",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "#F8FAFC"; }}
+                onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
+              >
+                {isActive && <span style={{ color: "#276749", marginRight: 6 }}>✓</span>}
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Top bar ───────────────────────────────────────────────────────────────────
-function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev }) {
+function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects, currentSlug, onProjectChange }) {
   const initial = userName ? userName[0].toUpperCase() : "?";
+  const showSwitcher = projects && projects.length > 1;
   return (
     <div className="topbar">
       <div className="brand">
@@ -123,6 +287,13 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev }) {
         </div>
       </div>
       <div className="topbar-right">
+        {showSwitcher && (
+          <ProjectSwitcher
+            projects={projects}
+            currentSlug={currentSlug}
+            onChange={onProjectChange}
+          />
+        )}
         <span className="live-badge">
           <span className="live-dot" />
           {lastUpdated ? `Updated ${lastUpdated}` : "LIVE · ClickUp"}
@@ -717,6 +888,7 @@ export default function ClientPortal() {
   const [authState, setAuthState]     = useState("loading");
   const [authError, setAuthError]     = useState("");
   const [userName, setUserName]       = useState("");
+  const [allowedProjects, setAllowedProjects] = useState([]); // [{slug,label}, ...] for current login
   const [projectSlug, setSlug]        = useState("");
   const [project, setProject]         = useState(null);
   const [dataLoading, setDataLoading] = useState(false);
@@ -766,7 +938,8 @@ export default function ClientPortal() {
           return;
         }
         setUserName(acc.name);
-        setSlug(acc.slug);
+        setAllowedProjects(acc.projects);
+        setSlug(acc.projects[0].slug); // default to first project
         setAuthState("app");
       } else {
         setAuthState("login");
@@ -789,8 +962,16 @@ export default function ClientPortal() {
 
   const handleLogin     = () => auth0Ref.current?.loginWithRedirect();
   const handleLogout    = () => auth0Ref.current?.logout({ logoutParams: { returnTo: window.location.origin } });
-  const handleDevSelect = (slug, name) => { setUserName(name); setSlug(slug); setAuthState("app"); };
+  const handleDevSelect = (slug, name) => {
+    setUserName(name);
+    setAllowedProjects([{ slug, label: name }]); // dev mode: single project at a time
+    setSlug(slug);
+    setAuthState("app");
+  };
   const handleDevSwitch = () => { setAuthState("devpicker"); setProject(null); setSlug(""); };
+  const handleProjectChange = (newSlug) => {
+    setSlug(newSlug);
+  };
 
   // ── Shared <Head> ───────────────────────────────────────────────────────────
   const headAndCss = (
@@ -833,7 +1014,16 @@ export default function ClientPortal() {
   return (
     <>
       {headAndCss}
-      <TopBar userName={userName} onLogout={handleLogout} lastUpdated={project?.lastUpdated} isDev={isDev} onSwitchDev={handleDevSwitch} />
+      <TopBar
+        userName={userName}
+        onLogout={handleLogout}
+        lastUpdated={project?.lastUpdated}
+        isDev={isDev}
+        onSwitchDev={handleDevSwitch}
+        projects={allowedProjects}
+        currentSlug={projectSlug}
+        onProjectChange={handleProjectChange}
+      />
       <div className="container">
         <div className="hero">
           <div className="live-corner">LIVE DATA</div>
