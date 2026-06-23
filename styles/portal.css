@@ -22,7 +22,7 @@ html, body {
 .login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--navy), var(--navy-dark)); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; transition: all 0.15s; }
 .login-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(31,58,95,0.3); }
 .login-error { font-size: 12px; color: var(--red); text-align: center; margin-top: 10px; }
-.login-footer { text-align: center; font-size: 11px; color: var(--slate-light); margin-top: 24px; letter-spacing: 0.5px; }
+.login-footer { text-align: center; font-size: 11px; color: var(--slate-light); margin-top: 24px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap; }
 .login-hint { background: #F8FAFC; border-radius: 8px; padding: 10px 14px; font-size: 11px; color: var(--slate); margin-top: 16px; border-left: 3px solid var(--gold); }
 .login-hint strong { color: var(--navy); }
 
@@ -225,3 +225,175 @@ html, body {
 
 /* SHIMMER */
 @keyframes shimmer { 0%{opacity:1} 50%{opacity:0.5} 100%{opacity:1} }
+
+/* SCHEDULING LOG */
+.mtg-card { }
+.mtg-group-label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.mtg-label-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.mtg-count { margin-left: auto; background: #F1F5F9; color: var(--slate); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.mtg-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px dashed #F1F5F9; }
+.mtg-row:last-of-type { border-bottom: none; }
+.mtg-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.mtg-up   .mtg-dot  { background: var(--amber); }
+.mtg-done .mtg-dot  { background: var(--green); }
+.mtg-body { flex: 1; min-width: 0; }
+.mtg-title { font-size: 13px; font-weight: 600; color: #1E293B; }
+.mtg-meta { font-size: 11.5px; color: var(--slate); margin-top: 3px; }
+.mtg-attendees { color: var(--slate-light); }
+.mtg-actions { flex-shrink: 0; }
+.mtg-link { font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 8px; text-decoration: none; }
+.mtg-join  { background: #DCFCE7; color: var(--green); }
+.mtg-notes { background: #DBEAFE; color: #1E40AF; }
+.mtg-empty { font-size: 12.5px; color: var(--slate-light); padding: 8px 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADMIN FEATURE CSS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Admin link in login footer ─────────────────────────────────────────────── */
+.admin-link-btn {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-left: 12px;
+  transition: color 0.15s, background 0.15s;
+  vertical-align: middle;
+}
+.admin-link-btn:hover {
+  color: #1F3A5F;
+  background: #F1F5F9;
+}
+
+/* ── PIN modal overlay ───────────────────────────────────────────────────────── */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.15s ease;
+}
+
+.admin-modal-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  width: 340px;
+  max-width: 92vw;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+  text-align: center;
+  animation: slideUp 0.2s ease;
+}
+
+.admin-modal-header { margin-bottom: 28px; }
+.admin-modal-icon { font-size: 36px; margin-bottom: 10px; line-height: 1; }
+.admin-modal-title { font-size: 20px; font-weight: 800; color: #1E293B; margin-bottom: 6px; }
+.admin-modal-sub { font-size: 13px; color: #64748B; line-height: 1.45; }
+
+/* ── PIN input boxes ─────────────────────────────────────────────────────────── */
+.pin-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pin-box {
+  width: 56px;
+  height: 60px;
+  border: 2px solid #E2E8F0;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  color: #1E293B;
+  background: #F8FAFC;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  caret-color: transparent;
+}
+.pin-box:focus { border-color: #1F3A5F; background: #fff; box-shadow: 0 0 0 3px rgba(31, 58, 95, 0.12); }
+.pin-box-filled { border-color: #1F3A5F; background: #EFF6FF; }
+.pin-box-error { border-color: #EF4444 !important; background: #FEF2F2 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important; }
+
+.pin-error-msg { font-size: 12.5px; color: #EF4444; margin-bottom: 16px; font-weight: 500; }
+
+@keyframes pinShake {
+  0%,100% { transform: translateX(0); }
+  15%      { transform: translateX(-8px); }
+  30%      { transform: translateX(8px); }
+  45%      { transform: translateX(-6px); }
+  60%      { transform: translateX(6px); }
+  75%      { transform: translateX(-4px); }
+  90%      { transform: translateX(4px); }
+}
+.pin-shake { animation: pinShake 0.55s ease; }
+
+.admin-modal-cancel { width: 100%; padding: 11px; margin-top: 4px; background: #F1F5F9; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; transition: background 0.15s; }
+.admin-modal-cancel:hover { background: #E2E8F0; }
+.admin-modal-hint { font-size: 11px; color: #94A3B8; margin-top: 14px; line-height: 1.5; }
+
+/* ── Admin client picker (full-screen) ───────────────────────────────────────── */
+.admin-picker-overlay { min-height: 100vh; background: #F4F6F9; display: flex; flex-direction: column; }
+
+.admin-picker-header {
+  background: linear-gradient(135deg, #1F3A5F 0%, #2C4F7C 100%);
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.admin-picker-brand { display: flex; align-items: center; gap: 14px; }
+
+.admin-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-size: 11.5px; font-weight: 700; padding: 5px 11px; border-radius: 20px; letter-spacing: 0.3px; }
+.admin-topbar-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+
+.admin-picker-body { padding: 28px; max-width: 1200px; width: 100%; margin: 0 auto; flex: 1; }
+.admin-picker-meta { font-size: 13px; color: #64748B; margin-bottom: 20px; font-weight: 500; }
+
+/* ── Admin search bar ──────────────────────────────────────────────────────────── */
+.admin-search-wrap { position: relative; margin-bottom: 24px; }
+.admin-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+.admin-search-input { width: 100%; box-sizing: border-box; padding: 12px 40px 12px 42px; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 14px; font-family: inherit; background: #fff; color: #1E293B; outline: none; box-shadow: 0 1px 4px rgba(0,0,0,0.05); transition: border-color 0.15s, box-shadow 0.15s; }
+.admin-search-input:focus { border-color: #1F3A5F; box-shadow: 0 0 0 3px rgba(31,58,95,0.1); }
+.admin-search-clear { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: #E2E8F0; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 10px; color: #475569; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.admin-search-clear:hover { background: #CBD5E1; }
+
+/* ── Admin client cards grid ─────────────────────────────────────────────────── */
+.admin-client-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+
+.admin-client-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); transition: box-shadow 0.15s, transform 0.15s; }
+.admin-client-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.1); transform: translateY(-1px); }
+
+.admin-card-header { display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px; border-bottom: 1px solid #F1F5F9; }
+.admin-card-avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; }
+.admin-card-name { font-size: 15px; font-weight: 700; color: #1E293B; }
+.admin-card-count { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+
+.admin-project-list { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+
+.admin-project-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 12px; background: transparent; border: none; border-radius: 10px; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; text-align: left; transition: background 0.12s, color 0.12s; font-family: inherit; }
+.admin-project-btn:hover { background: #F0F7FF; color: #1F3A5F; }
+
+.admin-project-label { flex: 1; line-height: 1.35; }
+.admin-project-arrow { font-size: 14px; color: #94A3B8; flex-shrink: 0; margin-left: 8px; transition: color 0.12s, transform 0.12s; }
+.admin-project-btn:hover .admin-project-arrow { color: #1F3A5F; transform: translateX(2px); }
+
+.admin-no-results { grid-column: 1 / -1; text-align: center; padding: 48px 0; color: #94A3B8; font-size: 14px; }
+
+/* ── Shared animations ───────────────────────────────────────────────────────── */
+@keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slideUp { from { transform: translateY(12px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
