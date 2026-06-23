@@ -3,20 +3,20 @@
 
 import Head from "next/head";
 import { useEffect, useState, useRef } from "react";
+
 const AUTH0_DOMAIN    = process.env.NEXT_PUBLIC_AUTH0_DOMAIN    || "dev-zrdwden5qdovxa40.us.auth0.com";
 const AUTH0_CLIENT_ID = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID || "Rhh7Of9haJruOvHsEYswD5YtmohXV81N";
+
+// ── ADMIN CONFIG ──────────────────────────────────────────────────────────────
+// Change ADMIN_PIN to any 4-digit string you prefer.
+// This is a convenience bypass — same security level as the dev picker.
+const ADMIN_PIN = "2580";
 
 // IS_DEV is determined client-side only to avoid SSR/hydration mismatch
 
 // ── EMAIL → PROJECT(S) MAP ────────────────────────────────────────────────────
-// Each entry has a `projects` array. Single-project clients have 1 entry,
-// multi-project clients have multiple. The dropdown only shows if length > 1.
-//
-// Old single-project logins (cw-bot1@pfas.pk etc.) still work — they map to
-// a single-element projects array. New combined logins (cw@pfas.pk) map to
-// the full project list and trigger the dropdown UI.
 const EMAIL_PROJECT_MAP = {
-  // ── Single-project logins (one client, one project) ────────────────────────
+  // ── Single-project logins ──────────────────────────────────────────────────
   "demo@pfas.pk":       { name: "Demo Client",            projects: [{ slug: "pcmmdc",         label: "PCMMDC HR Manual" }] },
   "pcmmdc@pfas.pk":     { name: "PCMMDC",                 projects: [{ slug: "pcmmdc",         label: "PCMMDC HR Manual" }] },
   "p4a@pfas.pk":        { name: "P4A",                    projects: [{ slug: "p4a",            label: "Tertiary Care Hospital" }] },
@@ -28,7 +28,7 @@ const EMAIL_PROJECT_MAP = {
   "hed@pfas.pk":        { name: "HED",                    projects: [{ slug: "hed",            label: "HED Engagement" }] },
   "phimc@pfas.pk":      { name: "PHIMC",                  projects: [{ slug: "phimc",          label: "6 Hospitals Feasibility" }] },
 
-  // ── Combined logins (one client, multiple projects → dropdown appears) ─────
+  // ── Combined logins (dropdown appears) ────────────────────────────────────
   "cw@pfas.pk": {
     name: "C&W Department",
     projects: [
@@ -62,7 +62,7 @@ const EMAIL_PROJECT_MAP = {
     ],
   },
 
-  // ── Legacy single-project logins (kept active so nothing breaks) ───────────
+  // ── Legacy single-project logins ──────────────────────────────────────────
   "fiedmc-sbp@pfas.pk": { name: "FIEDMC (SBP)",           projects: [{ slug: "fiedmc-sbp",     label: "FIEDMC Strategic Business Plan" }] },
   "cw-bot1@pfas.pk":    { name: "C&W (BOT-1)",            projects: [{ slug: "bot1",           label: "BOT-1 Depalpur-Pakpattan-Vehari" }] },
   "cw-bot2@pfas.pk":    { name: "C&W (BOT-2)",            projects: [{ slug: "bot2",           label: "BOT-2 Chiragabad-Jhang-Shorkot" }] },
@@ -74,6 +74,28 @@ const EMAIL_PROJECT_MAP = {
   "wildlife-c@pfas.pk": { name: "Wildlife (Changa)",      projects: [{ slug: "wildlife-changa",label: "Changa Manga Wildlife" }] },
   "vss@pfas.pk":        { name: "Finance (VSS)",          projects: [{ slug: "vss",            label: "VSS Engagement" }] },
 };
+
+// ── Admin client list: all unique clients for the admin picker ────────────────
+// Groups projects under their parent client name for a clean admin view.
+const ADMIN_CLIENT_LIST = (() => {
+  const seen = new Set();
+  const list = [];
+  // Primary logins only (no legacy duplicates)
+  const PRIMARY_EMAILS = [
+    "demo@pfas.pk", "pcmmdc@pfas.pk", "p4a@pfas.pk", "energy@pfas.pk",
+    "fisheries@pfas.pk", "tam@pfas.pk", "pha@pfas.pk", "pbf@pfas.pk",
+    "hed@pfas.pk", "phimc@pfas.pk", "cw@pfas.pk", "fiedmc@pfas.pk",
+    "finance@pfas.pk", "wildlife@pfas.pk",
+  ];
+  PRIMARY_EMAILS.forEach(email => {
+    const acc = EMAIL_PROJECT_MAP[email];
+    if (acc && !seen.has(acc.name)) {
+      seen.add(acc.name);
+      list.push({ email, name: acc.name, projects: acc.projects });
+    }
+  });
+  return list;
+})();
 
 // All distinct project slugs (for dev picker)
 const ALL_PROJECTS = (() => {
@@ -89,6 +111,213 @@ const ALL_PROJECTS = (() => {
   });
   return list;
 })();
+
+
+// ── Admin PIN modal ───────────────────────────────────────────────────────────
+// Shown as an overlay on top of the login screen when "Admin Access" is clicked.
+// Four digit boxes, auto-advances, shows shake animation on wrong PIN.
+function AdminPinModal({ onSuccess, onClose }) {
+  const [digits, setDigits]   = useState(["", "", "", ""]);
+  const [error, setError]     = useState(false);
+  const [shake, setShake]     = useState(false);
+  const inputRefs             = [useRef(), useRef(), useRef(), useRef()];
+
+  // Focus first box on mount
+  useEffect(() => { inputRefs[0].current?.focus(); }, []);
+
+  const handleKey = (idx, e) => {
+    // Allow only digits
+    const val = e.target.value.replace(/\D/g, "").slice(-1);
+    const next = [...digits];
+    next[idx] = val;
+    setDigits(next);
+    setError(false);
+
+    if (val && idx < 3) {
+      inputRefs[idx + 1].current?.focus();
+    }
+
+    // Auto-check when all 4 filled
+    if (val && idx === 3) {
+      const pin = [...next.slice(0, 3), val].join("");
+      checkPin(pin);
+    }
+  };
+
+  const handleKeyDown = (idx, e) => {
+    if (e.key === "Backspace" && !digits[idx] && idx > 0) {
+      inputRefs[idx - 1].current?.focus();
+    }
+    if (e.key === "Enter") {
+      const pin = digits.join("");
+      if (pin.length === 4) checkPin(pin);
+    }
+  };
+
+  const checkPin = (pin) => {
+    if (pin === ADMIN_PIN) {
+      onSuccess();
+    } else {
+      setShake(true);
+      setError(true);
+      setDigits(["", "", "", ""]);
+      setTimeout(() => {
+        setShake(false);
+        inputRefs[0].current?.focus();
+      }, 600);
+    }
+  };
+
+  return (
+    <div className="admin-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className={`admin-modal-card ${shake ? "pin-shake" : ""}`}>
+        {/* Header */}
+        <div className="admin-modal-header">
+          <div className="admin-modal-icon">🔐</div>
+          <div className="admin-modal-title">Admin Access</div>
+          <div className="admin-modal-sub">Enter your 4-digit admin PIN to access all client portals</div>
+        </div>
+
+        {/* PIN dots */}
+        <div className="pin-inputs">
+          {digits.map((d, i) => (
+            <input
+              key={i}
+              ref={inputRefs[i]}
+              className={`pin-box ${error ? "pin-box-error" : d ? "pin-box-filled" : ""}`}
+              type="password"
+              inputMode="numeric"
+              maxLength={1}
+              value={d}
+              onChange={(e) => handleKey(i, e)}
+              onKeyDown={(e) => handleKeyDown(i, e)}
+              autoComplete="off"
+            />
+          ))}
+        </div>
+
+        {error && (
+          <div className="pin-error-msg">Incorrect PIN. Please try again.</div>
+        )}
+
+        <button className="admin-modal-cancel" onClick={onClose}>
+          Cancel
+        </button>
+
+        <div className="admin-modal-hint">
+          Contact your PFAS system administrator if you've forgotten your PIN.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+// ── Admin client picker ───────────────────────────────────────────────────────
+// Full-screen picker shown after successful PIN entry.
+// Lists all clients with their projects. Click a client → load their portal.
+function AdminClientPicker({ onSelect, onBack }) {
+  const [search, setSearch] = useState("");
+
+  const filtered = ADMIN_CLIENT_LIST.filter(c =>
+    c.name.toLowerCase().includes(search.toLowerCase()) ||
+    c.projects.some(p => p.label.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  // Department color tags
+  const deptColor = (name) => {
+    if (name.includes("C&W"))        return { bg: "#DBEAFE", color: "#1E40AF" };
+    if (name.includes("Wildlife"))   return { bg: "#DCFCE7", color: "#166534" };
+    if (name.includes("FIEDMC"))     return { bg: "#FEF3C7", color: "#92400E" };
+    if (name.includes("Finance"))    return { bg: "#F3E8FF", color: "#6B21A8" };
+    if (name.includes("Energy"))     return { bg: "#FEE2E2", color: "#991B1B" };
+    if (name.includes("Fisheries"))  return { bg: "#CFFAFE", color: "#155E75" };
+    return { bg: "#F1F5F9", color: "#334155" };
+  };
+
+  return (
+    <div className="admin-picker-overlay">
+      {/* Header */}
+      <div className="admin-picker-header">
+        <div className="admin-picker-brand">
+          <div className="brand-logo" style={{ width: 52, height: 36, fontSize: 16 }}>PFAS</div>
+          <div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", letterSpacing: 1, textTransform: "uppercase" }}>Admin Mode</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>Client Portal Overview</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span className="admin-badge">🔐 Admin</span>
+          <button className="logout-btn" onClick={onBack}>← Exit Admin</button>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="admin-picker-body">
+        <div className="admin-picker-meta">
+          {ADMIN_CLIENT_LIST.length} clients · {ALL_PROJECTS.length} projects
+        </div>
+
+        {/* Search */}
+        <div className="admin-search-wrap">
+          <span className="admin-search-icon">🔍</span>
+          <input
+            className="admin-search-input"
+            type="text"
+            placeholder="Search clients or projects…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            autoFocus
+          />
+          {search && (
+            <button className="admin-search-clear" onClick={() => setSearch("")}>✕</button>
+          )}
+        </div>
+
+        {/* Client cards */}
+        <div className="admin-client-grid">
+          {filtered.length === 0 && (
+            <div className="admin-no-results">No clients match "{search}"</div>
+          )}
+          {filtered.map((client, ci) => {
+            const dc = deptColor(client.name);
+            const initials = client.name.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase();
+            return (
+              <div className="admin-client-card" key={ci}>
+                {/* Client header */}
+                <div className="admin-card-header">
+                  <div className="admin-card-avatar" style={{ background: dc.bg, color: dc.color }}>
+                    {initials}
+                  </div>
+                  <div>
+                    <div className="admin-card-name">{client.name}</div>
+                    <div className="admin-card-count">
+                      {client.projects.length} project{client.projects.length > 1 ? "s" : ""}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Project list */}
+                <div className="admin-project-list">
+                  {client.projects.map((p, pi) => (
+                    <button
+                      key={pi}
+                      className="admin-project-btn"
+                      onClick={() => onSelect(p.slug, client.name, client.projects)}
+                    >
+                      <span className="admin-project-label">{p.label}</span>
+                      <span className="admin-project-arrow">→</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 
 // ── Dev mode project picker ───────────────────────────────────────────────────
@@ -126,7 +355,7 @@ function DevPicker({ onSelect }) {
 }
 
 // ── Login screen ──────────────────────────────────────────────────────────────
-function LoginScreen({ onLogin, error }) {
+function LoginScreen({ onLogin, error, onAdminClick }) {
   return (
     <div className="login-overlay">
       <div className="login-card">
@@ -143,7 +372,12 @@ function LoginScreen({ onLogin, error }) {
           <strong>Secure login powered by Auth0.</strong> You will be redirected to a secure
           sign-in page. Contact your PFAS engagement lead if you need access.
         </div>
-        <div className="login-footer">© 2026 Punjab Financial Advisory Services</div>
+        <div className="login-footer">
+          © 2026 Punjab Financial Advisory Services
+          <button className="admin-link-btn" onClick={onAdminClick} title="Admin access">
+            🔐 Admin
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -163,13 +397,10 @@ function LoadingSkeleton() {
 }
 
 // ── Project switcher dropdown ─────────────────────────────────────────────────
-// Renders only when the logged-in client has 2+ projects. Compact dropdown
-// styled to match the top bar. Closes on outside click.
 function ProjectSwitcher({ projects, currentSlug, onChange }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return;
     const onClick = (e) => {
@@ -182,62 +413,30 @@ function ProjectSwitcher({ projects, currentSlug, onChange }) {
   const current = projects.find(p => p.slug === currentSlug) || projects[0];
 
   return (
-    <div
-      ref={wrapRef}
-      style={{ position: "relative", display: "inline-block" }}
-    >
+    <div ref={wrapRef} style={{ position: "relative", display: "inline-block" }}>
       <button
         onClick={() => setOpen(o => !o)}
         style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "6px 12px",
-          background: "rgba(255,255,255,0.12)",
-          color: "#fff",
-          border: "1px solid rgba(255,255,255,0.2)",
-          borderRadius: 16,
-          fontSize: 12,
-          fontWeight: 600,
-          cursor: "pointer",
-          maxWidth: 280,
+          display: "inline-flex", alignItems: "center", gap: 8,
+          padding: "6px 12px", background: "rgba(255,255,255,0.12)",
+          color: "#fff", border: "1px solid rgba(255,255,255,0.2)",
+          borderRadius: 16, fontSize: 12, fontWeight: 600, cursor: "pointer", maxWidth: 280,
         }}
       >
-        <span style={{
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}>
+        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {current.label}
         </span>
         <span style={{ fontSize: 10, opacity: 0.8 }}>▾</span>
       </button>
 
       {open && (
-        <div
-          style={{
-            position: "absolute",
-            top: "calc(100% + 6px)",
-            right: 0,
-            background: "#fff",
-            border: "1px solid #E2E8F0",
-            borderRadius: 12,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-            padding: 6,
-            zIndex: 100,
-            minWidth: 280,
-            maxHeight: 360,
-            overflowY: "auto",
-          }}
-        >
-          <div style={{
-            fontSize: 10,
-            letterSpacing: 1.2,
-            fontWeight: 700,
-            color: "#94A3B8",
-            padding: "8px 12px 4px",
-            textTransform: "uppercase",
-          }}>
+        <div style={{
+          position: "absolute", top: "calc(100% + 6px)", right: 0,
+          background: "#fff", border: "1px solid #E2E8F0", borderRadius: 12,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.12)", padding: 6, zIndex: 100,
+          minWidth: 280, maxHeight: 360, overflowY: "auto",
+        }}>
+          <div style={{ fontSize: 10, letterSpacing: 1.2, fontWeight: 700, color: "#94A3B8", padding: "8px 12px 4px", textTransform: "uppercase" }}>
             Switch Project
           </div>
           {projects.map(p => {
@@ -247,17 +446,11 @@ function ProjectSwitcher({ projects, currentSlug, onChange }) {
                 key={p.slug}
                 onClick={() => { onChange(p.slug); setOpen(false); }}
                 style={{
-                  display: "block",
-                  width: "100%",
-                  textAlign: "left",
-                  padding: "10px 12px",
-                  background: isActive ? "#F1F5F9" : "transparent",
-                  border: "none",
-                  borderRadius: 8,
-                  fontSize: 13,
+                  display: "block", width: "100%", textAlign: "left",
+                  padding: "10px 12px", background: isActive ? "#F1F5F9" : "transparent",
+                  border: "none", borderRadius: 8, fontSize: 13,
                   fontWeight: isActive ? 600 : 500,
-                  color: isActive ? "#1F3A5F" : "#334155",
-                  cursor: "pointer",
+                  color: isActive ? "#1F3A5F" : "#334155", cursor: "pointer",
                 }}
                 onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "#F8FAFC"; }}
                 onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
@@ -274,7 +467,7 @@ function ProjectSwitcher({ projects, currentSlug, onChange }) {
 }
 
 // ── Top bar ───────────────────────────────────────────────────────────────────
-function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects, currentSlug, onProjectChange }) {
+function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects, currentSlug, onProjectChange, isAdmin, onAdminSwitch }) {
   const initial = userName ? userName[0].toUpperCase() : "?";
   const showSwitcher = projects && projects.length > 1;
   return (
@@ -287,6 +480,9 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects,
         </div>
       </div>
       <div className="topbar-right">
+        {isAdmin && (
+          <span className="admin-topbar-badge">🔐 Admin</span>
+        )}
         {showSwitcher && (
           <ProjectSwitcher
             projects={projects}
@@ -302,16 +498,18 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects,
           <span className="av">{initial}</span>
           <span>{userName}</span>
         </span>
-        {isDev
-          ? <button className="logout-btn" onClick={onSwitchDev}>← Switch Client</button>
-          : <button className="logout-btn" onClick={onLogout}>Sign Out</button>
+        {isAdmin
+          ? <button className="logout-btn" onClick={onAdminSwitch}>← Client List</button>
+          : isDev
+            ? <button className="logout-btn" onClick={onSwitchDev}>← Switch Client</button>
+            : <button className="logout-btn" onClick={onLogout}>Sign Out</button>
         }
       </div>
     </div>
   );
 }
 
-// ── Project header (health chip removed) ──────────────────────────────────────
+// ── Project header ────────────────────────────────────────────────────────────
 function ProjectHeader({ project }) {
   return (
     <div className="project-header">
@@ -358,17 +556,12 @@ function KpiRow({ project }) {
   );
 }
 
-// ── Phase progress (sorted: completed → active → planned) ─────────────────────
+// ── Phase progress ────────────────────────────────────────────────────────────
 function PhaseList({ phases }) {
   if (!phases?.length) return <p style={{ color: "#94A3B8", fontSize: 13 }}>No phase data available.</p>;
 
-  // Sort: completed (100%) → in-progress (>0%) → not started (0%)
   const sorted = [...phases].sort((a, b) => {
-    const rank = (p) => {
-      if (p.pct === 100) return 0;
-      if (p.pct > 0)     return 1;
-      return 2;
-    };
+    const rank = (p) => { if (p.pct === 100) return 0; if (p.pct > 0) return 1; return 2; };
     return rank(a) - rank(b) || b.pct - a.pct;
   });
 
@@ -389,8 +582,7 @@ function PhaseList({ phases }) {
   );
 }
 
-// ── PFAS Staff Directory — sourced from data/pfas-staff.json ─────────────────
-// Keyed by lowercase email for fast lookup
+// ── PFAS Staff Directory ──────────────────────────────────────────────────────
 const STAFF_DIRECTORY = {
   "azmat.nawaz@pfas.pk":        { designation: "Chief Operating Officer",                                          contact: "0300-4975975" },
   "habeeba.naseer@pfas.pk":     { designation: "Chief Legal Officer",                                              contact: "0300-4416264" },
@@ -426,87 +618,33 @@ const STAFF_DIRECTORY = {
 function TeamGrid({ team }) {
   if (!team?.length) return <p style={{ color: "#94A3B8", fontSize: 13 }}>Team details coming soon.</p>;
   return (
-    <div
-      className="team-grid"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-        gap: 14,
-      }}
-    >
+    <div className="team-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 14 }}>
       {team.map((m, i) => {
         const initials = m.name.split(" ").map(n => n[0]).join("").substring(0, 2);
-        // Enrich from staff directory using email as key
         const staffKey = (m.email || "").toLowerCase().trim();
         const staff    = STAFF_DIRECTORY[staffKey] || {};
-        const designation = staff.designation || m.role || "—";
-        const contact     = staff.contact     || null;
+        const designation  = staff.designation || m.role || "—";
+        const contact      = staff.contact     || null;
         const emailDisplay = m.email && m.email !== "—" ? m.email : null;
-        // Per-member Teams scheduling deep link — pre-fills this member as attendee
         const scheduleHref = emailDisplay
           ? `https://teams.microsoft.com/l/meeting/new?attendees=${encodeURIComponent(emailDisplay)}&subject=${encodeURIComponent("PFAS Meeting — " + m.name)}`
           : "https://teams.microsoft.com/l/meeting/new";
         return (
-          <div
-            className="member-card"
-            key={i}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              padding: 16,
-              background: "#fff",
-              border: "1px solid #E2E8F0",
-              borderRadius: 14,
-              minWidth: 0,
-            }}
-          >
-            {/* Header: avatar + name/role side by side */}
+          <div className="member-card" key={i} style={{ display: "flex", flexDirection: "column", gap: 10, padding: 16, background: "#fff", border: "1px solid #E2E8F0", borderRadius: 14, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-              <div
-                className={`avatar av-${m.color}`}
-                style={{
-                  flexShrink: 0,
-                  width: 44,
-                  height: 44,
-                  borderRadius: "50%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#fff",
-                  fontWeight: 700,
-                  fontSize: 15,
-                }}
-              >
+              <div className={`avatar av-${m.color}`} style={{ flexShrink: 0, width: 44, height: 44, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15 }}>
                 {initials}
               </div>
               <div style={{ minWidth: 0, flex: 1 }}>
-                <div
-                  className="member-name"
-                  style={{ fontWeight: 700, fontSize: 15, color: "#1E293B", lineHeight: 1.25 }}
-                >
-                  {m.name}
-                </div>
-                <div
-                  className="member-role"
-                  style={{ fontSize: 12.5, color: "#64748B", lineHeight: 1.35, marginTop: 2 }}
-                >
-                  {designation}
-                </div>
+                <div className="member-name" style={{ fontWeight: 700, fontSize: 15, color: "#1E293B", lineHeight: 1.25 }}>{m.name}</div>
+                <div className="member-role" style={{ fontSize: 12.5, color: "#64748B", lineHeight: 1.35, marginTop: 2 }}>{designation}</div>
               </div>
             </div>
-
-            {/* Contact block */}
             <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
               {emailDisplay && (
                 <div className="member-email" style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12.5, minWidth: 0 }}>
                   <span style={{ flexShrink: 0 }}>✉</span>
-                  <a
-                    href={`mailto:${emailDisplay}`}
-                    style={{ color: "#1F3A5F", textDecoration: "none", overflowWrap: "anywhere", wordBreak: "break-word" }}
-                  >
-                    {emailDisplay}
-                  </a>
+                  <a href={`mailto:${emailDisplay}`} style={{ color: "#1F3A5F", textDecoration: "none", overflowWrap: "anywhere", wordBreak: "break-word" }}>{emailDisplay}</a>
                 </div>
               )}
               {contact && (
@@ -516,29 +654,8 @@ function TeamGrid({ team }) {
                 </div>
               )}
             </div>
-
-            {/* Schedule button */}
-            <a
-              className="member-schedule-btn"
-              href={scheduleHref}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                marginTop: 2,
-                padding: "7px 12px",
-                background: "#EEF2FF",
-                color: "#4338CA",
-                fontSize: 12.5,
-                fontWeight: 600,
-                borderRadius: 8,
-                textDecoration: "none",
-                border: "1px solid #E0E7FF",
-              }}
-            >
+            <a className="member-schedule-btn" href={scheduleHref} target="_blank" rel="noreferrer"
+              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 2, padding: "7px 12px", background: "#EEF2FF", color: "#4338CA", fontSize: 12.5, fontWeight: 600, borderRadius: 8, textDecoration: "none", border: "1px solid #E0E7FF" }}>
               📅 Schedule Meeting
             </a>
           </div>
@@ -549,16 +666,6 @@ function TeamGrid({ team }) {
 }
 
 // ── Teams discussion panel ────────────────────────────────────────────────────
-// PHASE 1: Shows pending connection UI when teamsChannelId is not set
-// PHASE 2: Fetches live messages from /api/teams-messages when teamsChannelId is set
-//
-// To activate Phase 2 for a project:
-//   1. Wahab grants ChannelMessage.Read.All admin consent in Azure portal
-//   2. Add teamsChannelId + teamsTeamId to the project entry in PROJECT_META (clickup-client.js)
-//      e.g.  teamsTeamId: "19:abc123@thread.tacv2",  teamsChannelId: "19:xyz456@thread.tacv2"
-//   3. The API route pages/api/teams-messages.js must be deployed
-//   That's it — no other changes needed. The panel auto-switches to live mode.
-
 function formatMsgTime(isoString) {
   if (!isoString) return "";
   const d = new Date(isoString);
@@ -586,7 +693,6 @@ function TeamsPanel({ project }) {
   const [error,   setError]   = useState("");
   const chatBodyRef = useRef(null);
 
-  // Phase 2: fetch live messages when channel IDs are present
   useEffect(() => {
     if (!hasLiveChannel) return;
     setLoading(true);
@@ -594,17 +700,15 @@ function TeamsPanel({ project }) {
     fetch(`/api/teams-messages?teamId=${project.teamsTeamId}&channelId=${project.teamsChannelId}`)
       .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
       .then(data => { setMsgs(data.messages || []); setLoading(false); })
-      .catch(err => { setError("Could not load messages."); setLoading(false); });
+      .catch(() => { setError("Could not load messages."); setLoading(false); });
   }, [project.teamsTeamId, project.teamsChannelId]);
 
-  // Auto-scroll to bottom when messages arrive
   useEffect(() => {
     if (chatBodyRef.current && msgs.length > 0) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   }, [msgs]);
 
-  // ── Phase 1: Pending connection state ───────────────────────────────────────
   if (!hasLiveChannel) {
     return (
       <div className="chat-card teams-panel">
@@ -617,14 +721,11 @@ function TeamsPanel({ project }) {
           <div>
             <div className="chat-title">{project.clientName} ↔ PFAS Team</div>
             <div className="chat-status-pending">
-              <span className="pending-dot" />
-              Connecting to Microsoft Teams…
+              <span className="pending-dot" /> Connecting to Microsoft Teams…
             </div>
           </div>
         </div>
-
         <div className="chat-pending-body">
-          {/* Teams logo mark */}
           <div className="teams-logo-wrap">
             <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
               <rect width="48" height="48" rx="12" fill="#6264A7"/>
@@ -632,47 +733,23 @@ function TeamsPanel({ project }) {
               <path d="M34 20h-4.5A6 6 0 0 1 24 34a6 6 0 0 1-5.5-14H14a2 2 0 0 0-2 2v8a10 10 0 0 0 20 0v-8a2 2 0 0 0-2-2z" fill="white" fillOpacity="0.85"/>
             </svg>
           </div>
-
           <div className="pending-title">Teams channel connecting</div>
-          <div className="pending-sub">
-            Live discussion from your project channel will appear here once the
-            Microsoft Teams integration is activated by your PFAS engagement team.
-          </div>
-
-          {/* Step indicators */}
+          <div className="pending-sub">Live discussion from your project channel will appear here once the Microsoft Teams integration is activated by your PFAS engagement team.</div>
           <div className="pending-steps">
-            <div className="pstep pstep-done">
-              <div className="pstep-icon">✓</div>
-              <div className="pstep-text">Portal connected to PFAS systems</div>
-            </div>
-            <div className="pstep pstep-done">
-              <div className="pstep-icon">✓</div>
-              <div className="pstep-text">Project channel identified</div>
-            </div>
-            <div className="pstep pstep-pending">
-              <div className="pstep-icon">
-                <span className="pstep-spinner" />
-              </div>
-              <div className="pstep-text">Awaiting Teams channel permission</div>
-            </div>
+            <div className="pstep pstep-done"><div className="pstep-icon">✓</div><div className="pstep-text">Portal connected to PFAS systems</div></div>
+            <div className="pstep pstep-done"><div className="pstep-icon">✓</div><div className="pstep-text">Project channel identified</div></div>
+            <div className="pstep pstep-pending"><div className="pstep-icon"><span className="pstep-spinner" /></div><div className="pstep-text">Awaiting Teams channel permission</div></div>
           </div>
-
-          <div className="pending-hint">
-            In the meantime, your team is active on Teams. Open the channel directly to see messages and post updates.
-          </div>
+          <div className="pending-hint">In the meantime, your team is active on Teams. Open the channel directly to see messages and post updates.</div>
         </div>
-
         <div className="chat-cta-banner">
           <div className="lbl">Your project channel is live on Teams</div>
-          <a className="chat-cta" href={project.teamsChannel || "#"} target="_blank" rel="noreferrer">
-            ↗ Open in Microsoft Teams
-          </a>
+          <a className="chat-cta" href={project.teamsChannel || "#"} target="_blank" rel="noreferrer">↗ Open in Microsoft Teams</a>
         </div>
       </div>
     );
   }
 
-  // ── Phase 2: Live messages ──────────────────────────────────────────────────
   return (
     <div className="chat-card teams-panel">
       <div className="chat-header">
@@ -683,64 +760,40 @@ function TeamsPanel({ project }) {
         </div>
         <div style={{ flex: 1 }}>
           <div className="chat-title">{project.clientName} ↔ PFAS Team</div>
-          <div className="chat-status">
-            {loading ? "Loading messages…" : `${msgs.length} message${msgs.length !== 1 ? "s" : ""} · Live from Teams`}
-          </div>
+          <div className="chat-status">{loading ? "Loading messages…" : `${msgs.length} message${msgs.length !== 1 ? "s" : ""} · Live from Teams`}</div>
         </div>
         <a href={project.teamsChannel || "#"} target="_blank" rel="noreferrer"
-           style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", textDecoration: "none", flexShrink: 0 }}>
-          Open ↗
-        </a>
+           style={{ fontSize: 11, color: "rgba(255,255,255,0.75)", textDecoration: "none", flexShrink: 0 }}>Open ↗</a>
       </div>
-
       <div className="chat-body" ref={chatBodyRef}>
-        {loading && (
-          <div className="chat-loading">
-            <div className="chat-loading-dot" /><div className="chat-loading-dot" /><div className="chat-loading-dot" />
-          </div>
-        )}
-        {error && (
-          <div className="chat-error">{error} — <a href={project.teamsChannel || "#"} target="_blank" rel="noreferrer" style={{ color: "#6264A7" }}>open in Teams ↗</a></div>
-        )}
-        {!loading && !error && msgs.length === 0 && (
-          <div className="chat-empty">No messages yet in this channel.</div>
-        )}
+        {loading && <div className="chat-loading"><div className="chat-loading-dot" /><div className="chat-loading-dot" /><div className="chat-loading-dot" /></div>}
+        {error && <div className="chat-error">{error} — <a href={project.teamsChannel || "#"} target="_blank" rel="noreferrer" style={{ color: "#6264A7" }}>open in Teams ↗</a></div>}
+        {!loading && !error && msgs.length === 0 && <div className="chat-empty">No messages yet in this channel.</div>}
         {msgs.map((msg, i) => {
-          const isMe = false; // all messages appear as "them" from client perspective
           const body = stripHtml(msg.body);
           if (!body) return null;
           return (
             <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
               <div className="msg-sender">{msg.from || "PFAS Team"}</div>
-              <div className="msg msg-them">
-                {body}
-                <div className="msg-time" style={{ color: "#94A3B8" }}>{formatMsgTime(msg.createdDateTime)}</div>
-              </div>
+              <div className="msg msg-them">{body}<div className="msg-time" style={{ color: "#94A3B8" }}>{formatMsgTime(msg.createdDateTime)}</div></div>
             </div>
           );
         })}
       </div>
-
       <div className="chat-cta-banner">
         <div className="lbl">Reply directly in Teams</div>
-        <a className="chat-cta" href={project.teamsChannel || "#"} target="_blank" rel="noreferrer">
-          ↗ Open in Microsoft Teams
-        </a>
+        <a className="chat-cta" href={project.teamsChannel || "#"} target="_blank" rel="noreferrer">↗ Open in Microsoft Teams</a>
       </div>
     </div>
   );
 }
 
 // ── Documents section ─────────────────────────────────────────────────────────
-// Shows recently uploaded files (static representative list) + Upload button
-// that redirects to the client's OneDrive folder.
-// NOTE: Real recent-files require Graph API with delegated auth (future enhancement).
-// For now, shows a representative placeholder list per project with link to full folder.
 const RECENT_FILES_PLACEHOLDER = [
-  { name: "Inception Report.pdf",          type: "pdf",  date: "Jun 2026" },
-  { name: "Stakeholder Consultation MoM.docx", type: "word", date: "May 2026" },
-  { name: "Financial Model v3.xlsx",        type: "excel", date: "May 2026" },
-  { name: "Draft Policy Framework.docx",   type: "word",  date: "Apr 2026" },
+  { name: "Inception Report.pdf",             type: "pdf",   date: "Jun 2026" },
+  { name: "Stakeholder Consultation MoM.docx",type: "word",  date: "May 2026" },
+  { name: "Financial Model v3.xlsx",           type: "excel", date: "May 2026" },
+  { name: "Draft Policy Framework.docx",       type: "word",  date: "Apr 2026" },
 ];
 
 function fileIcon(type) {
@@ -753,7 +806,6 @@ function fileIcon(type) {
 
 function DocumentsSection({ project }) {
   const uploadUrl = project.onedriveUrl || "#";
-
   return (
     <div className="section-card docs-card">
       <div className="section-title">Project Documents</div>
@@ -764,22 +816,15 @@ function DocumentsSection({ project }) {
           return (
             <a key={i} className="doc-file-row" href={uploadUrl} target="_blank" rel="noreferrer">
               <div className="doc-file-icon" style={{ background: fi.bg, color: fi.color }}>{fi.icon}</div>
-              <div className="doc-file-info">
-                <div className="doc-file-name">{f.name}</div>
-                <div className="doc-file-meta">{f.date}</div>
-              </div>
+              <div className="doc-file-info"><div className="doc-file-name">{f.name}</div><div className="doc-file-meta">{f.date}</div></div>
               <div className="doc-file-arrow">↗</div>
             </a>
           );
         })}
       </div>
       <div className="docs-actions-row">
-        <a className="docs-browse-btn" href={uploadUrl} target="_blank" rel="noreferrer">
-          📂 Browse All Files
-        </a>
-        <a className="docs-upload-btn" href={uploadUrl} target="_blank" rel="noreferrer">
-          ⬆ Upload Document
-        </a>
+        <a className="docs-browse-btn" href={uploadUrl} target="_blank" rel="noreferrer">📂 Browse All Files</a>
+        <a className="docs-upload-btn" href={uploadUrl} target="_blank" rel="noreferrer">⬆ Upload Document</a>
       </div>
     </div>
   );
@@ -787,22 +832,16 @@ function DocumentsSection({ project }) {
 
 // ── Quick actions ─────────────────────────────────────────────────────────────
 function ActionsGrid({ project }) {
-  // Scheduling: two paths.
-  //  • teamsBookingUrl  → open self-service Bookings / Virtual Appointments page (client, no login)
-  //  • teamsScheduleUrl → Teams "New meeting" deep link composer (PFAS team, set time + invite)
   return (
     <div className="actions-grid">
       <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-blue">📁</div>
         <div className="action-text"><div className="action-title">Shared Documents</div><div className="action-desc">Client Communication folder</div></div>
       </a>
-
-      {/* Client self-service booking — no Teams account required */}
       <a className="action-btn" href={project.teamsBookingUrl || project.teamsMeeting || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-green">📅</div>
         <div className="action-text"><div className="action-title">Book a Meeting</div><div className="action-desc">Pick an open slot with your PFAS team</div></div>
       </a>
-
       <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
         <div className="action-icon ai-purple">📝</div>
         <div className="action-text"><div className="action-title">Meeting Minutes</div><div className="action-desc">MoMs folder · OneDrive</div></div>
@@ -816,87 +855,56 @@ function ActionsGrid({ project }) {
 }
 
 // ── Scheduling log ────────────────────────────────────────────────────────────
-// Reads project.meetings: [{ title, datetime (ISO), attendees?, joinUrl?, notesUrl? }]
-// Auto-splits into Upcoming (datetime >= now) and Completed (datetime < now).
-// Works today with a static array in PROJECT_META; flip `meetings` to a live
-// Graph /events or ClickUp feed later with no change to this component.
 function MeetingLog({ project }) {
   const all = Array.isArray(project.meetings) ? project.meetings : [];
   const now = new Date();
-
   const parse = (m) => ({ ...m, _d: m.datetime ? new Date(m.datetime) : null });
   const parsed = all.map(parse).filter(m => m._d && !isNaN(m._d));
-
-  const upcoming = parsed
-    .filter(m => m._d >= now)
-    .sort((a, b) => a._d - b._d);
-  const completed = parsed
-    .filter(m => m._d < now)
-    .sort((a, b) => b._d - a._d);
-
+  const upcoming  = parsed.filter(m => m._d >= now).sort((a, b) => a._d - b._d);
+  const completed = parsed.filter(m => m._d <  now).sort((a, b) => b._d - a._d);
   const fmt = (d) =>
     d.toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" }) +
-    " · " +
-    d.toLocaleTimeString("en-PK", { hour: "numeric", minute: "2-digit" });
-
+    " · " + d.toLocaleTimeString("en-PK", { hour: "numeric", minute: "2-digit" });
   const row = (m, i, kind) => (
     <div className={`mtg-row mtg-${kind}`} key={`${kind}-${i}`}>
       <div className="mtg-dot" />
       <div className="mtg-body">
         <div className="mtg-title">{m.title || "Meeting"}</div>
-        <div className="mtg-meta">
-          {fmt(m._d)}
-          {m.attendees ? <span className="mtg-attendees"> · {m.attendees}</span> : null}
-        </div>
+        <div className="mtg-meta">{fmt(m._d)}{m.attendees ? <span className="mtg-attendees"> · {m.attendees}</span> : null}</div>
       </div>
       <div className="mtg-actions">
-        {kind === "up" && m.joinUrl && (
-          <a className="mtg-link mtg-join" href={m.joinUrl} target="_blank" rel="noreferrer">Join ↗</a>
-        )}
-        {kind === "done" && m.notesUrl && (
-          <a className="mtg-link mtg-notes" href={m.notesUrl} target="_blank" rel="noreferrer">Minutes ↗</a>
-        )}
+        {kind === "up"   && m.joinUrl  && <a className="mtg-link mtg-join"  href={m.joinUrl}  target="_blank" rel="noreferrer">Join ↗</a>}
+        {kind === "done" && m.notesUrl && <a className="mtg-link mtg-notes" href={m.notesUrl} target="_blank" rel="noreferrer">Minutes ↗</a>}
       </div>
     </div>
   );
-
   return (
     <div className="section-card mtg-card">
       <div className="section-title">Scheduling Log</div>
-
-      <div className="mtg-group-label mtg-up-label">
-        <span className="mtg-label-dot dot-amber" /> Upcoming Meetings
-        <span className="mtg-count">{upcoming.length}</span>
-      </div>
-      {upcoming.length
-        ? upcoming.map((m, i) => row(m, i, "up"))
-        : <div className="mtg-empty">No upcoming meetings scheduled.</div>}
-
-      <div className="mtg-group-label mtg-done-label" style={{ marginTop: 18 }}>
-        <span className="mtg-label-dot dot-green" /> Completed Meetings
-        <span className="mtg-count">{completed.length}</span>
-      </div>
-      {completed.length
-        ? completed.map((m, i) => row(m, i, "done"))
-        : <div className="mtg-empty">No meetings recorded yet.</div>}
+      <div className="mtg-group-label mtg-up-label"><span className="mtg-label-dot dot-amber" /> Upcoming Meetings<span className="mtg-count">{upcoming.length}</span></div>
+      {upcoming.length ? upcoming.map((m, i) => row(m, i, "up")) : <div className="mtg-empty">No upcoming meetings scheduled.</div>}
+      <div className="mtg-group-label mtg-done-label" style={{ marginTop: 18 }}><span className="mtg-label-dot dot-green" /> Completed Meetings<span className="mtg-count">{completed.length}</span></div>
+      {completed.length ? completed.map((m, i) => row(m, i, "done")) : <div className="mtg-empty">No meetings recorded yet.</div>}
     </div>
   );
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function ClientPortal() {
-  const [authState, setAuthState]     = useState("loading");
-  const [authError, setAuthError]     = useState("");
-  const [userName, setUserName]       = useState("");
-  const [allowedProjects, setAllowedProjects] = useState([]); // [{slug,label}, ...] for current login
-  const [projectSlug, setSlug]        = useState("");
-  const [project, setProject]         = useState(null);
-  const [dataLoading, setDataLoading] = useState(false);
-  const [dataError, setDataError]     = useState("");
-  const [isDev, setIsDev]             = useState(false);
+  const [authState, setAuthState]         = useState("loading");
+  const [authError, setAuthError]         = useState("");
+  const [userName, setUserName]           = useState("");
+  const [allowedProjects, setAllowedProjects] = useState([]);
+  const [projectSlug, setSlug]            = useState("");
+  const [project, setProject]             = useState(null);
+  const [dataLoading, setDataLoading]     = useState(false);
+  const [dataError, setDataError]         = useState("");
+  const [isDev, setIsDev]                 = useState(false);
+  const [isAdmin, setIsAdmin]             = useState(false);
+  const [showPinModal, setShowPinModal]   = useState(false);
   const auth0Ref = useRef(null);
 
-  // ── Boot: dev mode or Auth0 ─────────────────────────────────────────────────
+  // ── Boot ────────────────────────────────────────────────────────────────────
   useEffect(() => {
     const isLocalhost = window.location.hostname === "localhost";
     if (isLocalhost) {
@@ -904,7 +912,6 @@ export default function ClientPortal() {
       setAuthState("devpicker");
       return;
     }
-    // Production: Auth0
     async function boot() {
       if (!window.auth0) {
         await new Promise((resolve, reject) => {
@@ -915,8 +922,7 @@ export default function ClientPortal() {
         });
       }
       const client = await window.auth0.createAuth0Client({
-        domain: AUTH0_DOMAIN,
-        clientId: AUTH0_CLIENT_ID,
+        domain: AUTH0_DOMAIN, clientId: AUTH0_CLIENT_ID,
         authorizationParams: { redirect_uri: window.location.origin },
         cacheLocation: "localstorage",
       });
@@ -939,7 +945,7 @@ export default function ClientPortal() {
         }
         setUserName(acc.name);
         setAllowedProjects(acc.projects);
-        setSlug(acc.projects[0].slug); // default to first project
+        setSlug(acc.projects[0].slug);
         setAuthState("app");
       } else {
         setAuthState("login");
@@ -957,32 +963,54 @@ export default function ClientPortal() {
     fetch(`/api/clickup-client?project=${projectSlug}`)
       .then(r => { if (!r.ok) throw new Error(`API ${r.status}`); return r.json(); })
       .then(data => { setProject(data); setDataLoading(false); })
-      .catch(err => { setDataError("Could not load live project data. Please refresh."); setDataLoading(false); });
+      .catch(() => { setDataError("Could not load live project data. Please refresh."); setDataLoading(false); });
   }, [projectSlug]);
 
+  // ── Auth handlers ───────────────────────────────────────────────────────────
   const handleLogin     = () => auth0Ref.current?.loginWithRedirect();
   const handleLogout    = () => auth0Ref.current?.logout({ logoutParams: { returnTo: window.location.origin } });
   const handleDevSelect = (slug, name) => {
     setUserName(name);
-    setAllowedProjects([{ slug, label: name }]); // dev mode: single project at a time
+    setAllowedProjects([{ slug, label: name }]);
     setSlug(slug);
     setAuthState("app");
   };
   const handleDevSwitch = () => { setAuthState("devpicker"); setProject(null); setSlug(""); };
-  const handleProjectChange = (newSlug) => {
-    setSlug(newSlug);
+  const handleProjectChange = (newSlug) => setSlug(newSlug);
+
+  // ── Admin handlers ──────────────────────────────────────────────────────────
+  const handleAdminPinSuccess = () => {
+    setShowPinModal(false);
+    setIsAdmin(true);
+    setAuthState("adminpicker");
+  };
+  const handleAdminSelect = (slug, clientName, projects) => {
+    setUserName(clientName);
+    setAllowedProjects(projects);
+    setSlug(slug);
+    setAuthState("app");
+  };
+  const handleAdminSwitch = () => {
+    setAuthState("adminpicker");
+    setProject(null);
+    setSlug("");
+  };
+  const handleAdminExit = () => {
+    setIsAdmin(false);
+    setAuthState("login");
+    setProject(null);
+    setSlug("");
+    setUserName("");
   };
 
   // ── Shared <Head> ───────────────────────────────────────────────────────────
   const headAndCss = (
-    <>
-      <Head>
-        <title>PFAS Client Portal</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-      </Head>
-    </>
+    <Head>
+      <title>PFAS Client Portal</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    </Head>
   );
 
   // ── Render states ───────────────────────────────────────────────────────────
@@ -1005,12 +1033,33 @@ export default function ClientPortal() {
   }
 
   if (authState === "login") {
-    return <>{headAndCss}<LoginScreen onLogin={handleLogin} error={authError} /></>;
+    return (
+      <>
+        {headAndCss}
+        <LoginScreen onLogin={handleLogin} error={authError} onAdminClick={() => setShowPinModal(true)} />
+        {showPinModal && (
+          <AdminPinModal
+            onSuccess={handleAdminPinSuccess}
+            onClose={() => setShowPinModal(false)}
+          />
+        )}
+      </>
+    );
   }
 
-  // ── App shell: new 2-column layout ─────────────────────────────────────────
-  // Left (main):  ProjectHeader → KPIs → Team → Teams Discussion → Documents → Quick Actions
-  // Right (sidebar): Phase Progress (sorted)
+  if (authState === "adminpicker") {
+    return (
+      <>
+        {headAndCss}
+        <AdminClientPicker
+          onSelect={handleAdminSelect}
+          onBack={handleAdminExit}
+        />
+      </>
+    );
+  }
+
+  // ── App shell ───────────────────────────────────────────────────────────────
   return (
     <>
       {headAndCss}
@@ -1023,6 +1072,8 @@ export default function ClientPortal() {
         projects={allowedProjects}
         currentSlug={projectSlug}
         onProjectChange={handleProjectChange}
+        isAdmin={isAdmin}
+        onAdminSwitch={handleAdminSwitch}
       />
       <div className="container">
         <div className="hero">
@@ -1041,35 +1092,21 @@ export default function ClientPortal() {
 
         {project && !dataLoading && (
           <div className="main-grid">
-
-            {/* ── LEFT: main content ── */}
             <div>
               <ProjectHeader project={project} />
               <KpiRow project={project} />
-
-              {/* Team */}
               <div className="section-card">
                 <div className="section-title">Your PFAS Advisory Team</div>
                 <TeamGrid team={project.team} />
               </div>
-
-              {/* Teams Discussion Panel — center */}
               <TeamsPanel project={project} />
-
-              {/* Scheduling Log — upcoming + completed meetings */}
               <MeetingLog project={project} />
-
-              {/* Documents */}
               <DocumentsSection project={project} />
-
-              {/* Quick Actions */}
               <div className="section-card">
                 <div className="section-title">Quick Actions</div>
                 <ActionsGrid project={project} />
               </div>
             </div>
-
-            {/* ── RIGHT: phase progress ── */}
             <div className="sidebar">
               <div className="section-card phase-sidebar-card">
                 <div className="section-title">Phase Progress</div>
@@ -1081,7 +1118,6 @@ export default function ClientPortal() {
                 <PhaseList phases={project.phases} />
               </div>
             </div>
-
           </div>
         )}
       </div>
