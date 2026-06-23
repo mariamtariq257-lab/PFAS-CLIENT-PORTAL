@@ -113,6 +113,43 @@ const ALL_PROJECTS = (() => {
 })();
 
 
+// ── Shared design tokens (inline, apply regardless of external CSS) ────────────
+const CARD = {
+  background: "#fff",
+  border: "1px solid #E8ECF2",
+  borderRadius: 16,
+  boxShadow: "0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06)",
+  padding: 22,
+  marginBottom: 18,
+};
+const SECTION_TITLE = {
+  fontSize: 13,
+  fontWeight: 700,
+  letterSpacing: 0.4,
+  textTransform: "uppercase",
+  color: "#1F3A5F",
+  marginBottom: 16,
+  display: "flex",
+  alignItems: "center",
+  gap: 9,
+};
+const TITLE_BAR = {
+  width: 4,
+  height: 16,
+  borderRadius: 3,
+  background: "linear-gradient(180deg,#C9A24B,#B8902F)",
+  flexShrink: 0,
+};
+function SectionCard({ title, children, style }) {
+  return (
+    <div className="section-card" style={{ ...CARD, ...style }}>
+      {title && <div style={SECTION_TITLE}><span style={TITLE_BAR} />{title}</div>}
+      {children}
+    </div>
+  );
+}
+
+
 // ── Admin PIN modal ───────────────────────────────────────────────────────────
 // Shown as an overlay on top of the login screen when "Admin Access" is clicked.
 // Four digit boxes, auto-advances, shows shake animation on wrong PIN.
@@ -512,17 +549,18 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects,
 // ── Project header ────────────────────────────────────────────────────────────
 function ProjectHeader({ project }) {
   return (
-    <div className="project-header">
+    <div className="project-header" style={{ ...CARD, padding: 24, position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 3, background: "linear-gradient(90deg,#1F3A5F,#C9A24B)" }} />
       <div className="ph-top">
         <div className="ph-title-block">
-          <div className="ph-eyebrow">{project.type}</div>
-          <div className="ph-title">{project.displayName || project.name}</div>
+          <div className="ph-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "#C9A24B", marginBottom: 6 }}>{project.type}</div>
+          <div className="ph-title" style={{ fontSize: 24, fontWeight: 800, color: "#0F1E33", lineHeight: 1.2 }}>{project.displayName || project.name}</div>
         </div>
       </div>
-      <div className="ph-meta">
-        <span><strong>Client:</strong> {project.clientName}</span>
-        <span><strong>Current Phase:</strong> {project.currentPhase}</span>
-        <span><strong>Team Size:</strong> {project.team?.length || 0}</span>
+      <div className="ph-meta" style={{ display: "flex", flexWrap: "wrap", gap: 22, marginTop: 16, paddingTop: 16, borderTop: "1px solid #EEF1F6", fontSize: 13, color: "#475569" }}>
+        <span><strong style={{ color: "#1F3A5F" }}>Client:</strong> {project.clientName}</span>
+        <span><strong style={{ color: "#1F3A5F" }}>Current Phase:</strong> {project.currentPhase}</span>
+        <span><strong style={{ color: "#1F3A5F" }}>Team Size:</strong> {project.team?.length || 0}</span>
       </div>
     </div>
   );
@@ -530,28 +568,21 @@ function ProjectHeader({ project }) {
 
 // ── KPI row ───────────────────────────────────────────────────────────────────
 function KpiRow({ project }) {
+  const kpis = [
+    { label: "Project Progress", value: `${project.overallPercent}%`, sub: "Overall completion", accent: "#1F3A5F", bg: "linear-gradient(135deg,#F0F4FA,#FFFFFF)" },
+    { label: "Active Tasks",     value: project.activeTasks,          sub: `${project.overdueTasks} need attention`, accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
+    { label: "Current Phase",    value: project.currentPhase,         sub: "In progress", accent: "#166534", bg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", small: true },
+    { label: "Engagement Value", value: project.pfasFee || "PKR TBD", sub: "Total advisory fee", accent: "#6B21A8", bg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)" },
+  ];
   return (
-    <div className="kpi-row">
-      <div className="kpi k-progress">
-        <div className="kpi-label">Project Progress</div>
-        <div className="kpi-value">{project.overallPercent}%</div>
-        <div className="kpi-sub">Overall completion</div>
-      </div>
-      <div className="kpi k-tasks">
-        <div className="kpi-label">Active Tasks</div>
-        <div className="kpi-value">{project.activeTasks}</div>
-        <div className="kpi-sub">{project.overdueTasks} need attention</div>
-      </div>
-      <div className="kpi k-phase">
-        <div className="kpi-label">Current Phase</div>
-        <div className="kpi-value">{project.currentPhase}</div>
-        <div className="kpi-sub">In progress</div>
-      </div>
-      <div className="kpi k-fee">
-        <div className="kpi-label">Engagement Value</div>
-        <div className="kpi-value">{project.pfasFee || "PKR TBD"}</div>
-        <div className="kpi-sub">Total advisory fee</div>
-      </div>
+    <div className="kpi-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 18 }}>
+      {kpis.map((k, i) => (
+        <div key={i} style={{ ...CARD, marginBottom: 0, padding: 18, background: k.bg, borderLeft: `3px solid ${k.accent}` }}>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase", color: "#64748B" }}>{k.label}</div>
+          <div style={{ fontSize: k.small ? 18 : 27, fontWeight: 800, color: k.accent, margin: "8px 0 4px", lineHeight: 1.15 }}>{k.value}</div>
+          <div style={{ fontSize: 12, color: "#94A3B8" }}>{k.sub}</div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -648,27 +679,34 @@ function TeamGrid({ team }) {
                 <div className="member-role" style={{ fontSize: 12.5, color: "#64748B", lineHeight: 1.35, marginTop: 2 }}>{designation}</div>
               </div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingTop: 11, borderTop: "1px solid #F1F5F9" }}>
               {emailDisplay && (
-                <div className="member-email" style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12.5, minWidth: 0 }}>
-                  <span style={{ flexShrink: 0 }}>✉</span>
+                <div className="member-email" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, minWidth: 0 }}>
+                  <span style={{ flexShrink: 0, opacity: 0.55 }}>✉</span>
                   <a href={`mailto:${emailDisplay}`} style={{ color: "#1F3A5F", textDecoration: "none", overflowWrap: "anywhere", wordBreak: "break-word" }}>{emailDisplay}</a>
                 </div>
               )}
               {contact && (
-                <div className="member-contact" style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12.5 }}>
-                  <span style={{ flexShrink: 0 }}>📞</span>
-                  <a href={`tel:${contact}`} style={{ color: "#475569", textDecoration: "none" }}>{contact}</a>
+                <div className="member-contact" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5 }}>
+                  <span style={{ flexShrink: 0, opacity: 0.55 }}>📞</span>
+                  <span style={{ color: "#475569" }}>{contact}</span>
                 </div>
               )}
             </div>
-            {/* Action buttons */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 7, marginTop: 2 }}>
+            {/* Action buttons: Call (blinking) + WhatsApp, side by side */}
+            <div style={{ display: "flex", gap: 8, marginTop: 2 }}>
+              {contact && (
+                <a href={`tel:${contact}`} className="call-blink"
+                  style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 10px", color: "#166534", fontSize: 12.5, fontWeight: 700, borderRadius: 9, textDecoration: "none", border: "1px solid #86EFAC", background: "#DCFCE7" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#166534" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  Call
+                </a>
+              )}
               {waHref && (
                 <a href={waHref} target="_blank" rel="noreferrer"
-                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "7px 12px", background: "#DCFCE7", color: "#166534", fontSize: 12.5, fontWeight: 600, borderRadius: 8, textDecoration: "none", border: "1px solid #BBF7D0" }}>
+                  style={{ flex: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 10px", background: "#fff", color: "#166534", fontSize: 12.5, fontWeight: 700, borderRadius: 9, textDecoration: "none", border: "1px solid #BBF7D0" }}>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.858L.057 23.716a.5.5 0 0 0 .609.61l5.975-1.516A11.95 11.95 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.886 0-3.65-.523-5.157-1.432l-.36-.214-3.737.949.988-3.648-.235-.375A9.953 9.953 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-                  Contact on WhatsApp
+                  WhatsApp
                 </a>
               )}
             </div>
@@ -821,24 +859,30 @@ function fileIcon(type) {
 function DocumentsSection({ project }) {
   const uploadUrl = project.onedriveUrl || "#";
   return (
-    <div className="section-card docs-card">
-      <div className="section-title">Project Documents</div>
-      <div className="docs-recent-label">Recently Uploaded</div>
-      <div className="docs-file-list">
+    <div className="section-card docs-card" style={CARD}>
+      <div style={SECTION_TITLE}><span style={TITLE_BAR} />Project Documents</div>
+      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Recently Uploaded</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {RECENT_FILES_PLACEHOLDER.map((f, i) => {
           const fi = fileIcon(f.type);
           return (
-            <a key={i} className="doc-file-row" href={uploadUrl} target="_blank" rel="noreferrer">
-              <div className="doc-file-icon" style={{ background: fi.bg, color: fi.color }}>{fi.icon}</div>
-              <div className="doc-file-info"><div className="doc-file-name">{f.name}</div><div className="doc-file-meta">{f.date}</div></div>
-              <div className="doc-file-arrow">↗</div>
+            <a key={i} href={uploadUrl} target="_blank" rel="noreferrer"
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "1px solid #F1F5F9", textDecoration: "none" }}>
+              <div style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: fi.bg, color: fi.color }}>{fi.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 600, color: "#1E293B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</div>
+                <div style={{ fontSize: 11.5, color: "#94A3B8" }}>{f.date}</div>
+              </div>
+              <div style={{ flexShrink: 0, color: "#CBD5E1", fontSize: 13 }}>↗</div>
             </a>
           );
         })}
       </div>
-      <div className="docs-actions-row">
-        <a className="docs-browse-btn" href={uploadUrl} target="_blank" rel="noreferrer">📂 Browse All Files</a>
-        <a className="docs-upload-btn" href={uploadUrl} target="_blank" rel="noreferrer">⬆ Upload Document</a>
+      <div style={{ marginTop: 16 }}>
+        <a href={uploadUrl} target="_blank" rel="noreferrer"
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 16px", background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", color: "#fff", fontSize: 13.5, fontWeight: 600, borderRadius: 10, textDecoration: "none", boxShadow: "0 2px 8px rgba(31,58,95,0.2)" }}>
+          ⬆ Upload Document
+        </a>
       </div>
     </div>
   );
@@ -846,59 +890,24 @@ function DocumentsSection({ project }) {
 
 // ── Quick actions ─────────────────────────────────────────────────────────────
 function ActionsGrid({ project }) {
+  const actions = [
+    { href: project.onedriveUrl || "#",                             icon: "📁", bg: "#EFF6FF", color: "#1E40AF", title: "Shared Documents",   desc: "Client Communication folder" },
+    { href: project.teamsBookingUrl || project.teamsMeeting || "#", icon: "📅", bg: "#F0FDF4", color: "#166534", title: "Book a Meeting",     desc: "Pick an open slot with your PFAS team" },
+    { href: project.onedriveUrl || "#",                             icon: "📝", bg: "#FAF5FF", color: "#6B21A8", title: "Meeting Minutes",    desc: "MoMs folder · OneDrive" },
+    { href: project.onedriveUrl || "#",                             icon: "💰", bg: "#ECFEFF", color: "#155E75", title: "Invoices & Payments",desc: "Payments folder · OneDrive" },
+  ];
   return (
-    <div className="actions-grid">
-      <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
-        <div className="action-icon ai-blue">📁</div>
-        <div className="action-text"><div className="action-title">Shared Documents</div><div className="action-desc">Client Communication folder</div></div>
-      </a>
-      <a className="action-btn" href={project.teamsBookingUrl || project.teamsMeeting || "#"} target="_blank" rel="noreferrer">
-        <div className="action-icon ai-green">📅</div>
-        <div className="action-text"><div className="action-title">Book a Meeting</div><div className="action-desc">Pick an open slot with your PFAS team</div></div>
-      </a>
-      <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
-        <div className="action-icon ai-purple">📝</div>
-        <div className="action-text"><div className="action-title">Meeting Minutes</div><div className="action-desc">MoMs folder · OneDrive</div></div>
-      </a>
-      <a className="action-btn" href={project.onedriveUrl || "#"} target="_blank" rel="noreferrer">
-        <div className="action-icon ai-cyan">💰</div>
-        <div className="action-text"><div className="action-title">Invoices & Payments</div><div className="action-desc">Payments folder · OneDrive</div></div>
-      </a>
-    </div>
-  );
-}
-
-// ── Scheduling log ────────────────────────────────────────────────────────────
-function MeetingLog({ project }) {
-  const all = Array.isArray(project.meetings) ? project.meetings : [];
-  const now = new Date();
-  const parse = (m) => ({ ...m, _d: m.datetime ? new Date(m.datetime) : null });
-  const parsed = all.map(parse).filter(m => m._d && !isNaN(m._d));
-  const upcoming  = parsed.filter(m => m._d >= now).sort((a, b) => a._d - b._d);
-  const completed = parsed.filter(m => m._d <  now).sort((a, b) => b._d - a._d);
-  const fmt = (d) =>
-    d.toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" }) +
-    " · " + d.toLocaleTimeString("en-PK", { hour: "numeric", minute: "2-digit" });
-  const row = (m, i, kind) => (
-    <div className={`mtg-row mtg-${kind}`} key={`${kind}-${i}`}>
-      <div className="mtg-dot" />
-      <div className="mtg-body">
-        <div className="mtg-title">{m.title || "Meeting"}</div>
-        <div className="mtg-meta">{fmt(m._d)}{m.attendees ? <span className="mtg-attendees"> · {m.attendees}</span> : null}</div>
-      </div>
-      <div className="mtg-actions">
-        {kind === "up"   && m.joinUrl  && <a className="mtg-link mtg-join"  href={m.joinUrl}  target="_blank" rel="noreferrer">Join ↗</a>}
-        {kind === "done" && m.notesUrl && <a className="mtg-link mtg-notes" href={m.notesUrl} target="_blank" rel="noreferrer">Minutes ↗</a>}
-      </div>
-    </div>
-  );
-  return (
-    <div className="section-card mtg-card">
-      <div className="section-title">Scheduling Log</div>
-      <div className="mtg-group-label mtg-up-label"><span className="mtg-label-dot dot-amber" /> Upcoming Meetings<span className="mtg-count">{upcoming.length}</span></div>
-      {upcoming.length ? upcoming.map((m, i) => row(m, i, "up")) : <div className="mtg-empty">No upcoming meetings scheduled.</div>}
-      <div className="mtg-group-label mtg-done-label" style={{ marginTop: 18 }}><span className="mtg-label-dot dot-green" /> Completed Meetings<span className="mtg-count">{completed.length}</span></div>
-      {completed.length ? completed.map((m, i) => row(m, i, "done")) : <div className="mtg-empty">No meetings recorded yet.</div>}
+    <div className="actions-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+      {actions.map((a, i) => (
+        <a key={i} className="action-btn pfas-action-card" href={a.href} target="_blank" rel="noreferrer"
+          style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #EEF1F6", textDecoration: "none", background: "#fff" }}>
+          <div style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: a.bg, color: a.color }}>{a.icon}</div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>{a.title}</div>
+            <div style={{ fontSize: 11.5, color: "#94A3B8", lineHeight: 1.3, marginTop: 1 }}>{a.desc}</div>
+          </div>
+        </a>
+      ))}
     </div>
   );
 }
@@ -1024,6 +1033,25 @@ export default function ClientPortal() {
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      <style>{`
+        @keyframes pfas-call-blink {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(34,163,90,0.55); }
+          50%      { box-shadow: 0 0 0 6px rgba(34,163,90,0); }
+        }
+        @keyframes pfas-call-glow {
+          0%, 100% { background: #DCFCE7; border-color: #86EFAC; }
+          50%      { background: #BBF7D0; border-color: #22A35A; }
+        }
+        .call-blink {
+          animation: pfas-call-blink 1.4s ease-in-out infinite, pfas-call-glow 1.4s ease-in-out infinite;
+        }
+        .call-blink:hover { animation-play-state: paused; background: #BBF7D0; }
+        @media (prefers-reduced-motion: reduce) {
+          .call-blink { animation: none; }
+        }
+        .pfas-action-card { transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+        .pfas-action-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16,24,40,0.10); border-color: #D9E1EC; }
+      `}</style>
     </Head>
   );
 
@@ -1090,11 +1118,12 @@ export default function ClientPortal() {
         onAdminSwitch={handleAdminSwitch}
       />
       <div className="container">
-        <div className="hero">
-          <div className="live-corner">LIVE DATA</div>
-          <div className="hero-eyebrow">Project Portfolio Overview</div>
-          <div className="hero-title">Welcome to your PFAS engagement portal</div>
-          <div className="hero-sub">Track project progress, contact your advisory team directly, access shared documents and meeting minutes, and schedule meetings — all in one place.</div>
+        <div className="hero" style={{ position: "relative", overflow: "hidden", borderRadius: 18, padding: "28px 30px", marginBottom: 20, background: "linear-gradient(120deg,#16294A 0%,#1F3A5F 55%,#2C4F7C 100%)", boxShadow: "0 6px 24px rgba(22,41,74,0.28)" }}>
+          <div style={{ position: "absolute", top: -40, right: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(201,162,75,0.18),transparent 70%)" }} />
+          <div className="live-corner" style={{ position: "absolute", top: 16, right: 18, fontSize: 10, fontWeight: 700, letterSpacing: 1, color: "#C9A24B", border: "1px solid rgba(201,162,75,0.4)", borderRadius: 20, padding: "4px 12px" }}>● LIVE DATA</div>
+          <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Project Portfolio Overview</div>
+          <div className="hero-title" style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "8px 0 6px", lineHeight: 1.2 }}>Welcome to your PFAS engagement portal</div>
+          <div className="hero-sub" style={{ fontSize: 13.5, color: "rgba(255,255,255,0.78)", maxWidth: 640, lineHeight: 1.5 }}>Track project progress, contact your advisory team directly, access shared documents and meeting minutes, and schedule meetings — all in one place.</div>
         </div>
 
         {dataLoading && <LoadingSkeleton />}
@@ -1109,27 +1138,28 @@ export default function ClientPortal() {
             <div>
               <ProjectHeader project={project} />
               <KpiRow project={project} />
-              <div className="section-card">
-                <div className="section-title">Your PFAS Advisory Team</div>
+
+              <SectionCard title="Your PFAS Advisory Team">
                 <TeamGrid team={project.team} />
-              </div>
-              <MeetingLog project={project} />
-              <DocumentsSection project={project} />
-              <div className="section-card">
-                <div className="section-title">Quick Actions</div>
+              </SectionCard>
+
+              {/* Quick Actions — now ABOVE Project Documents */}
+              <SectionCard title="Quick Actions">
                 <ActionsGrid project={project} />
-              </div>
+              </SectionCard>
+
+              <DocumentsSection project={project} />
             </div>
+
             <div className="sidebar">
-              <div className="section-card phase-sidebar-card">
-                <div className="section-title">Phase Progress</div>
-                <div className="phase-legend">
+              <SectionCard title="Phase Progress" style={{ position: "sticky", top: 20 }}>
+                <div className="phase-legend" style={{ fontSize: 11.5, color: "#64748B", marginBottom: 14, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
                   <span className="legend-dot dot-green" /> Completed
                   <span className="legend-dot dot-amber" style={{ marginLeft: 12 }} /> In Progress
                   <span className="legend-dot dot-grey"  style={{ marginLeft: 12 }} /> Not Started
                 </div>
                 <PhaseList phases={project.phases} />
-              </div>
+              </SectionCard>
             </div>
           </div>
         )}
