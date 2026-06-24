@@ -568,11 +568,22 @@ function ProjectHeader({ project }) {
 
 // ── KPI row ───────────────────────────────────────────────────────────────────
 function KpiRow({ project }) {
+  // Format Received Payments — accepts "75%", 75, "75", or null/undefined
+  const formatReceivedPayments = (v) => {
+    if (v === null || v === undefined || v === "") return "—";
+    const s = String(v).trim();
+    if (s.endsWith("%")) return s;
+    if (!isNaN(Number(s))) return `${s}%`;
+    return s;
+  };
+  const receivedDisplay = formatReceivedPayments(project.receivedPayments);
+
   const kpis = [
-    { label: "Project Progress", value: `${project.overallPercent}%`, sub: "Overall completion", accent: "#1F3A5F", bg: "linear-gradient(135deg,#F0F4FA,#FFFFFF)" },
-    { label: "Active Tasks",     value: project.activeTasks,          sub: `${project.overdueTasks} need attention`, accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
-    { label: "Current Phase",    value: project.currentPhase,         sub: "In progress", accent: "#166534", bg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", small: true },
-    { label: "Engagement Value", value: project.pfasFee || "PKR TBD", sub: "Total advisory fee", accent: "#6B21A8", bg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)" },
+    { label: "Project Progress",   value: `${project.overallPercent}%`,         sub: "Overall completion",        accent: "#1F3A5F", bg: "linear-gradient(135deg,#F0F4FA,#FFFFFF)" },
+    { label: "Active Tasks",       value: project.activeTasks,                  sub: `${project.overdueTasks} need attention`, accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
+    { label: "Current Phase",      value: project.currentPhase,                 sub: "In progress",               accent: "#166534", bg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", small: true },
+    { label: "Engagement Value",   value: project.pfasFee || "PKR TBD",         sub: "Total advisory fee",        accent: "#6B21A8", bg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)" },
+    { label: "Received Payments",  value: receivedDisplay,                      sub: "Of total fee · live",       accent: "#0E7C66", bg: "linear-gradient(135deg,#ECFDF5,#FFFFFF)" },
   ];
   return (
     <div className="kpi-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 18 }}>
