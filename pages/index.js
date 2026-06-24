@@ -1169,11 +1169,10 @@ export default function ClientPortal() {
             font-size: 12.5px !important;
             line-height: 1.45 !important;
           }
-          .hero-eyebrow { font-size: 9.5px !important; letter-spacing: 1.5px !important; }
-          .hero-client { font-size: 27px !important; }
-          .hero-project { font-size: 15px !important; }
-          .hero-right { border-left: none !important; padding-left: 0 !important; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.14); flex-basis: 100% !important; }
-          .hero-welcome-label { font-size: 13.5px !important; }
+          .hero-eyebrow { font-size: 9.5px !important; letter-spacing: 2px !important; }
+          .hero-client { font-size: 28px !important; }
+          .hero-project { font-size: 15.5px !important; }
+          .hero-welcome-label { font-size: 15px !important; }
           .live-corner {
             font-size: 9px !important;
             padding: 3px 8px !important;
@@ -1377,38 +1376,34 @@ export default function ClientPortal() {
         onAdminSwitch={handleAdminSwitch}
       />
       <div className="container">
-        <div className="hero" style={{ position: "relative", overflow: "hidden", borderRadius: 18, padding: "24px 30px", marginBottom: 20, background: "linear-gradient(120deg,#16294A 0%,#1F3A5F 55%,#2C4F7C 100%)", boxShadow: "0 6px 24px rgba(22,41,74,0.28)" }}>
-          {/* soft gold ambient accent */}
-          <div style={{ position: "absolute", top: -70, right: 280, width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,201,60,0.12),transparent 68%)", pointerEvents: "none" }} />
+        <div className="hero" style={{ position: "relative", overflow: "hidden", borderRadius: 18, padding: "30px 30px 28px", marginBottom: 20, background: "linear-gradient(120deg,#16294A 0%,#1F3A5F 55%,#2C4F7C 100%)", boxShadow: "0 6px 24px rgba(22,41,74,0.28)" }}>
+          {/* soft gold ambient accents, symmetric */}
+          <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 360, height: 260, borderRadius: "50%", background: "radial-gradient(ellipse,rgba(255,201,60,0.10),transparent 70%)", pointerEvents: "none" }} />
 
           {project ? (
-            <div className="hero-row" style={{ position: "relative", display: "flex", alignItems: "stretch", gap: 28, flexWrap: "wrap" }}>
-              {/* LEFT: engagement (title) */}
-              <div className="hero-left" style={{ flex: "1 1 340px", minWidth: 0 }}>
-                <div className="hero-eyebrow" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "rgba(255,201,60,0.85)", marginBottom: 10 }}>Engagement</div>
-                <div className="hero-client" data-text={project.clientName} style={{ fontSize: 38, lineHeight: 1.08, letterSpacing: -0.6, marginBottom: 7 }}>
-                  {project.clientName}
-                </div>
-                <div className="hero-project" style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.3 }}>
-                  {project.displayName || project.name}
-                </div>
+            <div className="hero-center" style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+              <div className="hero-eyebrow" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "rgba(255,201,60,0.85)", marginBottom: 12 }}>Engagement</div>
+              <div className="hero-client" data-text={project.clientName} style={{ fontSize: 40, lineHeight: 1.08, letterSpacing: -0.5, marginBottom: 8 }}>
+                {project.clientName}
               </div>
-
-              {/* RIGHT: welcome copy, vertically centered, with divider */}
-              <div className="hero-right" style={{ flex: "0 1 300px", display: "flex", flexDirection: "column", justifyContent: "center", paddingLeft: 28, borderLeft: "1px solid rgba(255,255,255,0.14)" }}>
-                <div className="hero-welcome-label" style={{ fontSize: 14.5, fontWeight: 700, color: "#fff", marginBottom: 7 }}>
-                  Welcome to your portal
-                </div>
-                <div className="hero-sub" style={{ fontSize: 12.5, color: "rgba(255,255,255,0.7)", lineHeight: 1.55 }}>
-                  Track progress, contact your advisory team, access documents and minutes, and schedule meetings — all in one place.
-                </div>
+              <div className="hero-project" style={{ fontSize: 18.5, fontWeight: 600, lineHeight: 1.3 }}>
+                {project.displayName || project.name}
+              </div>
+              {/* centered gold accent rule */}
+              <div style={{ width: 70, height: 3, borderRadius: 3, background: "linear-gradient(90deg,rgba(255,201,60,0),#FFCB3D,rgba(255,201,60,0))", margin: "18px 0 14px" }} />
+              {/* Welcome — enlarged */}
+              <div className="hero-welcome-label" style={{ fontSize: 16.5, fontWeight: 700, color: "#fff", marginBottom: 6, letterSpacing: 0.2 }}>
+                Welcome to your portal
+              </div>
+              <div className="hero-sub" style={{ fontSize: 13, color: "rgba(255,255,255,0.72)", lineHeight: 1.55, maxWidth: 560 }}>
+                Track progress, contact your advisory team, access documents and minutes, and schedule meetings — all in one place.
               </div>
             </div>
           ) : (
-            <div style={{ position: "relative" }}>
-              <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 12 }}>Project Portfolio Overview</div>
-              <div className="hero-title" style={{ fontSize: 26, fontWeight: 800, color: "#fff", margin: "0 0 8px", lineHeight: 1.2 }}>Welcome to your PFAS engagement portal</div>
-              <div className="hero-sub" style={{ fontSize: 13.5, color: "rgba(255,255,255,0.78)", maxWidth: 620, lineHeight: 1.5 }}>Track project progress, contact your advisory team directly, access shared documents and meeting minutes, and schedule meetings.</div>
+            <div className="hero-center" style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+              <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginBottom: 12 }}>Project Portfolio Overview</div>
+              <div className="hero-title" style={{ fontSize: 27, fontWeight: 800, color: "#fff", margin: "0 0 10px", lineHeight: 1.2 }}>Welcome to your PFAS engagement portal</div>
+              <div className="hero-sub" style={{ fontSize: 13.5, color: "rgba(255,255,255,0.78)", maxWidth: 600, lineHeight: 1.5 }}>Track project progress, contact your advisory team directly, access shared documents and meeting minutes, and schedule meetings.</div>
             </div>
           )}
         </div>
