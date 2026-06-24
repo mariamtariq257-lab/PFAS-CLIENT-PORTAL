@@ -553,24 +553,20 @@ function ProjectHeader({ project }) {
       <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 3, background: "linear-gradient(90deg,#1F3A5F,#C9A24B)" }} />
       <div className="ph-top">
         <div className="ph-title-block">
-          <div className="ph-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "#C9A24B", marginBottom: 6 }}>{project.type}</div>
-          <div className="ph-title" style={{ fontSize: 24, fontWeight: 800, color: "#0F1E33", lineHeight: 1.2 }}>{project.displayName || project.name}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", flexShrink: 0 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="12" cy="7" r="4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="ph-client-name" style={{ fontSize: 22, fontWeight: 800, color: "#1F3A5F", letterSpacing: -0.2, lineHeight: 1.15 }}>{project.clientName}</div>
+          </div>
+          <div className="ph-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "#C9A24B", marginBottom: 5 }}>{project.type}</div>
+          <div className="ph-title" style={{ fontSize: 16, fontWeight: 600, color: "#475569", lineHeight: 1.35 }}>{project.displayName || project.name}</div>
         </div>
       </div>
-      <div className="ph-meta" style={{ display: "flex", flexWrap: "wrap", gap: 22, marginTop: 16, paddingTop: 16, borderTop: "1px solid #EEF1F6", fontSize: 13, color: "#475569" }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", flexShrink: 0 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="12" cy="7" r="4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </span>
-          <span>
-            <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase", color: "#94A3B8", display: "block", lineHeight: 1 }}>Client</span>
-            <span style={{ fontSize: 15, fontWeight: 700, color: "#1F3A5F", letterSpacing: 0.1 }}>{project.clientName}</span>
-          </span>
-        </span>
-      </div>
+      <div className="ph-meta" style={{ display: "none" }} />
     </div>
   );
 }
@@ -589,10 +585,10 @@ function KpiRow({ project }) {
 
   const kpis = [
     { label: "Project Progress",   value: `${project.overallPercent}%`,         sub: "Overall completion",        accent: "#1F3A5F", bg: "linear-gradient(135deg,#F0F4FA,#FFFFFF)" },
-    { label: "Active Tasks",       value: project.activeTasks,                  sub: "Ongoing tasks",                          accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
+    { label: "Active Tasks",       value: project.activeTasks,                  sub: "Ongoing tasks",              accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
     { label: "Current Phase",      value: project.currentPhase,                 sub: "In progress",               accent: "#166534", bg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", small: true },
     { label: "Engagement Value",   value: project.pfasFee || "PKR TBD",         sub: "Total advisory fee",        accent: "#6B21A8", bg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)" },
-    { label: "Received Payments",  value: receivedDisplay,                      sub: "Of total fee",              accent: "#0E7C66", bg: "linear-gradient(135deg,#ECFDF5,#FFFFFF)" },
+    { label: "Received Payments",  value: receivedDisplay,                      sub: "Of total fee",              accent: "#0369A1", bg: "linear-gradient(135deg,#EFF6FF,#FFFFFF)" },
   ];
   return (
     <div className="kpi-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 18 }}>
@@ -1345,10 +1341,9 @@ export default function ClientPortal() {
       <div className="container">
         <div className="hero" style={{ position: "relative", overflow: "hidden", borderRadius: 18, padding: "28px 30px", marginBottom: 20, background: "linear-gradient(120deg,#16294A 0%,#1F3A5F 55%,#2C4F7C 100%)", boxShadow: "0 6px 24px rgba(22,41,74,0.28)" }}>
           <div style={{ position: "absolute", top: -40, right: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(201,162,75,0.18),transparent 70%)" }} />
-          <div className="live-corner" style={{ position: "absolute", top: 16, right: 18, fontSize: 10, fontWeight: 700, letterSpacing: 1, color: "#C9A24B", border: "1px solid rgba(201,162,75,0.4)", borderRadius: 20, padding: "4px 12px" }}>● LIVE DATA</div>
           <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Project Portfolio Overview</div>
           <div className="hero-title" style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "8px 0 6px", lineHeight: 1.2 }}>Welcome to your PFAS engagement portal</div>
-          <div className="hero-sub" style={{ fontSize: 13.5, color: "rgba(255,255,255,0.78)", maxWidth: 640, lineHeight: 1.5 }}>Track project progress, contact your advisory team directly, access shared documents and meeting minutes, and schedule meetings — all in one place.</div>
+          <div className="hero-sub" style={{ fontSize: 13.5, color: "rgba(255,255,255,0.78)", maxWidth: 640, lineHeight: 1.5 }}>Track project progress, contact your advisory team directly, access shared documents and meeting minutes, and schedule meetings.</div>
         </div>
 
         {dataLoading && <LoadingSkeleton />}
