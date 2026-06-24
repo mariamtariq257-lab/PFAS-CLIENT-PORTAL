@@ -1096,6 +1096,30 @@ export default function ClientPortal() {
         .pfas-action-card { transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
         .pfas-action-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16,24,40,0.10); border-color: #D9E1EC; }
 
+        /* Hero client name — gold shine sweep + soft glow */
+        @keyframes pfas-client-glow {
+          0%, 100% { text-shadow: 0 0 8px rgba(201,162,75,0.35), 0 1px 2px rgba(0,0,0,0.3); }
+          50%      { text-shadow: 0 0 18px rgba(201,162,75,0.85), 0 0 30px rgba(201,162,75,0.45), 0 1px 2px rgba(0,0,0,0.3); }
+        }
+        .hero-client {
+          background: linear-gradient(100deg, #C9A24B 0%, #F4D98B 25%, #FFFFFF 45%, #F4D98B 65%, #C9A24B 100%);
+          background-size: 250% 100%;
+          -webkit-background-clip: text; background-clip: text;
+          -webkit-text-fill-color: transparent; color: transparent;
+          animation: pfas-client-shine 3.2s linear infinite, pfas-client-glow 2.4s ease-in-out infinite;
+        }
+        @keyframes pfas-client-shine {
+          0%   { background-position: 120% 0; }
+          100% { background-position: -120% 0; }
+        }
+        .hero-project {
+          color: #9EC4F0;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-client { animation: none; }
+        }
+
         /* ═══════════════════════════════════════════════════════════════════
            MOBILE OPTIMIZATIONS (≤768px)
            Web/tablet view unchanged. Mobile gets a vertical-stack layout
@@ -1159,6 +1183,9 @@ export default function ClientPortal() {
             line-height: 1.45 !important;
           }
           .hero-eyebrow { font-size: 9.5px !important; }
+          .hero-right { text-align: left !important; max-width: 100% !important; padding-top: 14px !important; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.12); width: 100%; }
+          .hero-client { font-size: 24px !important; }
+          .hero-project { font-size: 14px !important; }
           .live-corner {
             font-size: 9px !important;
             padding: 3px 8px !important;
@@ -1364,9 +1391,27 @@ export default function ClientPortal() {
       <div className="container">
         <div className="hero" style={{ position: "relative", overflow: "hidden", borderRadius: 18, padding: "28px 30px", marginBottom: 20, background: "linear-gradient(120deg,#16294A 0%,#1F3A5F 55%,#2C4F7C 100%)", boxShadow: "0 6px 24px rgba(22,41,74,0.28)" }}>
           <div style={{ position: "absolute", top: -40, right: -30, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle,rgba(201,162,75,0.18),transparent 70%)" }} />
-          <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Project Portfolio Overview</div>
-          <div className="hero-title" style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "8px 0 6px", lineHeight: 1.2 }}>Welcome to your PFAS engagement portal</div>
-          <div className="hero-sub" style={{ fontSize: 13.5, color: "rgba(255,255,255,0.78)", maxWidth: 640, lineHeight: 1.5 }}>Track project progress, contact your advisory team directly, access shared documents and meeting minutes, and schedule meetings.</div>
+          <div className="hero-row" style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24, flexWrap: "wrap" }}>
+            {/* Left: welcome copy */}
+            <div className="hero-left" style={{ minWidth: 0, flex: "1 1 320px" }}>
+              <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,0.6)" }}>Project Portfolio Overview</div>
+              <div className="hero-title" style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "8px 0 6px", lineHeight: 1.2 }}>Welcome to your PFAS engagement portal</div>
+              <div className="hero-sub" style={{ fontSize: 13.5, color: "rgba(255,255,255,0.78)", maxWidth: 560, lineHeight: 1.5 }}>Track project progress, contact your advisory team directly, access shared documents and meeting minutes, and schedule meetings.</div>
+            </div>
+
+            {/* Right: client + project name */}
+            {project && (
+              <div className="hero-right" style={{ flexShrink: 0, textAlign: "right", maxWidth: 340, paddingTop: 4 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.4, textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 6 }}>Engagement</div>
+                <div className="hero-client" style={{ fontSize: 30, fontWeight: 800, lineHeight: 1.12, letterSpacing: -0.3 }}>
+                  {project.clientName}
+                </div>
+                <div className="hero-project" style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.3, marginTop: 5 }}>
+                  {project.displayName || project.name}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {dataLoading && <LoadingSkeleton />}
@@ -1379,7 +1424,6 @@ export default function ClientPortal() {
         {project && !dataLoading && (
           <div className="main-grid">
             <div>
-              <ProjectHeader project={project} />
               <KpiRow project={project} />
 
               <SectionCard title="Your PFAS Advisory Team">
