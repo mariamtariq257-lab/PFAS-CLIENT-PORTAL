@@ -553,17 +553,40 @@ function ProjectHeader({ project }) {
       <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 3, background: "linear-gradient(90deg,#1F3A5F,#C9A24B)" }} />
       <div className="ph-top">
         <div className="ph-title-block">
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+          {/* Client name row */}
+          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 14 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", flexShrink: 0 }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="12" cy="7" r="4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <div className="ph-client-name" style={{ fontSize: 22, fontWeight: 800, color: "#1F3A5F", letterSpacing: -0.2, lineHeight: 1.15 }}>{project.clientName}</div>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#94A3B8", marginBottom: 2 }}>Client</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#1F3A5F", letterSpacing: -0.3, lineHeight: 1.1 }}>{project.clientName}</div>
+            </div>
           </div>
-          <div className="ph-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "#C9A24B", marginBottom: 5 }}>{project.type}</div>
-          <div className="ph-title" style={{ fontSize: 16, fontWeight: 600, color: "#475569", lineHeight: 1.35 }}>{project.displayName || project.name}</div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: "linear-gradient(90deg,#E2E8F0,transparent)", marginBottom: 14 }} />
+
+          {/* Project name row */}
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#C9A24B,#B8902F)", flexShrink: 0 }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#94A3B8", marginBottom: 2 }}>Project</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#0F1E33", letterSpacing: -0.3, lineHeight: 1.1 }}>{project.displayName || project.name}</div>
+            </div>
+          </div>
+
         </div>
       </div>
       <div className="ph-meta" style={{ display: "none" }} />
