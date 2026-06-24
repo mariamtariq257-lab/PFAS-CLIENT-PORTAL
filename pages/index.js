@@ -1030,7 +1030,7 @@ export default function ClientPortal() {
   const headAndCss = (
     <Head>
       <title>PFAS Client Portal</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <style>{`
@@ -1051,6 +1051,206 @@ export default function ClientPortal() {
         }
         .pfas-action-card { transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
         .pfas-action-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16,24,40,0.10); border-color: #D9E1EC; }
+
+        /* ═══════════════════════════════════════════════════════════════════
+           MOBILE OPTIMIZATIONS (≤768px)
+           Web/tablet view unchanged. Mobile gets a vertical-stack layout
+           with bigger tap targets, hidden tertiary text, and full-width cards.
+           ═══════════════════════════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+          /* Container & body */
+          body { font-size: 14px; }
+          .container { padding: 12px !important; max-width: 100% !important; }
+
+          /* Top bar: vertical 2-row stack */
+          .topbar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 10px !important;
+            padding: 12px 14px !important;
+          }
+          .topbar .brand { gap: 10px !important; }
+          .topbar .brand-logo { width: 40px !important; height: 32px !important; font-size: 13px !important; }
+          .topbar .brand-sub { font-size: 9px !important; letter-spacing: 0.5px !important; }
+          .topbar .brand-name { font-size: 15px !important; }
+
+          .topbar-right {
+            width: 100% !important;
+            flex-wrap: wrap !important;
+            justify-content: flex-end !important;
+            gap: 8px !important;
+          }
+          .topbar-right .live-badge {
+            display: none !important;  /* hide "Updated X ago" on mobile to save space */
+          }
+          .topbar-right .user-chip {
+            font-size: 11px !important;
+            padding: 4px 8px 4px 4px !important;
+          }
+          .topbar-right .user-chip .av {
+            width: 24px !important; height: 24px !important; font-size: 11px !important;
+          }
+          .topbar-right .logout-btn {
+            padding: 6px 10px !important;
+            font-size: 11px !important;
+          }
+
+          /* Project switcher dropdown — make full width on mobile */
+          .project-switcher-btn {
+            max-width: 100% !important;
+            font-size: 12px !important;
+          }
+
+          /* Hero banner: smaller, tighter */
+          .hero {
+            padding: 18px 16px !important;
+            border-radius: 14px !important;
+          }
+          .hero-title {
+            font-size: 18px !important;
+            margin: 6px 0 4px !important;
+          }
+          .hero-sub {
+            font-size: 12.5px !important;
+            line-height: 1.45 !important;
+          }
+          .hero-eyebrow { font-size: 9.5px !important; }
+          .live-corner {
+            font-size: 9px !important;
+            padding: 3px 8px !important;
+            top: 12px !important;
+            right: 12px !important;
+          }
+
+          /* Main grid: single column on mobile (no sidebar split) */
+          .main-grid {
+            display: block !important;
+            grid-template-columns: 1fr !important;
+          }
+          .sidebar {
+            margin-top: 16px !important;
+          }
+
+          /* Project header */
+          .project-header {
+            padding: 18px !important;
+          }
+          .ph-title {
+            font-size: 18px !important;
+          }
+          .ph-meta {
+            gap: 12px !important;
+            font-size: 12px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+
+          /* KPI row: 2 columns instead of 4 */
+          .kpi-row {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+          }
+          .kpi {
+            padding: 12px !important;
+          }
+          .kpi .kpi-label { font-size: 10px !important; }
+          .kpi .kpi-value { font-size: 18px !important; }
+          .kpi .kpi-sub { font-size: 10.5px !important; }
+
+          /* Section cards */
+          .section-card { padding: 16px !important; }
+          .section-title { font-size: 14px !important; }
+
+          /* Team grid: single column */
+          .team-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+          }
+          .member-card {
+            padding: 14px !important;
+          }
+          .member-card .avatar {
+            width: 38px !important;
+            height: 38px !important;
+            font-size: 13px !important;
+          }
+          .member-card .member-name { font-size: 14px !important; }
+          .member-card .member-role { font-size: 11.5px !important; }
+          .member-card .member-email,
+          .member-card .member-contact { font-size: 12px !important; }
+
+          /* Teams chat card */
+          .chat-card { border-radius: 14px !important; }
+          .chat-header { padding: 12px 14px !important; }
+          .chat-title { font-size: 13px !important; }
+          .chat-status, .chat-status-pending { font-size: 11px !important; }
+          .chat-body { min-height: 240px !important; max-height: 320px !important; padding: 14px !important; }
+          .chat-pending-body { padding: 20px 16px !important; }
+          .pending-title { font-size: 14px !important; }
+          .pending-sub { font-size: 12px !important; }
+          .pstep-text { font-size: 11.5px !important; }
+          .chat-cta-banner { padding: 12px 14px !important; }
+          .chat-cta { font-size: 12.5px !important; padding: 9px 14px !important; }
+
+          /* Documents */
+          .docs-card { padding: 16px !important; }
+          .doc-file-row { padding: 10px !important; }
+          .doc-file-name { font-size: 12.5px !important; }
+          .doc-file-meta { font-size: 10.5px !important; }
+          .docs-actions-row {
+            flex-direction: column !important;
+            gap: 8px !important;
+          }
+          .docs-browse-btn, .docs-upload-btn {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+
+          /* Quick actions: 1 column instead of 2 */
+          .actions-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+          }
+          .action-btn { padding: 14px !important; }
+          .action-title { font-size: 13px !important; }
+          .action-desc { font-size: 11px !important; }
+
+          /* Scheduling Log meetings */
+          .mtg-card { padding: 16px !important; }
+          .mtg-row {
+            flex-wrap: wrap !important;
+            padding: 12px 0 !important;
+          }
+          .mtg-title { font-size: 13px !important; }
+          .mtg-meta { font-size: 11.5px !important; }
+
+          /* Phase Progress sidebar — make it inline on mobile, not floating */
+          .phase-sidebar-card {
+            position: static !important;
+            margin-top: 0 !important;
+          }
+          .phase-row { padding: 8px 0 !important; }
+          .phase-name { font-size: 12.5px !important; }
+          .phase-pct { font-size: 12px !important; }
+
+          /* Login screen */
+          .login-overlay { padding: 16px !important; }
+          .login-card {
+            max-width: 100% !important;
+            padding: 28px 22px !important;
+          }
+          .login-title { font-size: 19px !important; }
+          .login-sub { font-size: 13px !important; }
+          .login-btn { font-size: 14px !important; padding: 13px !important; }
+        }
+
+        /* Extra-small phones (≤380px) */
+        @media (max-width: 380px) {
+          .kpi-row { grid-template-columns: 1fr !important; }
+          .topbar { padding: 10px 12px !important; }
+          .hero { padding: 16px 14px !important; }
+          .hero-title { font-size: 17px !important; }
+        }
       `}</style>
     </Head>
   );
