@@ -682,6 +682,8 @@ const STAFF_DIRECTORY = {
   "bilal.butt@pfas.pk":         { designation: "Assistant Manager / Senior Analyst PFM",                           contact: "0334-5308076" },
   "ahmad.qazi@pfas.pk":         { designation: "General Manager / Practice Lead Energy",                           contact: "0303-4441690" },
   "awais.khan@pfas.com.pk":     { designation: "Analyst",                                                          contact: "0322-8473455" },
+  "ali.jibran@pfas.com.pk":     { designation: "Analyst",                                                          contact: null },
+  "husnain.siddique@pfas.com.pk": { designation: "Senior Manager / Senior Associate Financial Advisory",            contact: "0342-8119118" },
 };
 
 // ── Team grid ─────────────────────────────────────────────────────────────────
