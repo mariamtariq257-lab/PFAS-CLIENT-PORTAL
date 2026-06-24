@@ -4,7 +4,7 @@
 //
 // Usage:  GET /api/clickup-client?project=shrimps-estate-project
 // Returns: { name, clientName, type, overallPercent, activeTasks, overdueTasks,
-//            pfasFee, currentPhase, health, phases[], members[], lastUpdated }
+//            pfasFee, receivedPayments, currentPhase, health, phases[], members[], lastUpdated }
 
 const CU_TOKEN = process.env.CLICKUP_API_TOKEN;
 const SPACE_ID = "901810857664";
@@ -168,20 +168,30 @@ async function fetchProjectDirEntry(listName) {
   );
   const tasks = data.tasks || [];
   const match = tasks.find(t => t.name.toLowerCase().trim() === listName.toLowerCase().trim());
-  if (!match) return { pfasFee: "PKR TBD", oneDriveUrl: null };
+  if (!match) return { pfasFee: "PKR TBD", oneDriveUrl: null, receivedPayments: null };
 
-  const feeField    = "7e823284-632f-4e8a-8562-63aee2cc970d";
-  const oneDriveField = "90882fc8-a254-48bb-9f2e-517582c8e4d7";
+  const feeField              = "7e823284-632f-4e8a-8562-63aee2cc970d";
+  const oneDriveField         = "90882fc8-a254-48bb-9f2e-517582c8e4d7";
+  const receivedPaymentsField = "1890ea78-2be4-42ff-a90f-ac6cd8bcff38";
 
   let pfasFee = "PKR TBD";
   let oneDriveUrl = null;
+  let receivedPayments = null;
 
   (match.custom_fields || []).forEach(f => {
-    if (f.id === feeField && f.value)      pfasFee    = f.value;
+    if (f.id === feeField && f.value)      pfasFee     = f.value;
     if (f.id === oneDriveField && f.value) oneDriveUrl = f.value;
+
+    // Received Payments is a DROPDOWN — value is the option ID (UUID).
+    // Map UUID → label (e.g. "75%") using the field's options array.
+    if (f.id === receivedPaymentsField && f.value !== null && f.value !== undefined) {
+      const opts = f.type_config?.options || [];
+      const opt = opts.find(o => o.id === f.value || o.orderindex === f.value);
+      if (opt) receivedPayments = opt.name;
+    }
   });
 
-  return { pfasFee, oneDriveUrl };
+  return { pfasFee, oneDriveUrl, receivedPayments };
 }
 
 // ── Main project data builder ────────────────────────────────────────────────
@@ -255,9 +265,10 @@ async function buildClientProject(listId, listName, clientName, slug) {
     ? new Date(Math.max(...allSubtasks.map(t => parseInt(t.date_updated || 0)))).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })
     : "—";
 
-  // Fetch pfasFee from Project Directory (overrides meta only if found)
-  const dirEntry = await fetchProjectDirEntry(listName);
-  const pfasFee  = dirEntry.pfasFee;
+  // Fetch pfasFee + receivedPayments from Project Directory (overrides meta only if found)
+  const dirEntry         = await fetchProjectDirEntry(listName);
+  const pfasFee          = dirEntry.pfasFee;
+  const receivedPayments = dirEntry.receivedPayments;
 
   return {
     slug,
@@ -267,6 +278,7 @@ async function buildClientProject(listId, listName, clientName, slug) {
     type:         meta.type || "Advisory",
     health,
     pfasFee,
+    receivedPayments,
     currentPhase,
     overallPercent: overallPct,
     activeTasks,
