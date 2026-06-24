@@ -558,9 +558,18 @@ function ProjectHeader({ project }) {
         </div>
       </div>
       <div className="ph-meta" style={{ display: "flex", flexWrap: "wrap", gap: 22, marginTop: 16, paddingTop: 16, borderTop: "1px solid #EEF1F6", fontSize: 13, color: "#475569" }}>
-        <span><strong style={{ color: "#1F3A5F" }}>Client:</strong> {project.clientName}</span>
-        <span><strong style={{ color: "#1F3A5F" }}>Current Phase:</strong> {project.currentPhase}</span>
-        <span><strong style={{ color: "#1F3A5F" }}>Team Size:</strong> {project.team?.length || 0}</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", flexShrink: 0 }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="12" cy="7" r="4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>
+          <span>
+            <span style={{ fontSize: 10.5, fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase", color: "#94A3B8", display: "block", lineHeight: 1 }}>Client</span>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#1F3A5F", letterSpacing: 0.1 }}>{project.clientName}</span>
+          </span>
+        </span>
       </div>
     </div>
   );
@@ -580,10 +589,10 @@ function KpiRow({ project }) {
 
   const kpis = [
     { label: "Project Progress",   value: `${project.overallPercent}%`,         sub: "Overall completion",        accent: "#1F3A5F", bg: "linear-gradient(135deg,#F0F4FA,#FFFFFF)" },
-    { label: "Active Tasks",       value: project.activeTasks,                  sub: `${project.overdueTasks} need attention`, accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
+    { label: "Active Tasks",       value: project.activeTasks,                  sub: "Ongoing tasks",                          accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
     { label: "Current Phase",      value: project.currentPhase,                 sub: "In progress",               accent: "#166534", bg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", small: true },
     { label: "Engagement Value",   value: project.pfasFee || "PKR TBD",         sub: "Total advisory fee",        accent: "#6B21A8", bg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)" },
-    { label: "Received Payments",  value: receivedDisplay,                      sub: "Of total fee · live",       accent: "#0E7C66", bg: "linear-gradient(135deg,#ECFDF5,#FFFFFF)" },
+    { label: "Received Payments",  value: receivedDisplay,                      sub: "Of total fee",              accent: "#0E7C66", bg: "linear-gradient(135deg,#ECFDF5,#FFFFFF)" },
   ];
   return (
     <div className="kpi-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 18 }}>
@@ -693,7 +702,12 @@ function TeamGrid({ team }) {
             <div style={{ display: "flex", flexDirection: "column", gap: 5, paddingTop: 11, borderTop: "1px solid #F1F5F9" }}>
               {emailDisplay && (
                 <div className="member-email" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, minWidth: 0 }}>
-                  <span style={{ flexShrink: 0, opacity: 0.55 }}>✉</span>
+                  <span style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="2" y="4" width="20" height="16" rx="3" fill="#1F3A5F" fillOpacity="0.12" stroke="#1F3A5F" strokeWidth="1.6"/>
+                      <path d="M2 8l10 7 10-7" stroke="#1F3A5F" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
                   <a href={`mailto:${emailDisplay}`} style={{ color: "#1F3A5F", textDecoration: "none", overflowWrap: "anywhere", wordBreak: "break-word" }}>{emailDisplay}</a>
                 </div>
               )}
