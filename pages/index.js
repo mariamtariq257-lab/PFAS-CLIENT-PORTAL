@@ -1382,21 +1382,12 @@ export default function ClientPortal() {
 
           {project ? (
             <div className="hero-center" style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-              <div className="hero-eyebrow" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "rgba(255,201,60,0.85)", marginBottom: 12 }}>Engagement</div>
+              <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "rgba(255,201,60,0.85)", marginBottom: 12 }}>Welcome to your portal</div>
               <div className="hero-client" data-text={project.clientName} style={{ fontSize: 40, lineHeight: 1.08, letterSpacing: -0.5, marginBottom: 8 }}>
                 {project.clientName}
               </div>
               <div className="hero-project" style={{ fontSize: 18.5, fontWeight: 600, lineHeight: 1.3 }}>
                 {project.displayName || project.name}
-              </div>
-              {/* centered gold accent rule */}
-              <div style={{ width: 70, height: 3, borderRadius: 3, background: "linear-gradient(90deg,rgba(255,201,60,0),#FFCB3D,rgba(255,201,60,0))", margin: "18px 0 14px" }} />
-              {/* Welcome — enlarged */}
-              <div className="hero-welcome-label" style={{ fontSize: 16.5, fontWeight: 700, color: "#fff", marginBottom: 6, letterSpacing: 0.2 }}>
-                Welcome to your portal
-              </div>
-              <div className="hero-sub" style={{ fontSize: 13, color: "rgba(255,255,255,0.72)", lineHeight: 1.55, maxWidth: 560 }}>
-                Track progress, contact your advisory team, access documents and minutes, and schedule meetings — all in one place.
               </div>
             </div>
           ) : (
