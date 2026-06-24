@@ -228,5 +228,45 @@
     "email": "ahmad.qazi@pfas.pk",
     "department": "Energy",
     "contact": "0303-4441690"
+  },
+  {
+    "ec": "",
+    "name": "Ahmad Sohail",
+    "designation": "Individual Consultant",
+    "category": "IC",
+    "grade": "",
+    "email": "ahmad.sohail@pfas.pk",
+    "department": "Operations",
+    "contact": "0300-0386181"
+  },
+  {
+    "ec": "",
+    "name": "Ali Jibran Mirza",
+    "designation": "Individual Consultant",
+    "category": "IC",
+    "grade": "",
+    "email": "ali.jibran@pfas.pk",
+    "department": "Operations",
+    "contact": "0300-8430503"
+  },
+  {
+    "ec": "",
+    "name": "Abdul Wahab",
+    "designation": "Individual Consultant",
+    "category": "IC",
+    "grade": "",
+    "email": "abdul.wahab@pfas.pk",
+    "department": "Operations",
+    "contact": "0305-2392065"
+  },
+  {
+    "ec": "",
+    "name": "Meiraj Najam Khan",
+    "designation": "Individual Consultant",
+    "category": "IC",
+    "grade": "",
+    "email": "meiraj.khan@pfas.pk",
+    "department": "Operations",
+    "contact": "0322-0227875"
   }
 ]
