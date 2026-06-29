@@ -506,7 +506,7 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects,
   return (
     <div className="topbar">
       <div className="brand">
-        <img src="/logo-dark.png" alt="PFAS" className="brand-logo" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+        <img src="/logo-dark.png" alt="PFAS" className="brand-logo" style={{ width: 110, height: 40, objectFit: "contain", objectPosition: "left center", background: "none", border: "none", borderRadius: 0, padding: 0, boxShadow: "none", flexShrink: 0 }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
           <div className="brand-logo-fallback" style={{ display: "none", alignItems: "center", justifyContent: "center", background: "#F2BE1A", borderRadius: 8, padding: "4px 10px", fontWeight: 800, fontSize: 15, color: "#1C2D56", letterSpacing: 1 }}>PFAS</div>
         <div>
           <div className="brand-sub">Punjab Financial Advisory Services</div>
