@@ -277,7 +277,7 @@ function AdminClientPicker({ onSelect, onBack }) {
       {/* Header */}
       <div className="admin-picker-header">
         <div className="admin-picker-brand">
-          <img src="/pfas-logo.png" alt="PFAS" style={{ width: 90, height: 36, objectFit: "contain", objectPosition: "left center" }} />
+          <img src="/logo-dark.png" alt="PFAS" style={{ width: 90, height: 36, objectFit: "contain", objectPosition: "left center" }} />
           <div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", letterSpacing: 1, textTransform: "uppercase" }}>Admin Mode</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>Client Portal Overview</div>
@@ -363,7 +363,7 @@ function DevPicker({ onSelect }) {
   return (
     <div className="login-overlay">
       <div className="login-card">
-        <img src="/pfas-logo.png" alt="PFAS" className="login-logo" />
+        <img src="/logo-dark.png" alt="PFAS" className="login-logo" />
         <div className="dev-banner">
           🛠 Dev mode — Auth0 bypassed on localhost.<br />
           Select a client to preview their portal.
@@ -394,7 +394,7 @@ function LoginScreen({ onLogin, error, onAdminClick }) {
   return (
     <div className="login-overlay">
       <div className="login-card">
-        <img src="/pfas-logo.png" alt="PFAS" className="login-logo" />
+        <img src="/logo-dark.png" alt="PFAS" className="login-logo" />
         <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
           <button className="login-btn" onClick={onLogin} style={{ marginTop: 0 }}>
             Sign In Securely
@@ -506,7 +506,7 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects,
   return (
     <div className="topbar">
       <div className="brand">
-        <img src="/pfas-logo-white.png" alt="PFAS" className="brand-logo" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+        <img src="/logo-dark.png" alt="PFAS" className="brand-logo" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
           <div className="brand-logo-fallback" style={{ display: "none", alignItems: "center", justifyContent: "center", background: "#F2BE1A", borderRadius: 8, padding: "4px 10px", fontWeight: 800, fontSize: 15, color: "#1C2D56", letterSpacing: 1 }}>PFAS</div>
         <div>
           <div className="brand-sub">Punjab Financial Advisory Services</div>
@@ -1091,6 +1091,7 @@ export default function ClientPortal() {
           object-fit: contain;
           object-position: left center;
           flex-shrink: 0;
+          filter: brightness(0) invert(1);
         }
 
         @keyframes pfas-call-blink {
@@ -1335,7 +1336,7 @@ export default function ClientPortal() {
         {headAndCss}
         <div style={{ minHeight: "100vh", background: "#F4F6F9", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ textAlign: "center", color: "#475569" }}>
-            <img src="/pfas-logo.png" alt="PFAS" style={{ width: 120, height: 48, objectFit: "contain", margin: "0 auto 16px", display: "block" }} />
+            <img src="/logo-dark.png" alt="PFAS" style={{ width: 120, height: 48, objectFit: "contain", margin: "0 auto 16px", display: "block" }} />
             <p style={{ fontSize: 14 }}>Loading portal…</p>
           </div>
         </div>
