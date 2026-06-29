@@ -1091,7 +1091,6 @@ export default function ClientPortal() {
           object-fit: contain;
           object-position: left center;
           flex-shrink: 0;
-          filter: brightness(0) invert(1);
         }
 
         @keyframes pfas-call-blink {
