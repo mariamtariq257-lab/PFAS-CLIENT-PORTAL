@@ -127,7 +127,7 @@ const SECTION_TITLE = {
   fontWeight: 700,
   letterSpacing: 0.4,
   textTransform: "uppercase",
-  color: "#1F3A5F",
+  color: "#1C2D56",
   marginBottom: 16,
   display: "flex",
   alignItems: "center",
@@ -137,7 +137,7 @@ const TITLE_BAR = {
   width: 4,
   height: 16,
   borderRadius: 3,
-  background: "linear-gradient(180deg,#C9A24B,#B8902F)",
+  background: "linear-gradient(180deg,#F2BE1A,#D4A716)",
   flexShrink: 0,
 };
 function SectionCard({ title, children, style }) {
@@ -277,7 +277,7 @@ function AdminClientPicker({ onSelect, onBack }) {
       {/* Header */}
       <div className="admin-picker-header">
         <div className="admin-picker-brand">
-          <div className="brand-logo" style={{ width: 52, height: 36, fontSize: 16 }}>PFAS</div>
+          <img src="/pfas-logo.png" alt="PFAS" style={{ width: 90, height: 36, objectFit: "contain", objectPosition: "left center" }} />
           <div>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", letterSpacing: 1, textTransform: "uppercase" }}>Admin Mode</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>Client Portal Overview</div>
@@ -363,9 +363,7 @@ function DevPicker({ onSelect }) {
   return (
     <div className="login-overlay">
       <div className="login-card">
-        <div className="login-logo">PFAS</div>
-        <div className="login-title">PFAS Client Portal</div>
-        <div className="login-sub">Local development mode</div>
+        <img src="/pfas-logo.png" alt="PFAS" className="login-logo" />
         <div className="dev-banner">
           🛠 Dev mode — Auth0 bypassed on localhost.<br />
           Select a client to preview their portal.
@@ -396,9 +394,7 @@ function LoginScreen({ onLogin, error, onAdminClick }) {
   return (
     <div className="login-overlay">
       <div className="login-card">
-        <div className="login-logo">PFAS</div>
-        <div className="login-title">PFAS Client Portal</div>
-        <div className="login-sub">Sign in to access your engagement workspace</div>
+        <img src="/pfas-logo.png" alt="PFAS" className="login-logo" />
         <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
           <button className="login-btn" onClick={onLogin} style={{ marginTop: 0 }}>
             Sign In Securely
@@ -487,7 +483,7 @@ function ProjectSwitcher({ projects, currentSlug, onChange }) {
                   padding: "10px 12px", background: isActive ? "#F1F5F9" : "transparent",
                   border: "none", borderRadius: 8, fontSize: 13,
                   fontWeight: isActive ? 600 : 500,
-                  color: isActive ? "#1F3A5F" : "#334155", cursor: "pointer",
+                  color: isActive ? "#1C2D56" : "#334155", cursor: "pointer",
                 }}
                 onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "#F8FAFC"; }}
                 onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
@@ -510,7 +506,8 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects,
   return (
     <div className="topbar">
       <div className="brand">
-        <div className="brand-logo">PFAS</div>
+        <img src="/pfas-logo-white.png" alt="PFAS" className="brand-logo" onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+          <div className="brand-logo-fallback" style={{ display: "none", alignItems: "center", justifyContent: "center", background: "#F2BE1A", borderRadius: 8, padding: "4px 10px", fontWeight: 800, fontSize: 15, color: "#1C2D56", letterSpacing: 1 }}>PFAS</div>
         <div>
           <div className="brand-sub">Punjab Financial Advisory Services</div>
           <div className="brand-name">Client Portal</div>
@@ -550,13 +547,13 @@ function TopBar({ userName, onLogout, lastUpdated, isDev, onSwitchDev, projects,
 function ProjectHeader({ project }) {
   return (
     <div className="project-header" style={{ ...CARD, padding: 24, position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 3, background: "linear-gradient(90deg,#1F3A5F,#C9A24B)" }} />
+      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 3, background: "linear-gradient(90deg,#1C2D56,#F2BE1A)" }} />
       <div className="ph-top">
         <div className="ph-title-block">
 
           {/* Client name row */}
           <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 14 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", flexShrink: 0 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", flexShrink: 0 }}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="12" cy="7" r="4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -564,7 +561,7 @@ function ProjectHeader({ project }) {
             </div>
             <div>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#94A3B8", marginBottom: 2 }}>Client</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#1F3A5F", letterSpacing: -0.3, lineHeight: 1.1 }}>{project.clientName}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#1C2D56", letterSpacing: -0.3, lineHeight: 1.1 }}>{project.clientName}</div>
             </div>
           </div>
 
@@ -573,7 +570,7 @@ function ProjectHeader({ project }) {
 
           {/* Project name row */}
           <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#C9A24B,#B8902F)", flexShrink: 0 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#F2BE1A,#D4A716)", flexShrink: 0 }}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -583,7 +580,7 @@ function ProjectHeader({ project }) {
             </div>
             <div>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#94A3B8", marginBottom: 2 }}>Project</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#0F1E33", letterSpacing: -0.3, lineHeight: 1.1 }}>{project.displayName || project.name}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#0A1628", letterSpacing: -0.3, lineHeight: 1.1 }}>{project.displayName || project.name}</div>
             </div>
           </div>
 
@@ -607,7 +604,7 @@ function KpiRow({ project }) {
   const receivedDisplay = formatReceivedPayments(project.receivedPayments);
 
   const kpis = [
-    { label: "Project Progress",   value: `${project.overallPercent}%`,         sub: "Overall completion",        accent: "#1F3A5F", bg: "linear-gradient(135deg,#F0F4FA,#FFFFFF)" },
+    { label: "Project Progress",   value: `${project.overallPercent}%`,         sub: "Overall completion",        accent: "#1C2D56", bg: "linear-gradient(135deg,#F0F4FA,#FFFFFF)" },
     { label: "Active Tasks",       value: project.activeTasks,                  sub: "Ongoing tasks",              accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
     { label: "Current Phase",      value: project.currentPhase,                 sub: "In progress",               accent: "#166534", bg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", small: true },
     { label: "Engagement Value",   value: project.pfasFee || "PKR TBD",         sub: "Total advisory fee",        accent: "#6B21A8", bg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)" },
@@ -723,11 +720,11 @@ function TeamGrid({ team }) {
                 <div className="member-email" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, minWidth: 0 }}>
                   <span style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="2" y="4" width="20" height="16" rx="3" fill="#1F3A5F" fillOpacity="0.12" stroke="#1F3A5F" strokeWidth="1.6"/>
-                      <path d="M2 8l10 7 10-7" stroke="#1F3A5F" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      <rect x="2" y="4" width="20" height="16" rx="3" fill="#1C2D56" fillOpacity="0.12" stroke="#1C2D56" strokeWidth="1.6"/>
+                      <path d="M2 8l10 7 10-7" stroke="#1C2D56" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </span>
-                  <a href={`mailto:${emailDisplay}`} style={{ color: "#1F3A5F", textDecoration: "none", overflowWrap: "anywhere", wordBreak: "break-word" }}>{emailDisplay}</a>
+                  <a href={`mailto:${emailDisplay}`} style={{ color: "#1C2D56", textDecoration: "none", overflowWrap: "anywhere", wordBreak: "break-word" }}>{emailDisplay}</a>
                 </div>
               )}
               {contact && (
@@ -924,7 +921,7 @@ function DocumentsSection({ project }) {
       </div>
       <div style={{ marginTop: 16 }}>
         <a href={uploadUrl} target="_blank" rel="noreferrer"
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 16px", background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", color: "#fff", fontSize: 13.5, fontWeight: 600, borderRadius: 10, textDecoration: "none", boxShadow: "0 2px 8px rgba(31,58,95,0.2)" }}>
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 16px", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", color: "#fff", fontSize: 13.5, fontWeight: 600, borderRadius: 10, textDecoration: "none", boxShadow: "0 2px 8px rgba(31,58,95,0.2)" }}>
           ⬆ Upload Document
         </a>
       </div>
@@ -1078,6 +1075,24 @@ export default function ClientPortal() {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <style>{`
+        /* ── Logo image sizing ─────────────────────────────────────── */
+        .login-logo {
+          display: block;
+          width: 160px;
+          height: auto;
+          max-height: 64px;
+          object-fit: contain;
+          margin: 0 auto 20px;
+        }
+        .brand-logo {
+          width: 110px;
+          height: auto;
+          max-height: 40px;
+          object-fit: contain;
+          object-position: left center;
+          flex-shrink: 0;
+        }
+
         @keyframes pfas-call-blink {
           0%, 100% { box-shadow: 0 0 0 0 rgba(34,163,90,0.55); }
           50%      { box-shadow: 0 0 0 6px rgba(34,163,90,0); }
@@ -1098,7 +1113,7 @@ export default function ClientPortal() {
 
         /* Hero client name — clean bright gold, no bloom */
         .hero-client {
-          color: #FFCB3D;
+          color: #F2BE1A;
           font-weight: 900;
           text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
@@ -1125,7 +1140,7 @@ export default function ClientPortal() {
             padding: 12px 14px !important;
           }
           .topbar .brand { gap: 10px !important; }
-          .topbar .brand-logo { width: 40px !important; height: 32px !important; font-size: 13px !important; }
+          .topbar .brand-logo { width: 80px !important; height: 32px !important; }
           .topbar .brand-sub { font-size: 9px !important; letter-spacing: 0.5px !important; }
           .topbar .brand-name { font-size: 15px !important; }
 
@@ -1320,7 +1335,7 @@ export default function ClientPortal() {
         {headAndCss}
         <div style={{ minHeight: "100vh", background: "#F4F6F9", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ textAlign: "center", color: "#475569" }}>
-            <div style={{ width: 72, height: 48, borderRadius: 12, background: "linear-gradient(135deg,#1F3A5F,#2C4F7C)", color: "#fff", fontWeight: 800, fontSize: 18, letterSpacing: 1, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>PFAS</div>
+            <img src="/pfas-logo.png" alt="PFAS" style={{ width: 120, height: 48, objectFit: "contain", margin: "0 auto 16px", display: "block" }} />
             <p style={{ fontSize: 14 }}>Loading portal…</p>
           </div>
         </div>
@@ -1376,13 +1391,13 @@ export default function ClientPortal() {
         onAdminSwitch={handleAdminSwitch}
       />
       <div className="container">
-        <div className="hero" style={{ position: "relative", overflow: "hidden", borderRadius: 18, padding: "30px 30px 28px", marginBottom: 20, background: "linear-gradient(120deg,#16294A 0%,#1F3A5F 55%,#2C4F7C 100%)", boxShadow: "0 6px 24px rgba(22,41,74,0.28)" }}>
+        <div className="hero" style={{ position: "relative", overflow: "hidden", borderRadius: 18, padding: "30px 30px 28px", marginBottom: 20, background: "linear-gradient(120deg,#0E1D3A 0%,#1C2D56 55%,#1C2D56 100%)", boxShadow: "0 6px 24px rgba(22,41,74,0.28)" }}>
           {/* soft gold ambient accents, symmetric */}
-          <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 360, height: 260, borderRadius: "50%", background: "radial-gradient(ellipse,rgba(255,201,60,0.10),transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 360, height: 260, borderRadius: "50%", background: "radial-gradient(ellipse,rgba(242,190,26,0.10),transparent 70%)", pointerEvents: "none" }} />
 
           {project ? (
             <div className="hero-center" style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-              <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "rgba(255,201,60,0.85)", marginBottom: 12 }}>Welcome to your portal</div>
+              <div className="hero-eyebrow" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "rgba(242,190,26,0.85)", marginBottom: 12 }}>Welcome to your portal</div>
               <div className="hero-client" data-text={project.clientName} style={{ fontSize: 40, lineHeight: 1.08, letterSpacing: -0.5, marginBottom: 8 }}>
                 {project.clientName}
               </div>
