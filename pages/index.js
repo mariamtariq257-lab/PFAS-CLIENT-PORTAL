@@ -724,8 +724,8 @@ const PROJECT_CONTACT_FILTER = {
   // Punjab One Bill — Samiya + Hassaan
   "punjab-onebill": ["samiya", "hassaan"],
 
-  // Fisheries + TAM — Khalid + Meiraj
-  "shrimps": ["khalid", "meiraj"],
+  // Fisheries + TAM — Khalid + Meiraj (Shrimps uses Ammar instead of Khalid)
+  "shrimps": ["ammar", "meiraj"],
   "tam":     ["khalid", "meiraj"],
 };
 
@@ -984,56 +984,79 @@ function DocumentsSection({ project }) {
 // client see which PFAS team members to add once inside Teams — selecting
 // a name just copies it to clipboard for convenience, nothing more.
 function BookMeetingPanel({ project, team }) {
-  const [picked, setPicked] = useState("");
+  const [open, setOpen]         = useState(false);
+  const [selected, setSelected] = useState([]);
   const bookingUrl = project.teamsBookingUrl || project.teamsMeeting || "#";
 
-  const handlePick = (e) => {
-    const name = e.target.value;
-    setPicked(name);
-    if (name && navigator?.clipboard) {
-      navigator.clipboard.writeText(name).catch(() => {});
-    }
+  const toggle = (name) => {
+    setSelected(s => s.includes(name) ? s.filter(n => n !== name) : [...s, name]);
+  };
+
+  const handleConfirm = () => {
+    setOpen(false);
+    window.open(bookingUrl, "_blank");
   };
 
   return (
-    <div className="section-card" style={CARD}>
-      <div style={SECTION_TITLE}><span style={TITLE_BAR} />Book a Meeting</div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "stretch", justifyContent: "center", height: "100%" }}>
-        <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.5, margin: 0 }}>
-          Schedule directly in Microsoft Teams with your PFAS advisory team.
-        </p>
-
-        {(team || []).length > 0 && (
-          <div>
-            <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>
-              Add this project's team in Teams
-            </label>
-            <select
-              value={picked}
-              onChange={handlePick}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box", background: "#fff" }}
-            >
-              <option value="">Select a team member to copy…</option>
-              {team.map((m, i) => (
-                <option key={i} value={m.email || m.name}>{m.name}</option>
-              ))}
-            </select>
-            {picked && (
-              <div style={{ fontSize: 11.5, color: "#16A34A", marginTop: 5 }}>Copied — paste into Teams attendees.</div>
-            )}
-          </div>
-        )}
-
-        <a
-          href={bookingUrl}
-          target="_blank" rel="noreferrer"
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 16px", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", color: "#fff", fontSize: 13.5, fontWeight: 600, borderRadius: 10, textDecoration: "none", boxShadow: "0 2px 8px rgba(28,45,86,0.2)" }}
-        >
-          📅 Open in Microsoft Teams
-        </a>
+    <>
+      <div
+        className="section-card"
+        onClick={() => setOpen(true)}
+        style={{ ...CARD, cursor: "pointer", display: "flex", flexDirection: "column" }}
+      >
+        <div style={SECTION_TITLE}><span style={TITLE_BAR} />Book a Meeting</div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, flex: 1, padding: "18px 8px", textAlign: "center" }}>
+          <div style={{ width: 46, height: 46, borderRadius: 12, background: "#EFF6FF", color: "#1E40AF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21 }}>📅</div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>Schedule a meeting</div>
+          <div style={{ fontSize: 11.5, color: "#94A3B8", lineHeight: 1.4 }}>With your PFAS team in Microsoft Teams</div>
+        </div>
       </div>
-    </div>
+
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 }}
+        >
+          <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, maxWidth: 420, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#1E293B", marginBottom: 4 }}>Who would you like to meet with?</div>
+            <div style={{ fontSize: 12.5, color: "#64748B", marginBottom: 16 }}>Select team members for this project, then continue to Microsoft Teams. You can still add or remove attendees once inside Teams.</div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 280, overflowY: "auto", marginBottom: 18 }}>
+              {(team || []).length === 0 && (
+                <div style={{ fontSize: 12.5, color: "#94A3B8" }}>No team listed for this project.</div>
+              )}
+              {(team || []).map((m, i) => {
+                const isSel = selected.includes(m.name);
+                return (
+                  <label key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, border: `1px solid ${isSel ? "#1C2D56" : "#E2E8F0"}`, background: isSel ? "#EFF6FF" : "#fff", cursor: "pointer" }}>
+                    <input type="checkbox" checked={isSel} onChange={() => toggle(m.name)} style={{ width: 16, height: 16, flexShrink: 0 }} />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#1E293B" }}>{m.name}</div>
+                      {m.role && <div style={{ fontSize: 11, color: "#94A3B8" }}>{m.role}</div>}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => setOpen(false)}
+                style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#fff", color: "#475569", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", color: "#fff", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}
+              >
+                Continue to Teams
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -1545,7 +1568,7 @@ export default function ClientPortal() {
 
                 <BookMeetingPanel
                   project={project}
-                  team={filterTeamForProject(project.team, projectSlug)}
+                  team={project.team}
                 />
               </div>
 
