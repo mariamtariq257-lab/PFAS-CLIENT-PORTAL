@@ -1020,19 +1020,19 @@ function BookMeetingPanel({ project }) {
 }
 
 // ── SharePoint folder map ────────────────────────────────────────────────────
-// Each project slug maps to its 4 client-facing SharePoint sub-folders:
-//   sharedDocs      -> "Data for client access" root / "1. PFAS Outputs"  (Shared Documents quick action)
-//   uploadDoc        -> "Received from Client"                            (Upload Document quick action)
-//   meetingMinutes    -> "Meeting Minutes and Notes"                       (Meeting Minutes quick action)
-//   invoices          -> "Invoices and Payments"                          (Invoices & Payments quick action)
+// Each project slug maps to its 4 client-facing SharePoint sub-folders, all
+// under: {project root}/Data for client access/{N}. {Folder Name}
+//   sharedDocs      -> "1. PFAS Outputs"            (Shared Documents quick action)
+//   uploadDoc        -> "2. Received from Client"     (Upload Document quick action)
+//   meetingMinutes    -> "3. Meeting Minutes and Notes" (Meeting Minutes quick action)
+//   invoices          -> "Invoices and Payments"      (sits at project root, sibling
+//                                                       to "Data for client access" —
+//                                                       Invoices & Payments quick action)
 //
-// Verified live against SharePoint (site: pfaspk.sharepoint.com/sites/PFAS-PMO)
-// as of 2026-06-30: Wildlife/Bansra Gali, Wildlife/Changa Manga, and
-// Finance/Punjab One Bill Study have the full 4-folder structure built.
-// All other projects only have "Project Master Data" populated so far —
-// for those, every quick action falls back to that project's root folder
-// in SharePoint until "Data for client access" is built out for them.
-// Update the fallback URLs below as each project's folder structure is completed.
+// Folder structure confirmed present across all 21 projects (site:
+// pfaspk.sharepoint.com/sites/PFAS-PMO). Folders may be empty pending file
+// uploads — that's expected and does not affect the links below, which point
+// at the correct destination regardless of current contents.
 
 const SHAREPOINT_BASE = "https://pfaspk.sharepoint.com/sites/PFAS-PMO/Shared Documents/PFAS Operations/All Clients";
 
@@ -1044,46 +1044,36 @@ function dataForClientAccess(deptPath, projectPath, opts = {}) {
     sharedDocs:      `${root}/Data for client access/${opts.outputsFolder || "1. PFAS Outputs"}`,
     uploadDoc:        `${root}/Data for client access/${opts.receivedFolder || "2. Received from Client"}`,
     meetingMinutes:    `${root}/Data for client access/${opts.minutesFolder || "3. Meeting Minutes and Notes"}`,
-    invoices:          opts.invoicesAtRoot
-      ? `${root}/Invoices and Payments`
-      : `${root}/Data for client access/${opts.invoicesFolder || "4. Invoices and Payments"}`,
+    // "Invoices and Payments" lives as its own folder at the project root,
+    // sibling to "Data for client access" — confirmed pattern across all
+    // projects (Bansra Gali, Changa Manga, and verified live by user).
+    invoices:          `${root}/${opts.invoicesFolder || "Invoices and Payments"}`,
   };
 }
 
-// Helper: fallback for projects where "Data for client access" hasn't been
-// built yet — every quick action points at the project's root folder so the
-// client always lands somewhere real, never a dead link.
-function projectRootFallback(deptPath, projectPath) {
-  const root = `${SHAREPOINT_BASE}/${deptPath}/${projectPath}`;
-  return { sharedDocs: root, uploadDoc: root, meetingMinutes: root, invoices: root };
-}
-
 const SHAREPOINT_FOLDERS = {
-  // ── Verified — full "Data for client access" structure exists ─────────────
-  "wildlife-bansra": dataForClientAccess("Wildlife", "Bansara Gali", { invoicesAtRoot: true }),
-  "wildlife-changa": dataForClientAccess("Wildlife", "Changa Manga", { invoicesAtRoot: true }),
+  "wildlife-bansra": dataForClientAccess("Wildlife", "Bansara Gali"),
+  "wildlife-changa": dataForClientAccess("Wildlife", "Changa Manga"),
   "punjab-onebill":  dataForClientAccess("Finance Department", "Punjab One Bill Study"),
-
-  // ── Not yet built in SharePoint — falls back to project root folder ───────
-  "bot1":            projectRootFallback("C&W", "BOT-1 Depalpur-Pakpattan-Vehari"),
-  "bot2":            projectRootFallback("C&W", "BOT-2 Chiragabad-Jhang-Shorkot"),
-  "bot3":            projectRootFallback("C&W", "BOT-3 Muzaffargarh-Alipur-TM"),
-  "bot4":            projectRootFallback("C&W", "BOT-4 Sahiwal Samundari"),
-  "bot5":            projectRootFallback("C&W", "BOT 5 Bahawalpur-Jhangra sharqi Road"),
-  "om-roads":        projectRootFallback("C&W", "18 O&M Roads-PPP"),
-  "pcmmdc":          projectRootFallback("PCMMDC", "HR Manual"),
-  "p4a":             projectRootFallback("P4A", "PPP Structure Optimisation and Economic & Financial Feasibility Advisory -  Tertiary Care General Hospital"),
-  "fiedmc-m3ic":     projectRootFallback("FIEDMC", "Optimal Fund Utilisation of M3IC Commercial Plot Sale Proceeds"),
-  "fiedmc-sbp":      projectRootFallback("FIEDMC", "Strategic Business Plan"),
-  "tam":             projectRootFallback("TAM", "Time Travel Park"),
-  "pha":             projectRootFallback("PHA", "PHA"),
-  "pbf":             projectRootFallback("Punjab Benevolent Fund", "Punjab Govt Employees welfare fund"),
-  "vss":             projectRootFallback("Finance Department", "VSS Engagement"),
-  "energy":          projectRootFallback("Energy Department", "Strategic Assessment & Design of a Project Management Wing"),
-  "hed":             projectRootFallback("Higher Education Department", "Higher Education Department"),
-  "phimc":           projectRootFallback("PHIMC", "6 Hospitals Feasibility"),
-  "lda":             projectRootFallback("LDA", "Economic & Financial Feasibility Advisory -  4 Hospitals"),
-  "shrimps":         projectRootFallback("Fisheries", "Shrimps Estate Project"),
+  "bot1":            dataForClientAccess("C&W", "BOT-1 Depalpur-Pakpattan-Vehari"),
+  "bot2":            dataForClientAccess("C&W", "BOT-2 Chiragabad-Jhang-Shorkot"),
+  "bot3":            dataForClientAccess("C&W", "BOT-3 Muzaffargarh-Alipur-TM"),
+  "bot4":            dataForClientAccess("C&W", "BOT-4 Sahiwal Samundari"),
+  "bot5":            dataForClientAccess("C&W", "BOT 5 Bahawalpur-Jhangra sharqi Road"),
+  "om-roads":        dataForClientAccess("C&W", "18 O&M Roads-PPP"),
+  "pcmmdc":          dataForClientAccess("PCMMDC", "HR Manual"),
+  "p4a":             dataForClientAccess("P4A", "PPP Structure Optimisation and Economic & Financial Feasibility Advisory -  Tertiary Care General Hospital"),
+  "fiedmc-m3ic":     dataForClientAccess("FIEDMC", "Optimal Fund Utilisation of M3IC Commercial Plot Sale Proceeds"),
+  "fiedmc-sbp":      dataForClientAccess("FIEDMC", "Strategic Business Plan"),
+  "tam":             dataForClientAccess("TAM", "Time Travel Park"),
+  "pha":             dataForClientAccess("PHA", "PHA"),
+  "pbf":             dataForClientAccess("Punjab Benevolent Fund", "Punjab Govt Employees welfare fund"),
+  "vss":             dataForClientAccess("Finance Department", "VSS Engagement"),
+  "energy":          dataForClientAccess("Energy Department", "Strategic Assessment & Design of a Project Management Wing"),
+  "hed":             dataForClientAccess("Higher Education Department", "Higher Education Department"),
+  "phimc":           dataForClientAccess("PHIMC", "6 Hospitals Feasibility"),
+  "lda":             dataForClientAccess("LDA", "Economic & Financial Feasibility Advisory -  4 Hospitals"),
+  "shrimps":         dataForClientAccess("Fisheries", "Shrimps Estate Project"),
 };
 
 // Returns the 4 quick-action URLs for a project, falling back to the
