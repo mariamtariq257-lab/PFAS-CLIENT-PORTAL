@@ -1031,12 +1031,13 @@ function ActionsGrid({ project }) {
     <div className="actions-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
       {actions.map((a, i) => (
         <a key={i} className="action-btn pfas-action-card" href={a.href} target="_blank" rel="noreferrer"
-          style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #D6DCE5", borderLeft: `3px solid ${a.accent}`, textDecoration: "none", background: a.cardBg }}>
+          style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #D6DCE5", borderLeft: `3px solid ${a.accent}`, textDecoration: "none", background: a.cardBg, animationDelay: `${i * 70}ms` }}>
           <div className="action-icon" style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: a.bg, color: a.color }}>{a.icon}</div>
-          <div style={{ minWidth: 0 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
             <div className="action-title" style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>{a.title}</div>
             <div className="action-desc" style={{ fontSize: 11.5, color: "#94A3B8", lineHeight: 1.3, marginTop: 1 }}>{a.desc}</div>
           </div>
+          <div className="action-arrow" style={{ flexShrink: 0, color: a.accent, fontSize: 14, opacity: 0.55 }}>→</div>
         </a>
       ))}
     </div>
@@ -1197,9 +1198,25 @@ export default function ClientPortal() {
         .call-blink:hover { animation-play-state: paused; background: #BBF7D0; }
         @media (prefers-reduced-motion: reduce) {
           .call-blink { animation: none; }
+          .pfas-action-card { animation: none; opacity: 1; }
+          .teams-icon-pop { animation: none; }
         }
-        .pfas-action-card { transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+        .pfas-action-card {
+          transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+          opacity: 0;
+          animation: action-card-in .45s ease forwards;
+        }
         .pfas-action-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16,24,40,0.10); border-color: #1C2D56; }
+        .pfas-action-card:active { transform: translateY(0) scale(0.97); }
+        @keyframes action-card-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .action-icon { transition: transform .25s cubic-bezier(.34,1.56,.64,1); }
+        .pfas-action-card:hover .action-icon { transform: scale(1.12) rotate(-6deg); }
+        .pfas-action-card:active .action-icon { transform: scale(0.94) rotate(0deg); }
+        .action-arrow { transition: transform .2s ease, opacity .2s ease; }
+        .pfas-action-card:hover .action-arrow { transform: translateX(3px); opacity: 1; }
 
         /* Hero client name — clean bright gold, no bloom */
         .hero-client {
