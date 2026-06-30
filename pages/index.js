@@ -1019,13 +1019,91 @@ function BookMeetingPanel({ project }) {
   );
 }
 
+// ── SharePoint folder map ────────────────────────────────────────────────────
+// Each project slug maps to its 4 client-facing SharePoint sub-folders:
+//   sharedDocs      -> "Data for client access" root / "1. PFAS Outputs"  (Shared Documents quick action)
+//   uploadDoc        -> "Received from Client"                            (Upload Document quick action)
+//   meetingMinutes    -> "Meeting Minutes and Notes"                       (Meeting Minutes quick action)
+//   invoices          -> "Invoices and Payments"                          (Invoices & Payments quick action)
+//
+// Verified live against SharePoint (site: pfaspk.sharepoint.com/sites/PFAS-PMO)
+// as of 2026-06-30: Wildlife/Bansra Gali, Wildlife/Changa Manga, and
+// Finance/Punjab One Bill Study have the full 4-folder structure built.
+// All other projects only have "Project Master Data" populated so far —
+// for those, every quick action falls back to that project's root folder
+// in SharePoint until "Data for client access" is built out for them.
+// Update the fallback URLs below as each project's folder structure is completed.
+
+const SHAREPOINT_BASE = "https://pfaspk.sharepoint.com/sites/PFAS-PMO/Shared Documents/PFAS Operations/All Clients";
+
+// Helper: builds the 4 sub-folder URLs for a project that already HAS the
+// full "Data for client access" structure built (verified pattern).
+function dataForClientAccess(deptPath, projectPath, opts = {}) {
+  const root = `${SHAREPOINT_BASE}/${deptPath}/${projectPath}`;
+  return {
+    sharedDocs:      `${root}/Data for client access/${opts.outputsFolder || "1. PFAS Outputs"}`,
+    uploadDoc:        `${root}/Data for client access/${opts.receivedFolder || "2. Received from Client"}`,
+    meetingMinutes:    `${root}/Data for client access/${opts.minutesFolder || "3. Meeting Minutes and Notes"}`,
+    invoices:          opts.invoicesAtRoot
+      ? `${root}/Invoices and Payments`
+      : `${root}/Data for client access/${opts.invoicesFolder || "4. Invoices and Payments"}`,
+  };
+}
+
+// Helper: fallback for projects where "Data for client access" hasn't been
+// built yet — every quick action points at the project's root folder so the
+// client always lands somewhere real, never a dead link.
+function projectRootFallback(deptPath, projectPath) {
+  const root = `${SHAREPOINT_BASE}/${deptPath}/${projectPath}`;
+  return { sharedDocs: root, uploadDoc: root, meetingMinutes: root, invoices: root };
+}
+
+const SHAREPOINT_FOLDERS = {
+  // ── Verified — full "Data for client access" structure exists ─────────────
+  "wildlife-bansra": dataForClientAccess("Wildlife", "Bansara Gali", { invoicesAtRoot: true }),
+  "wildlife-changa": dataForClientAccess("Wildlife", "Changa Manga", { invoicesAtRoot: true }),
+  "punjab-onebill":  dataForClientAccess("Finance Department", "Punjab One Bill Study"),
+
+  // ── Not yet built in SharePoint — falls back to project root folder ───────
+  "bot1":            projectRootFallback("C&W", "BOT-1 Depalpur-Pakpattan-Vehari"),
+  "bot2":            projectRootFallback("C&W", "BOT-2 Chiragabad-Jhang-Shorkot"),
+  "bot3":            projectRootFallback("C&W", "BOT-3 Muzaffargarh-Alipur-TM"),
+  "bot4":            projectRootFallback("C&W", "BOT-4 Sahiwal Samundari"),
+  "bot5":            projectRootFallback("C&W", "BOT 5 Bahawalpur-Jhangra sharqi Road"),
+  "om-roads":        projectRootFallback("C&W", "18 O&M Roads-PPP"),
+  "pcmmdc":          projectRootFallback("PCMMDC", "HR Manual"),
+  "p4a":             projectRootFallback("P4A", "PPP Structure Optimisation and Economic & Financial Feasibility Advisory -  Tertiary Care General Hospital"),
+  "fiedmc-m3ic":     projectRootFallback("FIEDMC", "Optimal Fund Utilisation of M3IC Commercial Plot Sale Proceeds"),
+  "fiedmc-sbp":      projectRootFallback("FIEDMC", "Strategic Business Plan"),
+  "tam":             projectRootFallback("TAM", "Time Travel Park"),
+  "pha":             projectRootFallback("PHA", "PHA"),
+  "pbf":             projectRootFallback("Punjab Benevolent Fund", "Punjab Govt Employees welfare fund"),
+  "vss":             projectRootFallback("Finance Department", "VSS Engagement"),
+  "energy":          projectRootFallback("Energy Department", "Strategic Assessment & Design of a Project Management Wing"),
+  "hed":             projectRootFallback("Higher Education Department", "Higher Education Department"),
+  "phimc":           projectRootFallback("PHIMC", "6 Hospitals Feasibility"),
+  "lda":             projectRootFallback("LDA", "Economic & Financial Feasibility Advisory -  4 Hospitals"),
+  "shrimps":         projectRootFallback("Fisheries", "Shrimps Estate Project"),
+};
+
+// Returns the 4 quick-action URLs for a project, falling back to the
+// project's existing onedriveUrl (or "#") if the slug isn't mapped at all.
+function getSharePointLinks(project, projectSlug) {
+  const mapped = SHAREPOINT_FOLDERS[projectSlug];
+  if (mapped) return mapped;
+  const fallback = project.onedriveUrl || "#";
+  return { sharedDocs: fallback, uploadDoc: fallback, meetingMinutes: fallback, invoices: fallback };
+}
+
+
 // ── Quick actions ─────────────────────────────────────────────────────────────
-function ActionsGrid({ project }) {
+function ActionsGrid({ project, projectSlug }) {
+  const sp = getSharePointLinks(project, projectSlug);
   const actions = [
-    { href: project.onedriveUrl || "#", icon: "📁", bg: "#DBEAFE", color: "#1E40AF", accent: "#2563EB", cardBg: "linear-gradient(135deg,#EFF6FF,#FFFFFF)", title: "Shared Documents",    desc: "Client Communication folder" },
-    { href: project.onedriveUrl || "#", icon: "⬆",  bg: "#DCFCE7", color: "#166534", accent: "#16A34A", cardBg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", title: "Upload Document",     desc: "Add a file to your shared folder" },
-    { href: project.onedriveUrl || "#", icon: "📝", bg: "#F3E8FF", color: "#6B21A8", accent: "#9333EA", cardBg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)", title: "Meeting Minutes",     desc: "MoMs folder · OneDrive" },
-    { href: project.onedriveUrl || "#", icon: "💰", bg: "#CFFAFE", color: "#155E75", accent: "#0891B2", cardBg: "linear-gradient(135deg,#ECFEFF,#FFFFFF)", title: "Invoices & Payments", desc: "Payments folder · OneDrive" },
+    { href: sp.sharedDocs,     icon: "📁", bg: "#DBEAFE", color: "#1E40AF", accent: "#2563EB", cardBg: "linear-gradient(135deg,#EFF6FF,#FFFFFF)", title: "Shared Documents",    desc: "Data for client access" },
+    { href: sp.uploadDoc,      icon: "⬆",  bg: "#DCFCE7", color: "#166534", accent: "#16A34A", cardBg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", title: "Upload Document",     desc: "Received from Client folder" },
+    { href: sp.meetingMinutes, icon: "📝", bg: "#F3E8FF", color: "#6B21A8", accent: "#9333EA", cardBg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)", title: "Meeting Minutes",     desc: "Meeting Minutes and Notes" },
+    { href: sp.invoices,       icon: "💰", bg: "#CFFAFE", color: "#155E75", accent: "#0891B2", cardBg: "linear-gradient(135deg,#ECFEFF,#FFFFFF)", title: "Invoices & Payments", desc: "Invoices and Payments folder" },
   ];
   return (
     <div className="actions-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
@@ -1600,7 +1678,7 @@ export default function ClientPortal() {
 
               {/* Quick Actions — now ABOVE Project Documents */}
               <SectionCard title="Quick Actions">
-                <ActionsGrid project={project} />
+                <ActionsGrid project={project} projectSlug={projectSlug} />
               </SectionCard>
 
               <DocumentsSection project={project} />
