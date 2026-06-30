@@ -1334,10 +1334,13 @@ export default function ClientPortal() {
 
           /* Team grid: single column */
           .team-grid {
-            grid-template-columns: 1fr !important;
+            display: flex !important;
+            flex-direction: column !important;
             gap: 10px !important;
           }
           .member-card {
+            width: 100% !important;
+            box-sizing: border-box !important;
             padding: 14px !important;
           }
           .member-card .avatar {
