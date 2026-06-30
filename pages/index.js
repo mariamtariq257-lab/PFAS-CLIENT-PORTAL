@@ -980,115 +980,58 @@ function DocumentsSection({ project }) {
 }
 
 // ── Book a Meeting panel ──────────────────────────────────────────────────────
-// Constant PFAS advisory team attendees (locked, derived from the filtered
-// team for this project) + a free-text field for the client to add their own
-// attendees. Submits via mailto: since no booking API is wired up.
+// Simple box that opens Microsoft Teams scheduling. A dropdown lets the
+// client see which PFAS team members to add once inside Teams — selecting
+// a name just copies it to clipboard for convenience, nothing more.
 function BookMeetingPanel({ project, team }) {
-  const [subject, setSubject]   = useState(`Meeting — ${project.clientName || "PFAS Engagement"}`);
-  const [date, setDate]         = useState("");
-  const [time, setTime]         = useState("");
-  const [extraAttendees, setExtraAttendees] = useState("");
-  const [note, setNote]         = useState("");
+  const [picked, setPicked] = useState("");
+  const bookingUrl = project.teamsBookingUrl || project.teamsMeeting || "#";
 
-  const pfasEmails = (team || [])
-    .map(m => m.email)
-    .filter(e => e && e !== "—");
-
-  const handleSend = () => {
-    const to = pfasEmails.join(",");
-    const cc = extraAttendees.trim();
-    const bodyLines = [
-      `Project: ${project.clientName || ""}`,
-      date ? `Proposed date: ${date}` : null,
-      time ? `Proposed time: ${time}` : null,
-      "",
-      note || "",
-    ].filter(Boolean).join("\n");
-    const params = new URLSearchParams({ subject, body: bodyLines });
-    let href = `mailto:${to}?${params.toString()}`;
-    if (cc) href += `&cc=${encodeURIComponent(cc)}`;
-    window.open(href, "_blank");
+  const handlePick = (e) => {
+    const name = e.target.value;
+    setPicked(name);
+    if (name && navigator?.clipboard) {
+      navigator.clipboard.writeText(name).catch(() => {});
+    }
   };
 
   return (
     <div className="section-card" style={CARD}>
       <div style={SECTION_TITLE}><span style={TITLE_BAR} />Book a Meeting</div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div>
-          <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Subject</label>
-          <input
-            type="text"
-            value={subject}
-            onChange={e => setSubject(e.target.value)}
-            style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box" }}
-          />
-        </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "stretch", justifyContent: "center", height: "100%" }}>
+        <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.5, margin: 0 }}>
+          Schedule directly in Microsoft Teams with your PFAS advisory team.
+        </p>
 
-        <div style={{ display: "flex", gap: 10 }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={e => setDate(e.target.value)}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box" }}
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Time</label>
-            <input
-              type="time"
-              value={time}
-              onChange={e => setTime(e.target.value)}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box" }}
-            />
-          </div>
-        </div>
-
-        <div>
-          <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>PFAS Attendees (fixed)</label>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {(team || []).length === 0 && (
-              <span style={{ fontSize: 12.5, color: "#94A3B8" }}>No advisory team set for this project.</span>
+        {(team || []).length > 0 && (
+          <div>
+            <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>
+              Add this project's team in Teams
+            </label>
+            <select
+              value={picked}
+              onChange={handlePick}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box", background: "#fff" }}
+            >
+              <option value="">Select a team member to copy…</option>
+              {team.map((m, i) => (
+                <option key={i} value={m.email || m.name}>{m.name}</option>
+              ))}
+            </select>
+            {picked && (
+              <div style={{ fontSize: 11.5, color: "#16A34A", marginTop: 5 }}>Copied — paste into Teams attendees.</div>
             )}
-            {(team || []).map((m, i) => (
-              <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 999, background: "#EFF6FF", border: "1px solid #DBEAFE", fontSize: 12, fontWeight: 600, color: "#1E40AF" }}>
-                {m.name}
-                <span style={{ fontSize: 9, opacity: 0.6 }}>🔒</span>
-              </span>
-            ))}
           </div>
-        </div>
+        )}
 
-        <div>
-          <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Add Attendees (optional)</label>
-          <input
-            type="text"
-            placeholder="name@email.com, name2@email.com"
-            value={extraAttendees}
-            onChange={e => setExtraAttendees(e.target.value)}
-            style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box" }}
-          />
-        </div>
-
-        <div>
-          <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Note (optional)</label>
-          <textarea
-            rows={2}
-            placeholder="Agenda or context for this meeting…"
-            value={note}
-            onChange={e => setNote(e.target.value)}
-            style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box", resize: "vertical", fontFamily: "inherit" }}
-          />
-        </div>
-
-        <button
-          onClick={handleSend}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 16px", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", color: "#fff", fontSize: 13.5, fontWeight: 600, borderRadius: 10, border: "none", cursor: "pointer", boxShadow: "0 2px 8px rgba(28,45,86,0.2)" }}
+        <a
+          href={bookingUrl}
+          target="_blank" rel="noreferrer"
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 16px", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", color: "#fff", fontSize: 13.5, fontWeight: 600, borderRadius: 10, textDecoration: "none", boxShadow: "0 2px 8px rgba(28,45,86,0.2)" }}
         >
-          📅 Send Meeting Request
-        </button>
+          📅 Open in Microsoft Teams
+        </a>
       </div>
     </div>
   );
@@ -1489,6 +1432,10 @@ export default function ClientPortal() {
           .hero { padding: 16px 14px !important; }
           .hero-title { font-size: 17px !important; }
         }
+
+        @media (max-width: 860px) {
+          .team-meeting-row { grid-template-columns: 1fr !important; }
+        }
       `}</style>
     </Head>
   );
@@ -1591,14 +1538,16 @@ export default function ClientPortal() {
             <div>
               <KpiRow project={project} />
 
-              <SectionCard title="Your PFAS Advisory Team">
-                <TeamGrid team={filterTeamForProject(project.team, projectSlug)} />
-              </SectionCard>
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 18, alignItems: "stretch" }} className="team-meeting-row">
+                <SectionCard title="Your PFAS Advisory Team" style={{ marginBottom: 0 }}>
+                  <TeamGrid team={filterTeamForProject(project.team, projectSlug)} />
+                </SectionCard>
 
-              <BookMeetingPanel
-                project={project}
-                team={filterTeamForProject(project.team, projectSlug)}
-              />
+                <BookMeetingPanel
+                  project={project}
+                  team={filterTeamForProject(project.team, projectSlug)}
+                />
+              </div>
 
               {/* Quick Actions — now ABOVE Project Documents */}
               <SectionCard title="Quick Actions">
