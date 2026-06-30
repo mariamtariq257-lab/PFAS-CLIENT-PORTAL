@@ -115,7 +115,7 @@ const ALL_PROJECTS = (() => {
 // ── Shared design tokens (inline, apply regardless of external CSS) ────────────
 const CARD = {
   background: "#fff",
-  border: "1px solid #E8ECF2",
+  border: "1px solid #C9D2DE",
   borderRadius: 16,
   boxShadow: "0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06)",
   padding: 22,
@@ -478,7 +478,7 @@ function ProjectSwitcher({ projects, currentSlug, onChange }) {
       {open && (
         <div style={{
           position: "absolute", top: "calc(100% + 6px)", right: 0,
-          background: "#fff", border: "1px solid #E2E8F0", borderRadius: 12,
+          background: "#fff", border: "1px solid #C9D2DE", borderRadius: 12,
           boxShadow: "0 10px 30px rgba(0,0,0,0.12)", padding: 6, zIndex: 100,
           minWidth: 280, maxHeight: 360, overflowY: "auto",
         }}>
@@ -761,7 +761,7 @@ function TeamGrid({ team }) {
         const waNumber     = toWhatsAppNumber(contact);
         const waHref       = waNumber ? `https://wa.me/${waNumber}` : null;
         return (
-          <div className="member-card" key={i} style={{ display: "flex", flexDirection: "column", gap: 10, padding: 16, background: "#fff", border: "1px solid #E2E8F0", borderRadius: 14, minWidth: 0 }}>
+          <div className="member-card" key={i} style={{ display: "flex", flexDirection: "column", gap: 10, padding: 16, background: "#fff", border: "1px solid #C9D2DE", borderRadius: 14, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
               <div className={`avatar av-${m.color}`} style={{ flexShrink: 0, width: 44, height: 44, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15 }}>
                 {initials}
@@ -964,7 +964,7 @@ function DocumentsSection({ project }) {
           const fi = fileIcon(f.type);
           return (
             <a key={i} href={uploadUrl} target="_blank" rel="noreferrer"
-              style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "1px solid #F1F5F9", textDecoration: "none" }}>
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "1px solid #D6DCE5", textDecoration: "none" }}>
               <div style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: fi.bg, color: fi.color }}>{fi.icon}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13.5, fontWeight: 600, color: "#1E293B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</div>
@@ -1013,7 +1013,7 @@ function BookMeetingPanel({ project }) {
           </svg>
         </div>
         <div style={{ fontSize: 14.5, fontWeight: 700, color: "#1E293B" }}>Schedule Meeting</div>
-        <div style={{ fontSize: 11.5, color: "#94A3B8" }}>Opens in Microsoft Teams</div>
+        <div style={{ fontSize: 11.5, color: "#94A3B8" }}>with PFAS team</div>
       </div>
     </a>
   );
@@ -1031,7 +1031,7 @@ function ActionsGrid({ project }) {
     <div className="actions-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
       {actions.map((a, i) => (
         <a key={i} className="action-btn pfas-action-card" href={a.href} target="_blank" rel="noreferrer"
-          style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #EEF1F6", textDecoration: "none", background: "#fff" }}>
+          style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #D6DCE5", textDecoration: "none", background: "#fff" }}>
           <div style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: a.bg, color: a.color }}>{a.icon}</div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>{a.title}</div>
@@ -1199,7 +1199,7 @@ export default function ClientPortal() {
           .call-blink { animation: none; }
         }
         .pfas-action-card { transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
-        .pfas-action-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16,24,40,0.10); border-color: #D9E1EC; }
+        .pfas-action-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(16,24,40,0.10); border-color: #1C2D56; }
 
         /* Hero client name — clean bright gold, no bloom */
         .hero-client {
