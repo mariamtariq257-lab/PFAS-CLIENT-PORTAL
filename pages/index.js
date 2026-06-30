@@ -983,80 +983,54 @@ function DocumentsSection({ project }) {
 // Simple box that opens Microsoft Teams scheduling. A dropdown lets the
 // client see which PFAS team members to add once inside Teams — selecting
 // a name just copies it to clipboard for convenience, nothing more.
-function BookMeetingPanel({ project, team }) {
-  const [open, setOpen]         = useState(false);
-  const [selected, setSelected] = useState([]);
+function BookMeetingPanel({ project }) {
   const bookingUrl = project.teamsBookingUrl || project.teamsMeeting || "#";
 
-  const toggle = (name) => {
-    setSelected(s => s.includes(name) ? s.filter(n => n !== name) : [...s, name]);
-  };
-
-  const handleConfirm = () => {
-    setOpen(false);
-    window.open(bookingUrl, "_blank");
-  };
-
   return (
-    <>
-      <div
-        className="section-card"
-        onClick={() => setOpen(true)}
-        style={{ ...CARD, cursor: "pointer", display: "flex", flexDirection: "column" }}
-      >
-        <div style={SECTION_TITLE}><span style={TITLE_BAR} />Book a Meeting</div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, flex: 1, padding: "18px 8px", textAlign: "center" }}>
-          <div style={{ width: 46, height: 46, borderRadius: 12, background: "#EFF6FF", color: "#1E40AF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 21 }}>📅</div>
-          <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>Schedule a meeting</div>
-          <div style={{ fontSize: 11.5, color: "#94A3B8", lineHeight: 1.4 }}>With your PFAS team in Microsoft Teams</div>
-        </div>
+    <a
+      href={bookingUrl}
+      target="_blank" rel="noreferrer"
+      className="section-card teams-meeting-card"
+      style={{
+        ...CARD,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        textDecoration: "none",
+        cursor: "pointer",
+        background: "linear-gradient(155deg,#4B53BC 0%,#444CB8 45%,#383F9E 100%)",
+        border: "none",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* soft ambient accent */}
+      <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,255,255,0.14),transparent 70%)", pointerEvents: "none" }} />
+
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: "rgba(255,255,255,0.65)", display: "flex", alignItems: "center", gap: 7, position: "relative" }}>
+        <span style={{ width: 6, height: 6, borderRadius: 2, background: "#fff", display: "inline-block" }} />
+        Book a Meeting
       </div>
 
-      {open && (
-        <div
-          onClick={() => setOpen(false)}
-          style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 }}
-        >
-          <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, maxWidth: 420, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#1E293B", marginBottom: 4 }}>Who would you like to meet with?</div>
-            <div style={{ fontSize: 12.5, color: "#64748B", marginBottom: 16 }}>Select team members for this project, then continue to Microsoft Teams. You can still add or remove attendees once inside Teams.</div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 280, overflowY: "auto", marginBottom: 18 }}>
-              {(team || []).length === 0 && (
-                <div style={{ fontSize: 12.5, color: "#94A3B8" }}>No team listed for this project.</div>
-              )}
-              {(team || []).map((m, i) => {
-                const isSel = selected.includes(m.name);
-                return (
-                  <label key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, border: `1px solid ${isSel ? "#1C2D56" : "#E2E8F0"}`, background: isSel ? "#EFF6FF" : "#fff", cursor: "pointer" }}>
-                    <input type="checkbox" checked={isSel} onChange={() => toggle(m.name)} style={{ width: 16, height: 16, flexShrink: 0 }} />
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "#1E293B" }}>{m.name}</div>
-                      {m.role && <div style={{ fontSize: 11, color: "#94A3B8" }}>{m.role}</div>}
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-
-            <div style={{ display: "flex", gap: 10 }}>
-              <button
-                onClick={() => setOpen(false)}
-                style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#fff", color: "#475569", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirm}
-                style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", color: "#fff", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}
-              >
-                Continue to Teams
-              </button>
-            </div>
-          </div>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, flex: 1, padding: "20px 10px", textAlign: "center", position: "relative" }}>
+        {/* Microsoft Teams glyph */}
+        <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(255,255,255,0.16)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width="28" height="28" viewBox="0 0 2228.833 2073.333" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#fff" d="M1554.637,777.5h575.713c54.391,0,98.483,44.092,98.483,98.483v0c0,159.084-118.929,294.296-277.083,310.6-39.083-13.667-81.166-21.083-125-21.083-83.333,0-160.583,27.083-223,72.917v-377.417C1603.75,824.792,1554.637,777.5,1554.637,777.5Z" transform="translate(-128.317 -350.083)"/>
+            <circle fill="#fff" cx="1746.583" cy="240.75" r="240.75"/>
+            <path fill="#fff" opacity="0.7" d="M1183.083,777.5H707.37c-54.391,0-98.483,44.092-98.483,98.483v500.953c0,278.604,225.871,504.475,504.475,504.475h0c278.604,0,504.475-225.871,504.475-504.475V875.983C1617.837,821.592,1573.745,777.5,1519.354,777.5Z" transform="translate(-128.317 -350.083)"/>
+            <circle fill="#fff" opacity="0.7" cx="945.417" cy="240.75" r="240.75"/>
+          </svg>
         </div>
-      )}
-    </>
+        <div style={{ fontSize: 14.5, fontWeight: 700, color: "#fff" }}>Schedule a meeting</div>
+        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.7)", lineHeight: 1.4 }}>Opens directly in Microsoft Teams</div>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "9px 0 2px", fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,0.9)", position: "relative" }}>
+        Continue
+        <span style={{ fontSize: 14 }}>→</span>
+      </div>
+    </a>
   );
 }
 
@@ -1566,10 +1540,7 @@ export default function ClientPortal() {
                   <TeamGrid team={filterTeamForProject(project.team, projectSlug)} />
                 </SectionCard>
 
-                <BookMeetingPanel
-                  project={project}
-                  team={project.team}
-                />
+                <BookMeetingPanel project={project} />
               </div>
 
               {/* Quick Actions — now ABOVE Project Documents */}
