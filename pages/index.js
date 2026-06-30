@@ -311,8 +311,8 @@ function AdminClientPicker({ onSelect, onBack }) {
           )}
         </div>
 
-        {/* Client cards */}
-        <div className="admin-client-grid">
+        {/* Client cards — single column list, projects collapse into dropdown */}
+        <div className="admin-client-grid" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {filtered.length === 0 && (
             <div className="admin-no-results">No clients match "{search}"</div>
           )}
@@ -320,38 +320,52 @@ function AdminClientPicker({ onSelect, onBack }) {
             const dc = deptColor(client.name);
             const initials = client.name.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase();
             return (
-              <div className="admin-client-card" key={ci}>
-                {/* Client header */}
-                <div className="admin-card-header">
-                  <div className="admin-card-avatar" style={{ background: dc.bg, color: dc.color }}>
-                    {initials}
-                  </div>
-                  <div>
-                    <div className="admin-card-name">{client.name}</div>
-                    <div className="admin-card-count">
-                      {client.projects.length} project{client.projects.length > 1 ? "s" : ""}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Project list */}
-                <div className="admin-project-list">
-                  {client.projects.map((p, pi) => (
-                    <button
-                      key={pi}
-                      className="admin-project-btn"
-                      onClick={() => onSelect(p.slug, client.name, client.projects)}
-                    >
-                      <span className="admin-project-label">{p.label}</span>
-                      <span className="admin-project-arrow">→</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <AdminClientRow key={ci} client={client} dc={dc} initials={initials} onSelect={onSelect} />
             );
           })}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Single client row with dropdown project list ───────────────────────────────
+function AdminClientRow({ client, dc, initials, onSelect }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="admin-client-card" style={{ width: "100%" }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left" }}
+      >
+        <div className="admin-card-header" style={{ marginBottom: 0 }}>
+          <div className="admin-card-avatar" style={{ background: dc.bg, color: dc.color }}>
+            {initials}
+          </div>
+          <div>
+            <div className="admin-card-name">{client.name}</div>
+            <div className="admin-card-count">
+              {client.projects.length} project{client.projects.length > 1 ? "s" : ""}
+            </div>
+          </div>
+        </div>
+        <span style={{ fontSize: 14, color: "#64748B", transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.18s ease", flexShrink: 0 }}>▾</span>
+      </button>
+
+      {open && (
+        <div className="admin-project-list" style={{ marginTop: 12 }}>
+          {client.projects.map((p, pi) => (
+            <button
+              key={pi}
+              className="admin-project-btn"
+              onClick={() => onSelect(p.slug, client.name, client.projects)}
+            >
+              <span className="admin-project-label">{p.label}</span>
+              <span className="admin-project-arrow">→</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -681,6 +695,49 @@ const STAFF_DIRECTORY = {
   "meiraj.khan@pfas.pk":        { designation: "Individual Consultant",                                             contact: "0322-0227875" },
 };
 
+// ── Per-project contact filter ──────────────────────────────────────────────
+// Only these staff (matched by first name, case-insensitive) show in the
+// "Your PFAS Advisory Team" panel for each project slug. Slugs not listed
+// here show the full team unchanged.
+const PROJECT_CONTACT_FILTER = {
+  // C&W — Husnain Siddique only
+  "bot1":     ["husnain"],
+  "bot2":     ["husnain"],
+  "bot3":     ["husnain"],
+  "bot4":     ["husnain"],
+  "bot5":     ["husnain"],
+  "om-roads": ["husnain"],
+
+  // PHA — Aneel + Harris
+  "pha": ["aneel", "harris"],
+
+  // Punjab Benevolent Fund — Aneel + Harris
+  "pbf": ["aneel", "harris"],
+
+  // Wildlife (Changa Manga + Bansra Gali) — Aneel + Aejwat
+  "wildlife-changa": ["aneel", "aejwat"],
+  "wildlife-bansra": ["aneel", "aejwat"],
+
+  // Hashim + Fahad projects — LDA Hospital / PCMMDC and similar
+  "pcmmdc": ["hashim", "fahad"],
+  "lda":    ["hashim", "fahad"],
+
+  // Punjab One Bill — Samiya + Hassaan
+  "punjab-onebill": ["samiya", "hassaan"],
+
+  // Fisheries + TAM — Khalid + Meiraj
+  "shrimps": ["khalid", "meiraj"],
+  "tam":     ["khalid", "meiraj"],
+};
+
+function filterTeamForProject(team, slug) {
+  const allowList = PROJECT_CONTACT_FILTER[slug];
+  if (!allowList || !team?.length) return team;
+  return team.filter(m =>
+    allowList.some(firstName => (m.name || "").toLowerCase().includes(firstName))
+  );
+}
+
 // ── Team grid ─────────────────────────────────────────────────────────────────
 // Converts Pakistani number to wa.me format: "0346-6991919" → "923466991919"
 function toWhatsAppNumber(raw) {
@@ -919,12 +976,6 @@ function DocumentsSection({ project }) {
           );
         })}
       </div>
-      <div style={{ marginTop: 16 }}>
-        <a href={uploadUrl} target="_blank" rel="noreferrer"
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 16px", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", color: "#fff", fontSize: 13.5, fontWeight: 600, borderRadius: 10, textDecoration: "none", boxShadow: "0 2px 8px rgba(31,58,95,0.2)" }}>
-          ⬆ Upload Document
-        </a>
-      </div>
     </div>
   );
 }
@@ -933,7 +984,7 @@ function DocumentsSection({ project }) {
 function ActionsGrid({ project }) {
   const actions = [
     { href: project.onedriveUrl || "#",                             icon: "📁", bg: "#EFF6FF", color: "#1E40AF", title: "Shared Documents",   desc: "Client Communication folder" },
-    { href: project.teamsBookingUrl || project.teamsMeeting || "#", icon: "📅", bg: "#F0FDF4", color: "#166534", title: "Book a Meeting",     desc: "Pick an open slot with your PFAS team" },
+    { href: project.onedriveUrl || "#",                             icon: "⬆", bg: "#F0FDF4", color: "#166534", title: "Upload Document",    desc: "Add a file to your shared folder" },
     { href: project.onedriveUrl || "#",                             icon: "📝", bg: "#FAF5FF", color: "#6B21A8", title: "Meeting Minutes",    desc: "MoMs folder · OneDrive" },
     { href: project.onedriveUrl || "#",                             icon: "💰", bg: "#ECFEFF", color: "#155E75", title: "Invoices & Payments",desc: "Payments folder · OneDrive" },
   ];
@@ -1427,7 +1478,18 @@ export default function ClientPortal() {
               <KpiRow project={project} />
 
               <SectionCard title="Your PFAS Advisory Team">
-                <TeamGrid team={project.team} />
+                <TeamGrid team={filterTeamForProject(project.team, projectSlug)} />
+                <a
+                  href={project.teamsBookingUrl || project.teamsMeeting || "#"}
+                  target="_blank" rel="noreferrer"
+                  style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #EEF1F6", textDecoration: "none", background: "#F0FDF4", marginTop: 14 }}
+                >
+                  <div style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: "#DCFCE7", color: "#166534" }}>📅</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>Book a Meeting</div>
+                    <div style={{ fontSize: 11.5, color: "#64748B", lineHeight: 1.3, marginTop: 1 }}>Pick an open slot with your PFAS team</div>
+                  </div>
+                </a>
               </SectionCard>
 
               {/* Quick Actions — now ABOVE Project Documents */}
