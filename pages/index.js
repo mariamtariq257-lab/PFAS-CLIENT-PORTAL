@@ -616,10 +616,21 @@ function KpiRow({ project }) {
   };
   const receivedDisplay = formatReceivedPayments(project.receivedPayments);
 
+  // ClickUp phase names often come back in ALL CAPS (e.g. "PHASE 2 –
+  // INSTITUTIONAL & LEGAL FRAMEWORK (D-II)"). Convert to sentence case
+  // (capitalize only the first letter) so it reads naturally instead of
+  // shouting.
+  const toSentenceCase = (str) => {
+    if (!str) return str;
+    const lower = str.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  };
+  const phaseDisplay = toSentenceCase(project.currentPhase);
+
   const kpis = [
     { label: "Project Progress",   value: `${project.overallPercent}%`,         sub: "Overall completion",        accent: "#1C2D56", bg: "linear-gradient(135deg,#F0F4FA,#FFFFFF)" },
     { label: "Active Tasks",       value: project.activeTasks,                  sub: "Ongoing tasks",              accent: "#B45309", bg: "linear-gradient(135deg,#FFF7ED,#FFFFFF)" },
-    { label: "Current Phase",      value: project.currentPhase,                 sub: "In progress",               accent: "#166534", bg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", small: true },
+    { label: "Current Phase",      value: phaseDisplay,                          sub: "In progress",               accent: "#166534", bg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", small: true },
     { label: "Engagement Value",   value: project.pfasFee || "PKR TBD",         sub: "Total advisory fee",        accent: "#6B21A8", bg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)" },
     { label: "Received Payments",  value: receivedDisplay,                      sub: "Of total fee",              accent: "#0369A1", bg: "linear-gradient(135deg,#EFF6FF,#FFFFFF)" },
   ];
@@ -628,7 +639,7 @@ function KpiRow({ project }) {
       {kpis.map((k, i) => (
         <div className="kpi" key={i} style={{ ...CARD, marginBottom: 0, padding: 18, background: k.bg, borderLeft: `3px solid ${k.accent}` }}>
           <div className="kpi-label" style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase", color: "#64748B" }}>{k.label}</div>
-          <div className="kpi-value" style={{ fontSize: k.small ? 18 : 27, fontWeight: 800, color: k.accent, margin: "8px 0 4px", lineHeight: 1.15, overflowWrap: "anywhere" }}>{k.value}</div>
+          <div className="kpi-value" style={{ fontSize: k.small ? 15 : 27, fontWeight: 700, color: k.accent, margin: "8px 0 4px", lineHeight: 1.3, overflowWrap: "anywhere" }}>{k.value}</div>
           <div className="kpi-sub" style={{ fontSize: 12, color: "#94A3B8" }}>{k.sub}</div>
         </div>
       ))}
