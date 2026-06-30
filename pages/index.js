@@ -1022,7 +1022,7 @@ function BookMeetingPanel({ project }) {
 // ── SharePoint folder map ────────────────────────────────────────────────────
 // Each project slug maps to its 4 client-facing SharePoint sub-folders, all
 // under: {project root}/Data for client access/{N}. {Folder Name}
-//   sharedDocs      -> "1. PFAS Outputs"            (Shared Documents quick action)
+//   sharedDocs      -> "Data for client access" (root folder)  (Project Documents quick action)
 //   uploadDoc        -> "2. Received from Client"     (Upload Document quick action)
 //   meetingMinutes    -> "3. Meeting Minutes and Notes" (Meeting Minutes quick action)
 //   invoices          -> "Invoices and Payments"      (sits at project root, sibling
@@ -1041,7 +1041,7 @@ const SHAREPOINT_BASE = "https://pfaspk.sharepoint.com/sites/PFAS-PMO/Shared Doc
 function dataForClientAccess(deptPath, projectPath, opts = {}) {
   const root = `${SHAREPOINT_BASE}/${deptPath}/${projectPath}`;
   return {
-    sharedDocs:      `${root}/Data for client access/${opts.outputsFolder || "1. PFAS Outputs"}`,
+    sharedDocs:      `${root}/Data for client access`,
     uploadDoc:        `${root}/Data for client access/${opts.receivedFolder || "2. Received from Client"}`,
     meetingMinutes:    `${root}/Data for client access/${opts.minutesFolder || "3. Meeting Minutes and Notes"}`,
     // "Invoices and Payments" lives as its own folder at the project root,
@@ -1090,7 +1090,7 @@ function getSharePointLinks(project, projectSlug) {
 function ActionsGrid({ project, projectSlug }) {
   const sp = getSharePointLinks(project, projectSlug);
   const actions = [
-    { href: sp.sharedDocs,     icon: "📁", bg: "#DBEAFE", color: "#1E40AF", accent: "#2563EB", cardBg: "linear-gradient(135deg,#EFF6FF,#FFFFFF)", title: "Shared Documents",    desc: "Data for client access" },
+    { href: sp.sharedDocs,     icon: "📁", bg: "#DBEAFE", color: "#1E40AF", accent: "#2563EB", cardBg: "linear-gradient(135deg,#EFF6FF,#FFFFFF)", title: "Project Documents",   desc: "Data for client access" },
     { href: sp.uploadDoc,      icon: "⬆",  bg: "#DCFCE7", color: "#166534", accent: "#16A34A", cardBg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", title: "Upload Document",     desc: "Received from Client folder" },
     { href: sp.meetingMinutes, icon: "📝", bg: "#F3E8FF", color: "#6B21A8", accent: "#9333EA", cardBg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)", title: "Meeting Minutes",     desc: "Meeting Minutes and Notes" },
     { href: sp.invoices,       icon: "💰", bg: "#CFFAFE", color: "#155E75", accent: "#0891B2", cardBg: "linear-gradient(135deg,#ECFEFF,#FFFFFF)", title: "Invoices & Payments", desc: "Invoices and Payments folder" },
