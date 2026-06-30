@@ -1022,16 +1022,16 @@ function BookMeetingPanel({ project }) {
 // ── Quick actions ─────────────────────────────────────────────────────────────
 function ActionsGrid({ project }) {
   const actions = [
-    { href: project.onedriveUrl || "#",                             icon: "📁", bg: "#EFF6FF", color: "#1E40AF", title: "Shared Documents",   desc: "Client Communication folder" },
-    { href: project.onedriveUrl || "#",                             icon: "⬆", bg: "#F0FDF4", color: "#166534", title: "Upload Document",    desc: "Add a file to your shared folder" },
-    { href: project.onedriveUrl || "#",                             icon: "📝", bg: "#FAF5FF", color: "#6B21A8", title: "Meeting Minutes",    desc: "MoMs folder · OneDrive" },
-    { href: project.onedriveUrl || "#",                             icon: "💰", bg: "#ECFEFF", color: "#155E75", title: "Invoices & Payments",desc: "Payments folder · OneDrive" },
+    { href: project.onedriveUrl || "#", icon: "📁", bg: "#DBEAFE", color: "#1E40AF", accent: "#2563EB", cardBg: "linear-gradient(135deg,#EFF6FF,#FFFFFF)", title: "Shared Documents",    desc: "Client Communication folder" },
+    { href: project.onedriveUrl || "#", icon: "⬆",  bg: "#DCFCE7", color: "#166534", accent: "#16A34A", cardBg: "linear-gradient(135deg,#F0FDF4,#FFFFFF)", title: "Upload Document",     desc: "Add a file to your shared folder" },
+    { href: project.onedriveUrl || "#", icon: "📝", bg: "#F3E8FF", color: "#6B21A8", accent: "#9333EA", cardBg: "linear-gradient(135deg,#FAF5FF,#FFFFFF)", title: "Meeting Minutes",     desc: "MoMs folder · OneDrive" },
+    { href: project.onedriveUrl || "#", icon: "💰", bg: "#CFFAFE", color: "#155E75", accent: "#0891B2", cardBg: "linear-gradient(135deg,#ECFEFF,#FFFFFF)", title: "Invoices & Payments", desc: "Payments folder · OneDrive" },
   ];
   return (
     <div className="actions-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
       {actions.map((a, i) => (
         <a key={i} className="action-btn pfas-action-card" href={a.href} target="_blank" rel="noreferrer"
-          style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #D6DCE5", textDecoration: "none", background: "#fff" }}>
+          style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #D6DCE5", borderLeft: `3px solid ${a.accent}`, textDecoration: "none", background: a.cardBg }}>
           <div className="action-icon" style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: a.bg, color: a.color }}>{a.icon}</div>
           <div style={{ minWidth: 0 }}>
             <div className="action-title" style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>{a.title}</div>
@@ -1573,7 +1573,7 @@ export default function ClientPortal() {
             <div>
               <KpiRow project={project} />
 
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 18, alignItems: "stretch" }} className="team-meeting-row">
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 18, alignItems: "stretch", marginBottom: 18 }} className="team-meeting-row">
                 <SectionCard title="Your PFAS Advisory Team" style={{ marginBottom: 0 }}>
                   <TeamGrid team={filterTeamForProject(project.team, projectSlug)} />
                 </SectionCard>
