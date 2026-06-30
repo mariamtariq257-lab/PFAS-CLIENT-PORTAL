@@ -17,7 +17,6 @@ const ADMIN_PIN = "2580";
 // ── EMAIL → PROJECT(S) MAP ────────────────────────────────────────────────────
 const EMAIL_PROJECT_MAP = {
   // ── Single-project logins ──────────────────────────────────────────────────
-  "demo@pfas.pk":       { name: "Demo Client",            projects: [{ slug: "pcmmdc",         label: "PCMMDC HR Manual" }] },
   "pcmmdc@pfas.pk":     { name: "PCMMDC",                 projects: [{ slug: "pcmmdc",         label: "PCMMDC HR Manual" }] },
   "p4a@pfas.pk":        { name: "P4A",                    projects: [{ slug: "p4a",            label: "Tertiary Care Hospital" }] },
   "energy@pfas.pk":     { name: "Energy Dept",            projects: [{ slug: "energy",         label: "PMW Strategic Design" }] },
@@ -82,7 +81,7 @@ const ADMIN_CLIENT_LIST = (() => {
   const list = [];
   // Primary logins only (no legacy duplicates)
   const PRIMARY_EMAILS = [
-    "demo@pfas.pk", "pcmmdc@pfas.pk", "p4a@pfas.pk", "energy@pfas.pk",
+    "pcmmdc@pfas.pk", "p4a@pfas.pk", "energy@pfas.pk",
     "fisheries@pfas.pk", "tam@pfas.pk", "pha@pfas.pk", "pbf@pfas.pk",
     "hed@pfas.pk", "phimc@pfas.pk", "cw@pfas.pk", "fiedmc@pfas.pk",
     "finance@pfas.pk", "wildlife@pfas.pk",
@@ -980,6 +979,121 @@ function DocumentsSection({ project }) {
   );
 }
 
+// ── Book a Meeting panel ──────────────────────────────────────────────────────
+// Constant PFAS advisory team attendees (locked, derived from the filtered
+// team for this project) + a free-text field for the client to add their own
+// attendees. Submits via mailto: since no booking API is wired up.
+function BookMeetingPanel({ project, team }) {
+  const [subject, setSubject]   = useState(`Meeting — ${project.clientName || "PFAS Engagement"}`);
+  const [date, setDate]         = useState("");
+  const [time, setTime]         = useState("");
+  const [extraAttendees, setExtraAttendees] = useState("");
+  const [note, setNote]         = useState("");
+
+  const pfasEmails = (team || [])
+    .map(m => m.email)
+    .filter(e => e && e !== "—");
+
+  const handleSend = () => {
+    const to = pfasEmails.join(",");
+    const cc = extraAttendees.trim();
+    const bodyLines = [
+      `Project: ${project.clientName || ""}`,
+      date ? `Proposed date: ${date}` : null,
+      time ? `Proposed time: ${time}` : null,
+      "",
+      note || "",
+    ].filter(Boolean).join("\n");
+    const params = new URLSearchParams({ subject, body: bodyLines });
+    let href = `mailto:${to}?${params.toString()}`;
+    if (cc) href += `&cc=${encodeURIComponent(cc)}`;
+    window.open(href, "_blank");
+  };
+
+  return (
+    <div className="section-card" style={CARD}>
+      <div style={SECTION_TITLE}><span style={TITLE_BAR} />Book a Meeting</div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div>
+          <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Subject</label>
+          <input
+            type="text"
+            value={subject}
+            onChange={e => setSubject(e.target.value)}
+            style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box" }}
+          />
+        </div>
+
+        <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box" }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Time</label>
+            <input
+              type="time"
+              value={time}
+              onChange={e => setTime(e.target.value)}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box" }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>PFAS Attendees (fixed)</label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {(team || []).length === 0 && (
+              <span style={{ fontSize: 12.5, color: "#94A3B8" }}>No advisory team set for this project.</span>
+            )}
+            {(team || []).map((m, i) => (
+              <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 10px", borderRadius: 999, background: "#EFF6FF", border: "1px solid #DBEAFE", fontSize: 12, fontWeight: 600, color: "#1E40AF" }}>
+                {m.name}
+                <span style={{ fontSize: 9, opacity: 0.6 }}>🔒</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Add Attendees (optional)</label>
+          <input
+            type="text"
+            placeholder="name@email.com, name2@email.com"
+            value={extraAttendees}
+            onChange={e => setExtraAttendees(e.target.value)}
+            style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box" }}
+          />
+        </div>
+
+        <div>
+          <label style={{ fontSize: 11.5, fontWeight: 600, color: "#64748B", display: "block", marginBottom: 5 }}>Note (optional)</label>
+          <textarea
+            rows={2}
+            placeholder="Agenda or context for this meeting…"
+            value={note}
+            onChange={e => setNote(e.target.value)}
+            style={{ width: "100%", padding: "9px 12px", borderRadius: 9, border: "1px solid #E2E8F0", fontSize: 13.5, color: "#1E293B", boxSizing: "border-box", resize: "vertical", fontFamily: "inherit" }}
+          />
+        </div>
+
+        <button
+          onClick={handleSend}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "11px 16px", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", color: "#fff", fontSize: 13.5, fontWeight: 600, borderRadius: 10, border: "none", cursor: "pointer", boxShadow: "0 2px 8px rgba(28,45,86,0.2)" }}
+        >
+          📅 Send Meeting Request
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Quick actions ─────────────────────────────────────────────────────────────
 function ActionsGrid({ project }) {
   const actions = [
@@ -1479,18 +1593,12 @@ export default function ClientPortal() {
 
               <SectionCard title="Your PFAS Advisory Team">
                 <TeamGrid team={filterTeamForProject(project.team, projectSlug)} />
-                <a
-                  href={project.teamsBookingUrl || project.teamsMeeting || "#"}
-                  target="_blank" rel="noreferrer"
-                  style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #EEF1F6", textDecoration: "none", background: "#F0FDF4", marginTop: 14 }}
-                >
-                  <div style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: "#DCFCE7", color: "#166534" }}>📅</div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>Book a Meeting</div>
-                    <div style={{ fontSize: 11.5, color: "#64748B", lineHeight: 1.3, marginTop: 1 }}>Pick an open slot with your PFAS team</div>
-                  </div>
-                </a>
               </SectionCard>
+
+              <BookMeetingPanel
+                project={project}
+                team={filterTeamForProject(project.team, projectSlug)}
+              />
 
               {/* Quick Actions — now ABOVE Project Documents */}
               <SectionCard title="Quick Actions">
