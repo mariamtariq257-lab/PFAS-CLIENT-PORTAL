@@ -949,43 +949,25 @@ function TeamsPanel({ project }) {
 }
 
 // ── Documents section ─────────────────────────────────────────────────────────
-const RECENT_FILES_PLACEHOLDER = [
-  { name: "Inception Report.pdf",             type: "pdf",   date: "Jun 2026" },
-  { name: "Stakeholder Consultation MoM.docx",type: "word",  date: "May 2026" },
-  { name: "Financial Model v3.xlsx",           type: "excel", date: "May 2026" },
-  { name: "Draft Policy Framework.docx",       type: "word",  date: "Apr 2026" },
-];
-
-function fileIcon(type) {
-  if (type === "pdf")   return { icon: "📄", bg: "#FECACA", color: "#9B2C2C" };
-  if (type === "word")  return { icon: "📝", bg: "#DBEAFE", color: "#1E40AF" };
-  if (type === "excel") return { icon: "📊", bg: "#DCFCE7", color: "#276749" };
-  if (type === "ppt")   return { icon: "📋", bg: "#FED7AA", color: "#9A3412" };
-  return                       { icon: "📎", bg: "#E2E8F0", color: "#475569" };
-}
-
-function DocumentsSection({ project }) {
-  const uploadUrl = project.onedriveUrl || "#";
+function DocumentsSection({ project, projectSlug }) {
+  const sp = getSharePointLinks(project, projectSlug);
+  const folderUrl = sp.sharedDocs;
   return (
     <div className="section-card docs-card" style={CARD}>
       <div style={SECTION_TITLE}><span style={TITLE_BAR} />Project Documents</div>
-      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Recently Uploaded</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {RECENT_FILES_PLACEHOLDER.map((f, i) => {
-          const fi = fileIcon(f.type);
-          return (
-            <a key={i} className="doc-file-row" href={uploadUrl} target="_blank" rel="noreferrer"
-              style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "1px solid #D6DCE5", textDecoration: "none" }}>
-              <div className="doc-file-icon" style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: fi.bg, color: fi.color }}>{fi.icon}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="doc-file-name" style={{ fontSize: 13.5, fontWeight: 600, color: "#1E293B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</div>
-                <div className="doc-file-meta" style={{ fontSize: 11.5, color: "#94A3B8" }}>{f.date}</div>
-              </div>
-              <div style={{ flexShrink: 0, color: "#CBD5E1", fontSize: 13 }}>↗</div>
-            </a>
-          );
-        })}
-      </div>
+      <a
+        href={folderUrl}
+        target="_blank" rel="noreferrer"
+        className="doc-file-row"
+        style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #D6DCE5", textDecoration: "none", background: "linear-gradient(135deg,#EFF6FF,#FFFFFF)", borderLeft: "3px solid #2563EB" }}
+      >
+        <div className="doc-file-icon" style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: "#DBEAFE", color: "#1E40AF" }}>📁</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="doc-file-name" style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>Browse all project documents</div>
+          <div className="doc-file-meta" style={{ fontSize: 11.5, color: "#94A3B8", marginTop: 1 }}>Data for client access · SharePoint</div>
+        </div>
+        <div style={{ flexShrink: 0, color: "#2563EB", fontSize: 14, opacity: 0.7 }}>→</div>
+      </a>
     </div>
   );
 }
@@ -1682,7 +1664,7 @@ export default function ClientPortal() {
                 <ActionsGrid project={project} projectSlug={projectSlug} />
               </SectionCard>
 
-              <DocumentsSection project={project} />
+              <DocumentsSection project={project} projectSlug={projectSlug} />
             </div>
 
             <div className="sidebar">
