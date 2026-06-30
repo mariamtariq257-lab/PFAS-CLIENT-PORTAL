@@ -139,9 +139,9 @@ const TITLE_BAR = {
   background: "linear-gradient(180deg,#F2BE1A,#D4A716)",
   flexShrink: 0,
 };
-function SectionCard({ title, children, style }) {
+function SectionCard({ title, children, style, className }) {
   return (
-    <div className="section-card" style={{ ...CARD, ...style }}>
+    <div className={`section-card${className ? " " + className : ""}`} style={{ ...CARD, ...style }}>
       {title && <div style={SECTION_TITLE}><span style={TITLE_BAR} />{title}</div>}
       {children}
     </div>
@@ -276,13 +276,13 @@ function AdminClientPicker({ onSelect, onBack }) {
       {/* Header */}
       <div className="admin-picker-header">
         <div className="admin-picker-brand">
-          <img src="/logo-dark.png" alt="PFAS" style={{ width: 90, height: 36, objectFit: "contain", objectPosition: "left center" }} />
+          <img src="/logo-dark.png" alt="PFAS" className="admin-picker-logo" style={{ width: 90, height: 36, objectFit: "contain", objectPosition: "left center" }} />
           <div>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", letterSpacing: 1, textTransform: "uppercase" }}>Admin Mode</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>Client Portal Overview</div>
+            <div className="admin-picker-eyebrow" style={{ fontSize: 11, color: "rgba(255,255,255,0.65)", letterSpacing: 1, textTransform: "uppercase" }}>Admin Mode</div>
+            <div className="admin-picker-title" style={{ fontSize: 18, fontWeight: 700, color: "#fff" }}>Client Portal Overview</div>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="admin-picker-header-right" style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span className="admin-badge">🔐 Admin</span>
           <button className="logout-btn" onClick={onBack}>← Exit Admin</button>
         </div>
@@ -565,16 +565,16 @@ function ProjectHeader({ project }) {
         <div className="ph-title-block">
 
           {/* Client name row */}
-          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 14 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", flexShrink: 0 }}>
+          <div className="ph-row" style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 14 }}>
+            <div className="ph-icon-circle" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#1C2D56,#1C2D56)", flexShrink: 0 }}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <circle cx="12" cy="7" r="4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#94A3B8", marginBottom: 2 }}>Client</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#1C2D56", letterSpacing: -0.3, lineHeight: 1.1 }}>{project.clientName}</div>
+            <div style={{ minWidth: 0 }}>
+              <div className="ph-eyebrow" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#94A3B8", marginBottom: 2 }}>Client</div>
+              <div className="ph-name" style={{ fontSize: 22, fontWeight: 800, color: "#1C2D56", letterSpacing: -0.3, lineHeight: 1.1, overflowWrap: "anywhere" }}>{project.clientName}</div>
             </div>
           </div>
 
@@ -582,8 +582,8 @@ function ProjectHeader({ project }) {
           <div style={{ height: 1, background: "linear-gradient(90deg,#E2E8F0,transparent)", marginBottom: 14 }} />
 
           {/* Project name row */}
-          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#F2BE1A,#D4A716)", flexShrink: 0 }}>
+          <div className="ph-row" style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <div className="ph-icon-circle" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#F2BE1A,#D4A716)", flexShrink: 0 }}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -591,9 +591,9 @@ function ProjectHeader({ project }) {
                 <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#94A3B8", marginBottom: 2 }}>Project</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: "#0A1628", letterSpacing: -0.3, lineHeight: 1.1 }}>{project.displayName || project.name}</div>
+            <div style={{ minWidth: 0 }}>
+              <div className="ph-eyebrow" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#94A3B8", marginBottom: 2 }}>Project</div>
+              <div className="ph-name" style={{ fontSize: 22, fontWeight: 800, color: "#0A1628", letterSpacing: -0.3, lineHeight: 1.1, overflowWrap: "anywhere" }}>{project.displayName || project.name}</div>
             </div>
           </div>
 
@@ -626,10 +626,10 @@ function KpiRow({ project }) {
   return (
     <div className="kpi-row" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 18 }}>
       {kpis.map((k, i) => (
-        <div key={i} style={{ ...CARD, marginBottom: 0, padding: 18, background: k.bg, borderLeft: `3px solid ${k.accent}` }}>
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase", color: "#64748B" }}>{k.label}</div>
-          <div style={{ fontSize: k.small ? 18 : 27, fontWeight: 800, color: k.accent, margin: "8px 0 4px", lineHeight: 1.15 }}>{k.value}</div>
-          <div style={{ fontSize: 12, color: "#94A3B8" }}>{k.sub}</div>
+        <div className="kpi" key={i} style={{ ...CARD, marginBottom: 0, padding: 18, background: k.bg, borderLeft: `3px solid ${k.accent}` }}>
+          <div className="kpi-label" style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.5, textTransform: "uppercase", color: "#64748B" }}>{k.label}</div>
+          <div className="kpi-value" style={{ fontSize: k.small ? 18 : 27, fontWeight: 800, color: k.accent, margin: "8px 0 4px", lineHeight: 1.15, overflowWrap: "anywhere" }}>{k.value}</div>
+          <div className="kpi-sub" style={{ fontSize: 12, color: "#94A3B8" }}>{k.sub}</div>
         </div>
       ))}
     </div>
@@ -963,12 +963,12 @@ function DocumentsSection({ project }) {
         {RECENT_FILES_PLACEHOLDER.map((f, i) => {
           const fi = fileIcon(f.type);
           return (
-            <a key={i} href={uploadUrl} target="_blank" rel="noreferrer"
+            <a key={i} className="doc-file-row" href={uploadUrl} target="_blank" rel="noreferrer"
               style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "1px solid #D6DCE5", textDecoration: "none" }}>
-              <div style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: fi.bg, color: fi.color }}>{fi.icon}</div>
+              <div className="doc-file-icon" style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: fi.bg, color: fi.color }}>{fi.icon}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: 600, color: "#1E293B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</div>
-                <div style={{ fontSize: 11.5, color: "#94A3B8" }}>{f.date}</div>
+                <div className="doc-file-name" style={{ fontSize: 13.5, fontWeight: 600, color: "#1E293B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</div>
+                <div className="doc-file-meta" style={{ fontSize: 11.5, color: "#94A3B8" }}>{f.date}</div>
               </div>
               <div style={{ flexShrink: 0, color: "#CBD5E1", fontSize: 13 }}>↗</div>
             </a>
@@ -1032,10 +1032,10 @@ function ActionsGrid({ project }) {
       {actions.map((a, i) => (
         <a key={i} className="action-btn pfas-action-card" href={a.href} target="_blank" rel="noreferrer"
           style={{ display: "flex", alignItems: "center", gap: 13, padding: 15, borderRadius: 12, border: "1px solid #D6DCE5", textDecoration: "none", background: "#fff" }}>
-          <div style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: a.bg, color: a.color }}>{a.icon}</div>
+          <div className="action-icon" style={{ flexShrink: 0, width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19, background: a.bg, color: a.color }}>{a.icon}</div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>{a.title}</div>
-            <div style={{ fontSize: 11.5, color: "#94A3B8", lineHeight: 1.3, marginTop: 1 }}>{a.desc}</div>
+            <div className="action-title" style={{ fontSize: 13.5, fontWeight: 700, color: "#1E293B" }}>{a.title}</div>
+            <div className="action-desc" style={{ fontSize: 11.5, color: "#94A3B8", lineHeight: 1.3, marginTop: 1 }}>{a.desc}</div>
           </div>
         </a>
       ))}
@@ -1298,14 +1298,22 @@ export default function ClientPortal() {
           .project-header {
             padding: 18px !important;
           }
-          .ph-title {
-            font-size: 18px !important;
+          .ph-name {
+            font-size: 17px !important;
           }
-          .ph-meta {
-            gap: 12px !important;
-            font-size: 12px !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
+          .ph-eyebrow {
+            font-size: 9px !important;
+          }
+          .ph-icon-circle {
+            width: 30px !important;
+            height: 30px !important;
+          }
+          .ph-icon-circle svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
+          .ph-row {
+            gap: 9px !important;
           }
 
           /* KPI row: 2 columns instead of 4 */
@@ -1357,7 +1365,8 @@ export default function ClientPortal() {
 
           /* Documents */
           .docs-card { padding: 16px !important; }
-          .doc-file-row { padding: 10px !important; }
+          .doc-file-row { padding: 10px !important; gap: 10px !important; }
+          .doc-file-icon { width: 30px !important; height: 30px !important; font-size: 14px !important; }
           .doc-file-name { font-size: 12.5px !important; }
           .doc-file-meta { font-size: 10.5px !important; }
           .docs-actions-row {
@@ -1375,8 +1384,13 @@ export default function ClientPortal() {
             gap: 10px !important;
           }
           .action-btn { padding: 14px !important; }
+          .action-icon { width: 36px !important; height: 36px !important; font-size: 16px !important; }
           .action-title { font-size: 13px !important; }
           .action-desc { font-size: 11px !important; }
+
+          /* Book a Meeting (Teams card) */
+          .teams-icon-pop { width: 64px !important; height: 64px !important; }
+          .teams-icon-pop svg { width: 64px !important; height: 64px !important; }
 
           /* Scheduling Log meetings */
           .mtg-card { padding: 16px !important; }
@@ -1405,6 +1419,32 @@ export default function ClientPortal() {
           .login-title { font-size: 19px !important; }
           .login-sub { font-size: 13px !important; }
           .login-btn { font-size: 14px !important; padding: 13px !important; }
+
+          /* Advisory Team + Book a Meeting row: stack on mobile */
+          .team-meeting-row {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+
+          /* Admin picker */
+          .admin-picker-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            padding: 16px !important;
+          }
+          .admin-picker-logo { width: 70px !important; height: 28px !important; }
+          .admin-picker-eyebrow { font-size: 9.5px !important; }
+          .admin-picker-title { font-size: 15px !important; }
+          .admin-picker-header-right { width: 100% !important; justify-content: space-between !important; }
+          .admin-picker-body { padding: 14px !important; }
+          .admin-picker-meta { font-size: 12px !important; margin-bottom: 10px !important; }
+          .admin-search-input { font-size: 13px !important; }
+          .admin-card-header { gap: 10px !important; }
+          .admin-card-avatar { width: 38px !important; height: 38px !important; font-size: 13px !important; }
+          .admin-card-name { font-size: 14px !important; }
+          .admin-card-count { font-size: 11.5px !important; }
+          .admin-project-btn { padding: 10px 12px !important; font-size: 12.5px !important; }
         }
 
         /* Extra-small phones (≤380px) */
@@ -1547,7 +1587,7 @@ export default function ClientPortal() {
             </div>
 
             <div className="sidebar">
-              <SectionCard title="Phase Progress" style={{ position: "sticky", top: 20 }}>
+              <SectionCard title="Phase Progress" className="phase-sidebar-card" style={{ position: "sticky", top: 20 }}>
                 <div className="phase-legend" style={{ fontSize: 11.5, color: "#64748B", marginBottom: 14, display: "flex", alignItems: "center", flexWrap: "wrap" }}>
                   <span className="legend-dot dot-green" /> Completed
                   <span className="legend-dot dot-amber" style={{ marginLeft: 12 }} /> In Progress
