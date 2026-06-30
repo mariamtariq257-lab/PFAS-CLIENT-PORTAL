@@ -996,40 +996,23 @@ function BookMeetingPanel({ project }) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
         textDecoration: "none",
         cursor: "pointer",
-        background: "linear-gradient(155deg,#4B53BC 0%,#444CB8 45%,#383F9E 100%)",
-        border: "none",
-        position: "relative",
-        overflow: "hidden",
+        gap: 10,
       }}
     >
-      {/* soft ambient accent */}
-      <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,255,255,0.14),transparent 70%)", pointerEvents: "none" }} />
-
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: "rgba(255,255,255,0.65)", display: "flex", alignItems: "center", gap: 7, position: "relative" }}>
-        <span style={{ width: 6, height: 6, borderRadius: 2, background: "#fff", display: "inline-block" }} />
-        Book a Meeting
+      {/* Microsoft Teams glyph — full color */}
+      <div className="teams-icon-pop" style={{ width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <svg width="56" height="56" viewBox="0 0 2228.833 2073.333" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#5059C9" d="M1554.637,777.5h575.713c54.391,0,98.483,44.092,98.483,98.483v0c0,159.084-118.929,294.296-277.083,310.6-39.083-13.667-81.166-21.083-125-21.083-83.333,0-160.583,27.083-223,72.917v-377.417C1603.75,824.792,1554.637,777.5,1554.637,777.5Z" transform="translate(-128.317 -350.083)"/>
+          <circle fill="#5059C9" cx="1746.583" cy="240.75" r="240.75"/>
+          <path fill="#7B83EB" opacity="1" d="M1183.083,777.5H707.37c-54.391,0-98.483,44.092-98.483,98.483v500.953c0,278.604,225.871,504.475,504.475,504.475h0c278.604,0,504.475-225.871,504.475-504.475V875.983C1617.837,821.592,1573.745,777.5,1519.354,777.5Z" transform="translate(-128.317 -350.083)"/>
+          <circle fill="#7B83EB" cx="945.417" cy="240.75" r="240.75"/>
+        </svg>
       </div>
-
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, flex: 1, padding: "20px 10px", textAlign: "center", position: "relative" }}>
-        {/* Microsoft Teams glyph */}
-        <div style={{ width: 52, height: 52, borderRadius: 14, background: "rgba(255,255,255,0.16)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="28" height="28" viewBox="0 0 2228.833 2073.333" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#fff" d="M1554.637,777.5h575.713c54.391,0,98.483,44.092,98.483,98.483v0c0,159.084-118.929,294.296-277.083,310.6-39.083-13.667-81.166-21.083-125-21.083-83.333,0-160.583,27.083-223,72.917v-377.417C1603.75,824.792,1554.637,777.5,1554.637,777.5Z" transform="translate(-128.317 -350.083)"/>
-            <circle fill="#fff" cx="1746.583" cy="240.75" r="240.75"/>
-            <path fill="#fff" opacity="0.7" d="M1183.083,777.5H707.37c-54.391,0-98.483,44.092-98.483,98.483v500.953c0,278.604,225.871,504.475,504.475,504.475h0c278.604,0,504.475-225.871,504.475-504.475V875.983C1617.837,821.592,1573.745,777.5,1519.354,777.5Z" transform="translate(-128.317 -350.083)"/>
-            <circle fill="#fff" opacity="0.7" cx="945.417" cy="240.75" r="240.75"/>
-          </svg>
-        </div>
-        <div style={{ fontSize: 14.5, fontWeight: 700, color: "#fff" }}>Schedule a meeting</div>
-        <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.7)", lineHeight: 1.4 }}>Opens directly in Microsoft Teams</div>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, padding: "9px 0 2px", fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,0.9)", position: "relative" }}>
-        Continue
-        <span style={{ fontSize: 14 }}>→</span>
-      </div>
+      <div style={{ fontSize: 14, fontWeight: 700, color: "#1E293B" }}>Schedule Meeting</div>
     </a>
   );
 }
@@ -1432,6 +1415,17 @@ export default function ClientPortal() {
 
         @media (max-width: 860px) {
           .team-meeting-row { grid-template-columns: 1fr !important; }
+        }
+
+        .teams-meeting-card:hover .teams-icon-pop {
+          animation: teams-pop 0.5s ease;
+        }
+        @keyframes teams-pop {
+          0%   { transform: scale(1); }
+          30%  { transform: scale(1.18) rotate(-4deg); }
+          55%  { transform: scale(0.95) rotate(3deg); }
+          75%  { transform: scale(1.06) rotate(-1deg); }
+          100% { transform: scale(1); }
         }
       `}</style>
     </Head>
