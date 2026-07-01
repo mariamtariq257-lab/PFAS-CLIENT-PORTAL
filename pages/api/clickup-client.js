@@ -1,4 +1,4 @@
-// pages/api/clickup-client.js
+// pages/api/clickup-client.js — updated 2026-07-01
 // PFAS Client Portal — Live ClickUp data feed
 // Returns ONLY client-safe fields. Never exposes internal notes, budgets, or PM data.
 //
