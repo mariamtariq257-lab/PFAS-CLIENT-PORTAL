@@ -48,7 +48,7 @@ const EMAIL_PROJECT_MAP = {
     name: "Finance Department",
     projects: [
       { slug: "punjab-onebill", label: "Punjab One Bill Study" },
-      { slug: "vss",            label: "Project Twilight" },
+      { slug: "twilight",            label: "Project Twilight" },
     ],
   },
   "wildlife@pfas.pk": {
@@ -69,7 +69,7 @@ const EMAIL_PROJECT_MAP = {
   "cw-om@pfas.pk":      { name: "C&W (18 O&M)",           projects: [{ slug: "om-roads",       label: "18 O&M Roads PPP" }] },
   "wildlife-b@pfas.pk": { name: "Wildlife (Bansra Gali)", projects: [{ slug: "wildlife-bansra",label: "Bansra Gali Wildlife" }] },
   "wildlife-c@pfas.pk": { name: "Wildlife (Changa)",      projects: [{ slug: "wildlife-changa",label: "Changa Manga Wildlife" }] },
-  "vss@pfas.pk":        { name: "Finance (Project Twilight)", projects: [{ slug: "vss", label: "Project Twilight" }] },
+  "vss@pfas.pk":        { name: "Finance (Project Twilight)", projects: [{ slug: "twilight", label: "Project Twilight" }] },
 };
 
 // ── Admin client list: all unique clients for the admin picker ────────────────
@@ -1165,7 +1165,7 @@ const SHAREPOINT_FOLDERS = {
   "tam":             dataForClientAccess("TAM", "Time Travel Park"),
   "pha":             dataForClientAccess("PHA", "PHA"),
   "pbf":             dataForClientAccess("Punjab Benevolent Fund", "Punjab Govt Employees welfare fund"),
-  "vss":             dataForClientAccess("Finance Department", "Project Twilight"),
+  "twilight":         dataForClientAccess("Finance Department", "Project Twilight"),
   "energy":          dataForClientAccess("Energy Department", "Strategic Assessment & Design of a Project Management Wing"),
   "hed":             dataForClientAccess("Higher Education Department", "Higher Education Department"),
   "phimc":           dataForClientAccess("PHIMC", "6 Hospitals Feasibility"),
