@@ -1,11 +1,9 @@
 // pages/index.js  —  PFAS Client Portal
-// Auth0 login → fetch live ClickUp data → render project dashboard
+// NextAuth credentials login → fetch live ClickUp data → render project dashboard
 
 import Head from "next/head";
 import { useEffect, useState, useRef } from "react";
-
-const AUTH0_DOMAIN    = process.env.NEXT_PUBLIC_AUTH0_DOMAIN    || "dev-zrdwden5qdovxa40.us.auth0.com";
-const AUTH0_CLIENT_ID = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID || "Rhh7Of9haJruOvHsEYswD5YtmohXV81N";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 // ── ADMIN CONFIG ──────────────────────────────────────────────────────────────
 // Change ADMIN_PIN to any 4-digit string you prefer.
@@ -403,21 +401,62 @@ function DevPicker({ onSelect }) {
 }
 
 // ── Login screen ──────────────────────────────────────────────────────────────
-function LoginScreen({ onLogin, error, onAdminClick }) {
+function LoginScreen({ onAdminClick }) {
+  const [email, setEmail]       = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const result = await signIn("credentials", {
+      email: email.toLowerCase().trim(),
+      password,
+      redirect: false,
+    });
+    setLoading(false);
+    if (!result?.ok) {
+      setError("Invalid email or password. Contact your PFAS engagement lead if you need access.");
+    }
+  };
+
   return (
     <div className="login-overlay">
       <div className="login-card">
         <img src="/logo-dark.png" alt="PFAS" className="login-logo" />
-        <div style={{ textAlign: "center", padding: "24px 0 8px" }}>
-          <button className="login-btn" onClick={onLogin} style={{ marginTop: 0 }}>
-            Sign In Securely
+        <div className="login-title">PFAS Client Portal</div>
+        <div className="login-sub">Sign in to access your engagement workspace</div>
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 20 }}>
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            style={{ padding: "12px 14px", borderRadius: 10, border: "1px solid #C9D2DE", fontSize: 14, outline: "none", fontFamily: "inherit" }}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            style={{ padding: "12px 14px", borderRadius: 10, border: "1px solid #C9D2DE", fontSize: 14, outline: "none", fontFamily: "inherit" }}
+          />
+          {error && <div className="login-error">{error}</div>}
+          <button
+            type="submit"
+            className="login-btn"
+            disabled={loading}
+            style={{ marginTop: 4, opacity: loading ? 0.7 : 1 }}
+          >
+            {loading ? "Signing in…" : "Sign In →"}
           </button>
-        </div>
-        {error && <div className="login-error">{error}</div>}
-        <div className="login-hint">
-          <strong>Secure login powered by Auth0.</strong> You will be redirected to a secure
-          sign-in page. Contact your PFAS engagement lead if you need access.
-        </div>
+        </form>
+
         <div className="login-footer">
           © 2026 Punjab Financial Advisory Services
           <button className="admin-link-btn" onClick={onAdminClick} title="Admin access">
@@ -1183,7 +1222,7 @@ export default function ClientPortal() {
   const [isDev, setIsDev]                 = useState(false);
   const [isAdmin, setIsAdmin]             = useState(false);
   const [showPinModal, setShowPinModal]   = useState(false);
-  const auth0Ref = useRef(null);
+  const { data: session, status }         = useSession();
 
   // ── Boot ────────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -1193,47 +1232,25 @@ export default function ClientPortal() {
       setAuthState("devpicker");
       return;
     }
-    async function boot() {
-      if (!window.auth0) {
-        await new Promise((resolve, reject) => {
-          const s = document.createElement("script");
-          s.src = "https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js";
-          s.onload = resolve; s.onerror = reject;
-          document.head.appendChild(s);
-        });
-      }
-      const client = await window.auth0.createAuth0Client({
-        domain: AUTH0_DOMAIN, clientId: AUTH0_CLIENT_ID,
-        authorizationParams: { redirect_uri: window.location.origin },
-        cacheLocation: "localstorage",
-      });
-      auth0Ref.current = client;
 
-      if (window.location.search.includes("code=")) {
-        await client.handleRedirectCallback();
-        window.history.replaceState({}, document.title, "/");
-      }
+    if (status === "loading") return; // wait for session
 
-      const isAuth = await client.isAuthenticated();
-      if (isAuth) {
-        const user  = await client.getUser();
-        const email = (user?.email || "").toLowerCase();
-        const acc   = EMAIL_PROJECT_MAP[email];
-        if (!acc) {
-          setAuthError("Your account is not linked to any PFAS project. Contact your engagement lead.");
-          setAuthState("login");
-          return;
-        }
-        setUserName(acc.name);
-        setAllowedProjects(acc.projects);
-        setSlug(acc.projects[0].slug);
-        setAuthState("app");
-      } else {
+    if (status === "authenticated" && session?.user?.email) {
+      const email = session.user.email.toLowerCase();
+      const acc   = EMAIL_PROJECT_MAP[email];
+      if (!acc) {
+        setAuthError("Your account is not linked to any PFAS project. Contact your engagement lead.");
         setAuthState("login");
+        return;
       }
+      setUserName(acc.name);
+      setAllowedProjects(acc.projects);
+      setSlug(acc.projects[0].slug);
+      setAuthState("app");
+    } else if (status === "unauthenticated") {
+      setAuthState("login");
     }
-    boot().catch(() => setAuthState("login"));
-  }, []);
+  }, [status, session]);
 
   // ── Fetch live project data ─────────────────────────────────────────────────
   useEffect(() => {
@@ -1248,8 +1265,7 @@ export default function ClientPortal() {
   }, [projectSlug]);
 
   // ── Auth handlers ───────────────────────────────────────────────────────────
-  const handleLogin     = () => auth0Ref.current?.loginWithRedirect();
-  const handleLogout    = () => auth0Ref.current?.logout({ logoutParams: { returnTo: window.location.origin } });
+  const handleLogout    = () => signOut({ callbackUrl: "/" });
   const handleDevSelect = (slug, name) => {
     setUserName(name);
     setAllowedProjects([{ slug, label: name }]);
@@ -1641,7 +1657,7 @@ export default function ClientPortal() {
     return (
       <>
         {headAndCss}
-        <LoginScreen onLogin={handleLogin} error={authError} onAdminClick={() => setShowPinModal(true)} />
+        <LoginScreen onAdminClick={() => setShowPinModal(true)} />
         {showPinModal && (
           <AdminPinModal
             onSuccess={handleAdminPinSuccess}
