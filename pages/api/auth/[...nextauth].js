@@ -18,12 +18,12 @@ const USERS = {
   "pbf@pfas.pk":        { password: "Pbf@2026!",       projects: ["pbf"] },
   "hed@pfas.pk":        { password: "Hed@2026!",       projects: ["hed"] },
   "phimc@pfas.pk":      { password: "Phimc@2026!",     projects: ["phimc"] },
-  "vss@pfas.pk":        { password: "Vss@2026!",       projects: ["vss"] },
+  "vss@pfas.pk":        { password: "Vss@2026!",       projects: ["twilight"] },
 
   // Combined logins
   "cw@pfas.pk":         { password: "Cw@2026!",        projects: ["bot1","bot2","bot3","bot4","bot5","om-roads"] },
   "fiedmc@pfas.pk":     { password: "Fiedmc@2026!",    projects: ["fiedmc-m3ic","fiedmc-sbp"] },
-  "finance@pfas.pk":    { password: "Finance@2026!",   projects: ["punjab-onebill","vss"] },
+  "finance@pfas.pk":    { password: "Finance@2026!",   projects: ["punjab-onebill","twilight"] },
   "wildlife@pfas.pk":   { password: "Wildlife@2026!",  projects: ["wildlife-bansra","wildlife-changa"] },
 
   // Legacy single-project logins
