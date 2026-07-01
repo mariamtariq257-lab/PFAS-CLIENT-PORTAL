@@ -34,7 +34,8 @@ const SLUG_TO_LIST_NAME = {
   "punjab-onebill":   "punjab one bill study",
   "vss":              "project twilight",
   "hed":              "higher education department",
-  "phimc":            "economic & financial feasibility advisory -  4 hospitals (lda)",
+  "phimc":            "phimc johar town — hospital bot ppp",
+  "lda":              "economic & financial feasibility advisory -  4 hospitals (lda)",
 };
 
 // Static metadata that doesn't live in ClickUp — Teams links, OneDrive links, team contacts
@@ -296,22 +297,30 @@ async function buildClientProject(listId, listName, clientName, slug) {
 
 // ── Discover list ID from slug ───────────────────────────────────────────────
 
+const LEGAL_SPACE_ID = "90189129438";
+
 async function findListForSlug(slug) {
   const targetName = SLUG_TO_LIST_NAME[slug];
   if (!targetName) return null;
 
-  const foldersData = await cuJson(
-    `https://api.clickup.com/api/v2/space/${SPACE_ID}/folder?archived=false`
-  );
-  const folders = foldersData.folders || [];
+  // Search both spaces — most projects are in PFAS Operations,
+  // PHIMC is in LEGAL space
+  const spacesToSearch = [SPACE_ID, LEGAL_SPACE_ID];
 
-  for (const folder of folders) {
-    const listsData = await cuJson(
-      `https://api.clickup.com/api/v2/folder/${folder.id}/list?archived=false`
+  for (const spaceId of spacesToSearch) {
+    const foldersData = await cuJson(
+      `https://api.clickup.com/api/v2/space/${spaceId}/folder?archived=false`
     );
-    const lists = listsData.lists || [];
-    const match = lists.find(l => l.name.toLowerCase().trim() === targetName);
-    if (match) return { listId: match.id, listName: match.name, clientName: folder.name };
+    const folders = foldersData.folders || [];
+
+    for (const folder of folders) {
+      const listsData = await cuJson(
+        `https://api.clickup.com/api/v2/folder/${folder.id}/list?archived=false`
+      );
+      const lists = listsData.lists || [];
+      const match = lists.find(l => l.name.toLowerCase().trim() === targetName);
+      if (match) return { listId: match.id, listName: match.name, clientName: folder.name };
+    }
   }
   return null;
 }
