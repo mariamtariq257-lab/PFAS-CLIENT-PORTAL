@@ -15,15 +15,15 @@ const ADMIN_PIN = "2580";
 // ── EMAIL → PROJECT(S) MAP ────────────────────────────────────────────────────
 const EMAIL_PROJECT_MAP = {
   // ── Single-project logins ──────────────────────────────────────────────────
-  "pcmmdc@pfas.pk":     { name: "PCMMDC",                 projects: [{ slug: "pcmmdc",         label: "PCMMDC HR Manual" }] },
-  "p4a@pfas.pk":        { name: "P4A",                    projects: [{ slug: "p4a",            label: "Tertiary Care Hospital" }] },
-  "energy@pfas.pk":     { name: "Energy Dept",            projects: [{ slug: "energy",         label: "PMW Strategic Design" }] },
+  "pcmmdc@pfas.pk":     { name: "PCMMDC",                 projects: [{ slug: "pcmmdc",         label: "HR Manual (PCMMDC)" }] },
+  "p4a@pfas.pk":        { name: "P4A",                    projects: [{ slug: "p4a",            label: "Tertiary Care General Hospital" }] },
+  "energy@pfas.pk":     { name: "Energy Dept",            projects: [{ slug: "energy",         label: "Project Management Wing — Energy" }] },
   "fisheries@pfas.pk":  { name: "Fisheries Dept",         projects: [{ slug: "shrimps",        label: "Shrimps Estate Project" }] },
   "tam@pfas.pk":        { name: "TAM",                    projects: [{ slug: "tam",            label: "Time Travel Theme Park" }] },
-  "pha@pfas.pk":        { name: "PHA",                    projects: [{ slug: "pha",            label: "PHA Lahore Sustainability" }] },
-  "pbf@pfas.pk":        { name: "Punjab Benevolent",      projects: [{ slug: "pbf",            label: "Employees Welfare Fund" }] },
-  "hed@pfas.pk":        { name: "HED",                    projects: [{ slug: "hed",            label: "HED Engagement" }] },
-  "phimc@pfas.pk":      { name: "PHIMC",                  projects: [{ slug: "phimc",          label: "6 Hospitals Feasibility" }] },
+  "pha@pfas.pk":        { name: "PHA",                    projects: [{ slug: "pha",            label: "PHA Lahore — Financial Sustainability" }] },
+  "pbf@pfas.pk":        { name: "Punjab Benevolent Fund",      projects: [{ slug: "pbf",            label: "Punjab Govt Employees Welfare Fund" }] },
+  "hed@pfas.pk":        { name: "HED",                    projects: [{ slug: "hed",            label: "Higher Education Department" }] },
+  "phimc@pfas.pk":      { name: "PHIMC",                  projects: [{ slug: "phimc",          label: "PHIMC Johar Town — Hospital BOT PPP" }] },
 
   // ── Combined logins (dropdown appears) ────────────────────────────────────
   "cw@pfas.pk": {
@@ -48,7 +48,6 @@ const EMAIL_PROJECT_MAP = {
     name: "Finance Department",
     projects: [
       { slug: "punjab-onebill", label: "Punjab One Bill Study" },
-      { slug: "twilight",            label: "Project Twilight" },
     ],
   },
   "wildlife@pfas.pk": {
@@ -69,7 +68,6 @@ const EMAIL_PROJECT_MAP = {
   "cw-om@pfas.pk":      { name: "C&W (18 O&M)",           projects: [{ slug: "om-roads",       label: "18 O&M Roads PPP" }] },
   "wildlife-b@pfas.pk": { name: "Wildlife (Bansra Gali)", projects: [{ slug: "wildlife-bansra",label: "Bansra Gali Wildlife" }] },
   "wildlife-c@pfas.pk": { name: "Wildlife (Changa)",      projects: [{ slug: "wildlife-changa",label: "Changa Manga Wildlife" }] },
-  "vss@pfas.pk":        { name: "Finance (Project Twilight)", projects: [{ slug: "twilight", label: "Project Twilight" }] },
 };
 
 // ── Admin client list: all unique clients for the admin picker ────────────────
@@ -1165,7 +1163,6 @@ const SHAREPOINT_FOLDERS = {
   "tam":             dataForClientAccess("TAM", "Time Travel Park"),
   "pha":             dataForClientAccess("PHA", "PHA"),
   "pbf":             dataForClientAccess("Punjab Benevolent Fund", "Punjab Govt Employees welfare fund"),
-  "twilight":         dataForClientAccess("Finance Department", "Project Twilight"),
   "energy":          dataForClientAccess("Energy Department", "Strategic Assessment & Design of a Project Management Wing"),
   "hed":             dataForClientAccess("Higher Education Department", "Higher Education Department"),
   "phimc":           dataForClientAccess("PHIMC", "6 Hospitals Feasibility"),
