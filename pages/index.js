@@ -949,12 +949,77 @@ function TeamsPanel({ project }) {
 }
 
 // ── Documents section ─────────────────────────────────────────────────────────
+function fileIcon(type) {
+  if (type === "pdf")  return { icon: "📄", bg: "#FECACA", color: "#9B2C2C" };
+  if (type === "doc" || type === "docx") return { icon: "📝", bg: "#DBEAFE", color: "#1E40AF" };
+  if (type === "xls" || type === "xlsx") return { icon: "📊", bg: "#DCFCE7", color: "#276749" };
+  if (type === "ppt" || type === "pptx") return { icon: "📋", bg: "#FED7AA", color: "#9A3412" };
+  return { icon: "📎", bg: "#E2E8F0", color: "#475569" };
+}
+
+function formatFileDate(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
 function DocumentsSection({ project, projectSlug }) {
   const sp = getSharePointLinks(project, projectSlug);
   const folderUrl = sp.sharedDocs;
+  const [recentFiles, setRecentFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [unavailable, setUnavailable] = useState(false);
+
+  useEffect(() => {
+    if (!projectSlug) return;
+    setLoading(true);
+    fetch(`/api/sharepoint-recent?project=${projectSlug}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.error || !data.files) {
+          setUnavailable(true);
+          setRecentFiles([]);
+        } else {
+          setRecentFiles(data.files);
+          setUnavailable(false);
+        }
+      })
+      .catch(() => { setUnavailable(true); setRecentFiles([]); })
+      .finally(() => setLoading(false));
+  }, [projectSlug]);
+
   return (
     <div className="section-card docs-card" style={CARD}>
       <div style={SECTION_TITLE}><span style={TITLE_BAR} />Project Documents</div>
+
+      {!loading && !unavailable && recentFiles.length > 0 && (
+        <>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: 0.4, textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Recently Uploaded</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
+            {recentFiles.map((f, i) => {
+              const fi = fileIcon(f.type);
+              return (
+                <a key={i} className="doc-file-row" href={f.webUrl} target="_blank" rel="noreferrer"
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "1px solid #D6DCE5", textDecoration: "none" }}>
+                  <div className="doc-file-icon" style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: fi.bg, color: fi.color }}>{fi.icon}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="doc-file-name" style={{ fontSize: 13.5, fontWeight: 600, color: "#1E293B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</div>
+                    <div className="doc-file-meta" style={{ fontSize: 11.5, color: "#94A3B8" }}>{formatFileDate(f.lastModifiedDateTime)}</div>
+                  </div>
+                  <div style={{ flexShrink: 0, color: "#CBD5E1", fontSize: 13 }}>↗</div>
+                </a>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {!loading && (unavailable || recentFiles.length === 0) && (
+        <div style={{ fontSize: 12.5, color: "#94A3B8", marginBottom: 14 }}>
+          {unavailable ? "Live file list unavailable right now." : "No documents uploaded yet."}
+        </div>
+      )}
+
       <a
         href={folderUrl}
         target="_blank" rel="noreferrer"
