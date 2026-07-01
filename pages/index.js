@@ -20,10 +20,10 @@ const EMAIL_PROJECT_MAP = {
   "energy@pfas.pk":     { name: "Energy Dept",            projects: [{ slug: "energy",         label: "PMW Strategic Design" }] },
   "fisheries@pfas.pk":  { name: "Fisheries Dept",         projects: [{ slug: "shrimps",        label: "Shrimps Estate Project" }] },
   "tam@pfas.pk":        { name: "TAM",                    projects: [{ slug: "tam",            label: "Time Travel Theme Park" }] },
-  "pha@pfas.pk":        { name: "PHA",                    projects: [{ slug: "pha",            label: "PHA Lahore Sustainability" }] },
-  "pbf@pfas.pk":        { name: "Punjab Benevolent",      projects: [{ slug: "pbf",            label: "Employees Welfare Fund" }] },
-  "hed@pfas.pk":        { name: "HED",                    projects: [{ slug: "hed",            label: "HED Engagement" }] },
-  "phimc@pfas.pk":      { name: "PHIMC",                  projects: [{ slug: "phimc",          label: "6 Hospitals Feasibility" }] },
+  "pha@pfas.pk":        { name: "PHA",                    projects: [{ slug: "pha",            label: "PHA Lahore — Financial Sustainability" }] },
+  "pbf@pfas.pk":        { name: "Punjab Benevolent Fund",      projects: [{ slug: "pbf",            label: "Punjab Govt Employees Welfare Fund" }] },
+  "hed@pfas.pk":        { name: "HED",                    projects: [{ slug: "hed",            label: "Higher Education Department" }] },
+  "phimc@pfas.pk":      { name: "PHIMC",                  projects: [{ slug: "phimc",          label: "PHIMC Johar Town — Hospital BOT PPP" }] },
 
   // ── Combined logins (dropdown appears) ────────────────────────────────────
   "cw@pfas.pk": {
